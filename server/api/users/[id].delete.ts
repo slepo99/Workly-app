@@ -1,0 +1,23 @@
+import { deleteUserById } from '~~/server/services/users.service'
+
+export default defineEventHandler(async (event) => {
+  const id = getRouterParam(event, 'id')
+
+  if (!id) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'User ID is required',
+    })
+  }
+
+  const user = await deleteUserById(id)
+
+  if (!user) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: 'User not found',
+    })
+  }
+
+  return user
+})

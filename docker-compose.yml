@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: workly-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: workly
+      POSTGRES_PASSWORD: workly
+      POSTGRES_DB: workly
+    ports:
+      - "5432:5432"
+    volumes:
+      - workly-postgres-data:/var/lib/postgresql/data
+
+volumes:
+  workly-postgres-data:
