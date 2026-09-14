@@ -27,6 +27,20 @@ export const projectMembers = pgTable("project_members", {
     .references(() => projects.id),
 
   role: varchar("role", { length: 50 }).notNull(),
-  
+
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+export const tasks = pgTable("tasks", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  projectId: uuid("project_id")
+    .notNull()
+    .references(() => projects.id),
+
+  assigneeId: uuid("assignee_id")
+    .references(() => users.id),
+
+  title: varchar("title", { length: 150 }).notNull(),
+  description: varchar("description", { length: 1000 }),
+  status: varchar("status", { length: 50 }).notNull().default("pending"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });

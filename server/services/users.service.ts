@@ -1,5 +1,5 @@
 import { db } from '~~/server/db'
-import { users } from '~~/server/db/schema'
+import { tasks, users } from '~~/server/db/schema'
 import { eq } from 'drizzle-orm'
 
 export async function createUser(data: {
@@ -45,6 +45,14 @@ export async function updateUserById(
     .set(data)
     .where(eq(users.id, id))
     .returning()
+
+  return result[0]
+}
+export async function deleteTaskById(id: string) {
+  const result = await db
+      .delete(tasks)
+      .where(eq(tasks.id, id))
+      .returning()
 
   return result[0]
 }
