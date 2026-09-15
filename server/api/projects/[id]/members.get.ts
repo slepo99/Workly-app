@@ -1,4 +1,4 @@
-import { getProjectWithMembers } from '~~/server/services/projects.service'
+import { getMembersByProjectId } from '~~/server/services/projects.service'
 
 export default defineEventHandler(async (event) => {
   const id = getRouterParam(event, 'id')
@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const result = await getProjectWithMembers(id)
+  const result = await getMembersByProjectId(id)
 
   if (!result) {
     throw createError({
