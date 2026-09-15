@@ -1,0 +1,1 @@
+ALTER TABLE "project_members" ADD CONSTRAINT "project_members_user_id_project_id_unique" UNIQUE("user_id","project_id");
