@@ -1,0 +1,12 @@
+{
+  "header": {
+    "title": "Workly",
+    "subtitle": "A simple project management tool"
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "projects": "Projects",
+    "users": "Users",
+    "settings": "Settings"
+  }
+}
