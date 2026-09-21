@@ -1,12 +1,24 @@
 {
   "header": {
     "title": "Workly",
-    "subtitle": "A simple project management tool"
+    "subtitle": "A simple project management tool",
+    "settings": {
+      "language": "Language",
+      "theme": {
+        "theme": "Theme",
+        "light": "Light",
+        "dark": "Dark",
+        "system": "System"
+      }
+    }
   },
   "navigation": {
     "dashboard": "Dashboard",
     "projects": "Projects",
     "users": "Users",
-    "settings": "Settings"
+    "settings": "Settings",
+    "tasks": "Tasks",
+    "calendar": "Calendar",
+    "teams": "Teams"
   }
 }

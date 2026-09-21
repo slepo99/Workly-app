@@ -1,6 +1,6 @@
 <template>
     <div>
-projects
+users
     </div>
 </template>
 

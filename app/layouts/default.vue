@@ -1,13 +1,15 @@
 <template>
   <div class="flex min-h-screen">
-    <LayoutAppSidebar/>
+    <LayoutAppSidebar />
 
     <div class="flex min-w-0 flex-1 flex-col">
-      <LayoutAppHeader/>
+      <LayoutAppHeader />
 
-      <main class="flex-1 p-6">
-        <slot />
-      </main>
+      <UMain class="flex-1">
+        <UContainer class="py-6">
+          <slot />
+        </UContainer>
+      </UMain>
     </div>
   </div>
 </template>
