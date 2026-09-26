@@ -1,8 +1,9 @@
 <template>
   <UCard
     :ui="{
-      header: 'flex items-center justify-between',
+      header: 'lg:p-4 flex items-center justify-between',
       body: 'lg:p-4',
+      footer: 'lg:p-4',
     }"
   >
     <template #header>
@@ -32,12 +33,30 @@
         <UButton
           variant="ghost"
           color="neutral"
-          class="bg-pink-400/70 hover:bg-pink-500/70 cursor-pointer justify-center w-full mt-4"
+          class="bg-pink-400/70 hover:bg-pink-500/70 cursor-pointer justify-center w-full mt-4 mb-4"
         >
           Upcoming Meetings
         </UButton>
+        <UAvatarGroup max="3">
+          <UAvatar
+            v-for="i in 6"
+            :key="i"
+            src="https://github.com/benjamincanac.png"
+            alt="Benjamin Canac"
+          />
+        </UAvatarGroup>
       </div>
     </template>
+     <template #footer> 
+        <div class="rounded-lg bg-elevated p-3 flex flex-col gap-2">
+          <UButton class="w-full bg-blue-500 hover:bg-blue-600 cursor-pointer justify-center" variant="ghost" color="neutral">
+            join call
+          </UButton>
+          <UButton class="w-full bg-gray-500 hover:bg-gray-600 cursor-pointer justify-center" variant="ghost" color="neutral">
+            reschedule
+          </UButton>
+        </div>
+       </template>
   </UCard>
 </template>
 

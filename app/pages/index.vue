@@ -13,6 +13,8 @@
     <DashboardDeadlinesCard />
     <DashboardUpcomingMeetingCard />
 </div>
+<DashboardTasklistTable/>
+<DashboardDraft/>
 </template>
 
 <script lang="ts" setup></script>

@@ -1,7 +1,7 @@
 <template>
   <UCard
     :ui="{
-      header: 'flex items-center justify-between',
+      header: 'lg:p-4 flex items-center justify-between',
       body: 'lg:p-4',
     }"
   >
