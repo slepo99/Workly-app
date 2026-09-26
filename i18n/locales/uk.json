@@ -20,5 +20,39 @@
     "tasks": "Завдання",
     "calendar": "Календар",
     "teams": "Команди"
+  },
+  "dashboard": {
+    "statCard": {
+      "totalTasks": "Усього завдань",
+      "totalProjects": "Усього проєктів",
+      "totalEmployee": "Загальна кількість працівників",
+      "tasksComplited": "Завдань виконано"
+    },
+    "taskActivity": {
+      "title": "Aктивність щодо завдань",
+      "status": {
+        "complited": "Завершено",
+        "underReview": "На стадії розгляду",
+        "active": "Активний"  
+      },
+      "priority": {
+        "high": "Високий",
+        "medium": "Cередній",
+        "low": "Низький"
+      },
+      "actions": {
+        "viewDetails": "Детальніше",
+        "editTsk": "Редагувати",
+        "deleteTask": "Видалити"
+      }
+    },
+    "upcomingDeadlines": {
+      "title": "Дедлайни"
+    },
+    "upcomingMeeting": {
+      "title": "Майбутні зустрічі",
+      "joinCall": "Приєднатися",
+      "reschedule": "Перенести"
+    }
   }
 }

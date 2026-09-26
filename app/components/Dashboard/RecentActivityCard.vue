@@ -8,7 +8,7 @@
     <template #header>
       <div class="flex items-center gap-2">
         <UIcon name="i-lucide-clipboard-list" />
-        <span class="text-lg font-semibold">Recent Task Activity</span>
+        <span class="text-lg font-semibold">{{ t('dashboard.taskActivity.title') }}</span>
       </div>
       <UButton
         icon="i-lucide-arrow-up-right"
@@ -30,7 +30,8 @@
 </template>
 
 <script setup lang="ts">
-
+import { useI18n } from '#imports';
+const { t } = useI18n()
 </script>
 
 <style scoped></style>

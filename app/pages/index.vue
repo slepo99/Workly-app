@@ -1,13 +1,28 @@
 <template>
   <div class="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
-    <div v-for="i in 4">
-      <DashboardStatCard
+    <DashboardStatCard
         :icon="'i-lucide-clipboard-list'"
-        :title="'Total Tasks'"
+        :title="t('dashboard.statCard.totalTasks')"
         :value="'120'"
       />
+      <DashboardStatCard
+        :icon="'i-lucide-clipboard-list'"
+        :title="t('dashboard.statCard.totalProjects')"
+        :value="'120'"
+      />
+      <DashboardStatCard
+        :icon="'i-lucide-clipboard-list'"
+        :title="t('dashboard.statCard.totalEmployee')"
+        :value="'120'"
+      />
+      <DashboardStatCard
+        :icon="'i-lucide-clipboard-list'"
+        :title="t('dashboard.statCard.tasksComplited')"
+        :value="'120'"
+      />
+      
          <!-- <DashboardSkeletonsStatCardSkeleton/> -->
-    </div>
+  
   </div>
 <div class="mt-6 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
     <DashboardRecentActivityCard  class="sm:col-span-2"/>
@@ -21,6 +36,9 @@
 <DashboardTasklistTable class="my-6"/>
 </template>
 
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+import { useI18n } from "vue-i18n";
+const { t } = useI18n()
+</script>
 
 <style></style>

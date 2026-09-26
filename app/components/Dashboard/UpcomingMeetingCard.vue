@@ -9,7 +9,7 @@
     <template #header>
       <div class="flex items-center gap-2">
         <UIcon name="i-lucide-calendar" />
-        <span class="text-lg font-semibold">Upcoming Meetings</span>
+        <span class="text-lg font-semibold">{{ t('dashboard.upcomingMeeting.title') }}</span>
       </div>
       <UButton
         icon="i-lucide-arrow-up-right"
@@ -35,7 +35,7 @@
           color="neutral"
           class="bg-pink-400/70 hover:bg-pink-500/70 cursor-pointer justify-center w-full mt-4 mb-4"
         >
-          Upcoming Meetings
+          {{ t('dashboard.upcomingMeeting.title') }}
         </UButton>
         <UAvatarGroup max="3">
           <UAvatar
@@ -50,16 +50,19 @@
      <template #footer> 
         <div class="rounded-lg bg-elevated p-3 flex flex-col gap-2">
           <UButton class="w-full bg-blue-500 hover:bg-blue-600 cursor-pointer justify-center" variant="ghost" color="neutral">
-            join call
+            {{ t('dashboard.upcomingMeeting.joinCall') }}
           </UButton>
           <UButton class="w-full bg-gray-500 hover:bg-gray-600 cursor-pointer justify-center" variant="ghost" color="neutral">
-            reschedule
+            {{ t('dashboard.upcomingMeeting.reschedule') }}
           </UButton>
         </div>
        </template>
   </UCard>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { useI18n } from '#imports';
+const { t } = useI18n()
+</script>
 
 <style scoped></style>

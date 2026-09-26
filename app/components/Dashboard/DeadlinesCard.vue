@@ -8,7 +8,7 @@
     <template #header>
       <div class="flex items-center gap-2">
         <UIcon name="i-lucide-clipboard-list" />
-        <span class="text-lg font-semibold">Upcoming Deadlines</span>
+        <span class="text-lg font-semibold">{{ t('dashboard.upcomingDeadlines.title') }}</span>
       </div>
       <UButton
         icon="i-lucide-arrow-up-right"
@@ -44,6 +44,9 @@
   </UCard>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { useI18n } from '#imports';
+const { t } = useI18n()
+</script>
 
 <style scoped></style>

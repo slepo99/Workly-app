@@ -9,7 +9,7 @@
         >
           <template #header>
             <span class="text-sm"> Task 1 </span>
-            <UBadge :color="badgeColor">Completed</UBadge>
+            <UBadge :color="badgeColor">{{ t('dashboard.taskActivity.status.complited') }}</UBadge>
           </template>
           <template #default>
             <div class="mt-2 text-sm text-neutral-500">
@@ -22,7 +22,7 @@
                 <UIcon name="i-lucide-calendar" class="mr-1" />
                 <span class="text-sm">2024-06-01</span>
               </div>
-              <UBadge :color="statusColor">Hight</UBadge>
+              <UBadge :color="statusColor">{{ t('dashboard.taskActivity.priority.medium') }}</UBadge>
             </div>
           </template>
           <template #footer>
@@ -48,6 +48,8 @@
 
 <script setup lang="ts">
 import type { DropdownMenuItem } from "@nuxt/ui";
+import { useI18n } from "#imports";
+const { t } = useI18n()
 const badgeColor = computed(() => {
   if (true) {
     return "success";
@@ -69,21 +71,21 @@ const statusColor = computed(() => {
 const dropDownMenuItems = ref<DropdownMenuItem[][]>([
   [
     {
-      label: "View Details",
+      label: t('dashboard.taskActivity.actions.viewDetails'),
       icon: "i-lucide-eye",
       onClick: () => {
         console.log("View Details clicked");
       },
     },
     {
-      label: "Edit Task",
+      label: t('dashboard.taskActivity.actions.editTsk'),
       icon: "i-lucide-edit",
       onClick: () => {
         console.log("Edit Task clicked");
       },
     },
     {
-      label: "Delete Task",
+      label: t('dashboard.taskActivity.actions.deleteTask'),
       icon: "i-lucide-trash-2",
       color: "error",
       onClick: () => {

@@ -20,5 +20,39 @@
     "tasks": "Tasks",
     "calendar": "Calendar",
     "teams": "Teams"
+  },
+  "dashboard": {
+    "statCard": {
+      "totalTasks": "Total task",
+      "totalProjects": "Total project",
+      "totalEmployee": "Total employee",
+      "tasksComplited": "Tasks completed"
+    },
+    "taskActivity": {
+      "title": "Task activity",
+      "status": {
+        "complited": "Complited",
+        "underReview": "Under review",
+        "active": "Active"
+      },
+      "priority": {
+        "high": "High",
+        "medium": "Medium",
+        "low": "Low"
+      },
+      "actions": {
+        "viewDetails": "View details",
+        "editTsk": "Edit task",
+        "deleteTask": "Delete task"
+      }
+    },
+    "upcomingDeadlines": {
+      "title": "Upcoming deadlines"
+    },
+    "upcomingMeeting": {
+      "title": "Upcoming meetings",
+      "joinCall": "Join call",
+      "reschedule": "Reschedule"
+    }
   }
 }
