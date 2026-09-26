@@ -10,6 +10,7 @@
           <slot />
         </UContainer>
       </UMain>
+      <LayoutAppFooter/>
     </div>
   </div>
 </template>

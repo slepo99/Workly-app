@@ -5,6 +5,7 @@
     </div>
 
     <UTable
+  
       sticky
       :data="data"
       v-model:sorting="sorting"
