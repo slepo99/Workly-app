@@ -41,5 +41,11 @@ export const useAuthStore = defineStore("auth", {
         this.isInitialized = true;
       }
     },
+    async logout() {
+      const { logout } = useAuthApi();
+      await logout();
+      this.user = null;
+      this.isInitialized = true;
+    },
   },
 });

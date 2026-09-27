@@ -70,23 +70,45 @@
 <script setup lang="ts">
 import type { DropdownMenuItem } from "@nuxt/ui";
 import { useI18n } from "vue-i18n";
+import { useAuthStore } from "~/stores/auth";
+
+const authStore = useAuthStore();
 const colorMode = useColorMode();
-const { t, locale, setLocale} = useI18n();
 
-const items = ref<DropdownMenuItem[][]>([
-  [
-    {
-      label: "Theme",
-      slot: "theme" as const,
-    },
-    {
-      label: "Language",
-      slot: "language" as const,
-    },
-  ],
-]);
+const { t, locale, setLocale } = useI18n();
 
-const currentTheme = computed(() => {
-  return t(`header.settings.theme.${colorMode.preference}`)
+const items = computed<DropdownMenuItem[][]>(() => {
+  const menu: DropdownMenuItem[][] = [
+    [
+      {
+        label: "Theme",
+        slot: "theme" as const,
+      },
+      {
+        label: "Language",
+        slot: "language" as const,
+      },
+    ],
+  ]
+
+  if (authStore.user) {
+    menu.push([
+      {
+        label: "Logout",
+        icon: "i-lucide-log-out",
+        color: "error",
+        kbds: ["shift", "meta", "q"],
+        onSelect: async () => {
+          await authStore.logout()
+          await navigateTo("/login")
+        },
+      },
+    ])
+  }
+
+  return menu
 })
+const currentTheme = computed(() => {
+  return t(`header.settings.theme.${colorMode.preference}`);
+});
 </script>
