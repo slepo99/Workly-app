@@ -16,12 +16,20 @@ export async function createUser(data: {
   return result[0]
 }
 export async function getUserById(id: string) {
-  const result = await db
-    .select()
+  const [user] = await db
+    .select({
+      id: users.id,
+      name: users.name,
+      email: users.email,
+      role: users.role,
+      position: users.position,
+      avatar: users.avatar,
+      createdAt: users.createdAt,
+    })
     .from(users)
     .where(eq(users.id, id))
 
-  return result[0]
+  return user
 }
 export async function deleteUserById(id: string) {
   const result = await db

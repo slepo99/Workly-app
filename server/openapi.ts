@@ -16,6 +16,108 @@ export const openapi = {
   paths: {
     // =========================
 
+    // AUTH
+
+    // =========================
+
+    "/auth/register": {
+      post: {
+        summary: "Register a new user",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["name", "email", "password"],
+                properties: {
+                  name: {
+                    type: "string",
+                    minLength: 2,
+                    maxLength: 100,
+                    example: "John Doe",
+                  },
+                  email: {
+                    type: "string",
+                    format: "email",
+                    example: "john@example.com",
+                  },
+                  password: {
+                    type: "string",
+                    minLength: 6,
+                    example: "password123",
+                  },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          200: { description: "Registered user" },
+          409: { description: "User with this email already exists" },
+        },
+      },
+    },
+
+    "/auth/login": {
+      post: {
+        summary: "Log in",
+        description:
+          "Validates credentials and stores the JWT in the auth_token HttpOnly cookie.",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["email", "password"],
+                properties: {
+                  email: {
+                    type: "string",
+                    format: "email",
+                    example: "john@example.com",
+                  },
+                  password: {
+                    type: "string",
+                    minLength: 6,
+                    example: "password123",
+                  },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          200: { description: "Logged in user" },
+          401: { description: "Invalid email or password" },
+        },
+      },
+    },
+
+    "/auth/me": {
+      get: {
+        summary: "Get current authenticated user",
+        security: [{ cookieAuth: [] }],
+        responses: {
+          200: { description: "Current user" },
+          401: { description: "Unauthorized or invalid token" },
+        },
+      },
+    },
+
+    "/auth/logout": {
+      post: {
+        summary: "Log out",
+        description: "Deletes the auth_token cookie.",
+        security: [{ cookieAuth: [] }],
+        responses: {
+          200: { description: "Logged out successfully" },
+        },
+      },
+    },
+
+    // =========================
+
     // USERS
 
     // =========================
@@ -830,6 +932,16 @@ export const openapi = {
             description: "List of project tasks with assignees",
           },
         },
+      },
+    },
+  },
+
+  components: {
+    securitySchemes: {
+      cookieAuth: {
+        type: "apiKey",
+        in: "cookie",
+        name: "auth_token",
       },
     },
   },
