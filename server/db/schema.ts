@@ -40,10 +40,29 @@ export const tasks = pgTable("tasks", {
     .notNull()
     .references(() => projects.id),
 
-  assigneeId: uuid("assignee_id").references(() => users.id),
+  // assigneeId: uuid("assignee_id").references(() => users.id),
 
   title: varchar("title", { length: 150 }).notNull(),
   description: varchar("description", { length: 1000 }),
   status: varchar("status", { length: 50 }).notNull().default("pending"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+export const taskAssignees = pgTable("task_assignees", {
+    id: uuid("id").defaultRandom().primaryKey(),
+
+    taskId: uuid("task_id")
+      .notNull()
+      .references(() => tasks.id),
+
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id),
+    
+    createdAt: timestamp("created_at")
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    unique().on(table.taskId, table.userId),
+  ],
+)

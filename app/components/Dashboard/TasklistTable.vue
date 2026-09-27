@@ -5,7 +5,6 @@
     </div>
 
     <UTable
-  
       sticky
       :data="data"
       v-model:sorting="sorting"
@@ -211,39 +210,39 @@ const columns: TableColumn<ProjectTableRow>[] = [
     },
   },
   {
-  id: "actions",
-  header: "Actions",
-  enableSorting: false,
-  cell: ({ row }) => {
-    return h(
-      "div",
-      {
-        class: "flex items-center gap-1",
-      },
-      [
-        h(UButton, {
-          icon: "i-lucide-eye",
-          color: "neutral",
-          variant: "ghost",
-          size: "sm",
-          onClick: () => {
-            console.log("Open task:", row.original.id);
-          },
-        }),
+    id: "actions",
+    header: "Actions",
+    enableSorting: false,
+    cell: ({ row }) => {
+      return h(
+        "div",
+        {
+          class: "flex items-center gap-1",
+        },
+        [
+          h(UButton, {
+            icon: "i-lucide-eye",
+            color: "neutral",
+            variant: "ghost",
+            size: "sm",
+            onClick: () => {
+              console.log("Open task:", row.original.id);
+            },
+          }),
 
-        h(UButton, {
-          icon: "i-lucide-trash-2",
-          color: "error",
-          variant: "ghost",
-          size: "sm",
-          onClick: () => {
-            console.log("Delete task:", row.original.id);
-          },
-        }),
-      ],
-    );
+          h(UButton, {
+            icon: "i-lucide-trash-2",
+            color: "error",
+            variant: "ghost",
+            size: "sm",
+            onClick: () => {
+              console.log("Delete task:", row.original.id);
+            },
+          }),
+        ],
+      );
+    },
   },
-},
 ];
 
 function getHeader(column: Column<ProjectTableRow>, label: string) {

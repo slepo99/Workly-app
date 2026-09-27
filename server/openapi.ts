@@ -1,64 +1,82 @@
 export const openapi = {
-  openapi: '3.0.0',
+  openapi: "3.0.0",
 
   info: {
-    title: 'Workly API',
-    version: '1.0.0',
+    title: "Workly API",
+
+    version: "1.0.0",
   },
 
   servers: [
     {
-      url: 'http://localhost:3000/api',
+      url: "http://localhost:3000/api",
     },
   ],
 
   paths: {
     // =========================
+
     // USERS
+
     // =========================
 
-    '/users': {
+    "/users": {
       get: {
-        summary: 'Get all users',
+        summary: "Get all users",
 
         responses: {
           200: {
-            description: 'List of users',
+            description: "List of users",
           },
         },
       },
 
       post: {
-        summary: 'Create a user',
+        summary: "Create a user",
 
         requestBody: {
           required: true,
+
           content: {
-            'application/json': {
+            "application/json": {
               schema: {
-                type: 'object',
-                required: ['name', 'email'],
+                type: "object",
+
+                required: ["name", "email"],
+
                 properties: {
                   name: {
-                    type: 'string',
+                    type: "string",
+
                     maxLength: 100,
-                    example: 'John Doe',
+
+                    example: "John Doe",
                   },
+
                   email: {
-                    type: 'string',
-                    format: 'email',
-                    example: 'john@example.com',
+                    type: "string",
+
+                    format: "email",
+
+                    example: "john\\@example.com",
                   },
+
                   position: {
-                    type: 'string',
+                    type: "string",
+
                     maxLength: 100,
-                    example: 'Frontend Developer',
+
+                    example: "Frontend Developer",
                   },
+
                   avatar: {
-                    type: 'string',
-                    format: 'uri',
+                    type: "string",
+
+                    format: "uri",
+
                     maxLength: 500,
-                    example: 'https://example.com/avatar.jpg',
+
+                    example: "https\\://example.com/avatar.jpg",
                   },
                 },
               },
@@ -68,77 +86,99 @@ export const openapi = {
 
         responses: {
           200: {
-            description: 'Created user',
+            description: "Created user",
           },
         },
       },
     },
 
-    '/users/{id}': {
+    "/users/{id}": {
       get: {
-        summary: 'Get user by ID',
+        summary: "Get user by ID",
 
         parameters: [
           {
-            name: 'id',
-            in: 'path',
+            name: "id",
+
+            in: "path",
+
             required: true,
+
             schema: {
-              type: 'string',
-              format: 'uuid',
+              type: "string",
+
+              format: "uuid",
             },
           },
         ],
 
         responses: {
           200: {
-            description: 'User',
+            description: "User",
           },
         },
       },
 
       patch: {
-        summary: 'Update user',
+        summary: "Update user",
 
         parameters: [
           {
-            name: 'id',
-            in: 'path',
+            name: "id",
+
+            in: "path",
+
             required: true,
+
             schema: {
-              type: 'string',
-              format: 'uuid',
+              type: "string",
+
+              format: "uuid",
             },
           },
         ],
 
         requestBody: {
           required: true,
+
           content: {
-            'application/json': {
+            "application/json": {
               schema: {
-                type: 'object',
+                type: "object",
+
                 properties: {
                   name: {
-                    type: 'string',
+                    type: "string",
+
                     maxLength: 100,
-                    example: 'John Doe',
+
+                    example: "John Doe",
                   },
+
                   email: {
-                    type: 'string',
-                    format: 'email',
-                    example: 'john@example.com',
+                    type: "string",
+
+                    format: "email",
+
+                    example: "john\\@example.com",
                   },
+
                   position: {
-                    type: 'string',
+                    type: "string",
+
                     maxLength: 100,
-                    example: 'Senior Frontend Developer',
+
+                    example: "Senior Frontend Developer",
                   },
+
                   avatar: {
-                    type: 'string',
-                    format: 'uri',
+                    type: "string",
+
+                    format: "uri",
+
                     maxLength: 500,
-                    example: 'https://example.com/avatar.jpg',
+
+                    example: "https\\://example.com/avatar.jpg",
                   },
                 },
               },
@@ -148,74 +188,89 @@ export const openapi = {
 
         responses: {
           200: {
-            description: 'Updated user',
+            description: "Updated user",
           },
         },
       },
 
       delete: {
-        summary: 'Delete user',
+        summary: "Delete user",
 
         parameters: [
           {
-            name: 'id',
-            in: 'path',
+            name: "id",
+
+            in: "path",
+
             required: true,
+
             schema: {
-              type: 'string',
-              format: 'uuid',
+              type: "string",
+
+              format: "uuid",
             },
           },
         ],
 
         responses: {
           200: {
-            description: 'Deleted user',
+            description: "Deleted user",
           },
         },
       },
-    },
+    }, // =========================
 
-    // =========================
     // PROJECTS
+
     // =========================
 
-    '/projects': {
+    "/projects": {
       get: {
-        summary: 'Get all projects',
+        summary: "Get all projects",
 
         responses: {
           200: {
-            description: 'List of projects',
+            description: "List of projects",
           },
         },
       },
 
       post: {
-        summary: 'Create a project',
+        summary: "Create a project",
 
         requestBody: {
           required: true,
+
           content: {
-            'application/json': {
+            "application/json": {
               schema: {
-                type: 'object',
-                required: ['name'],
+                type: "object",
+
+                required: ["name"],
+
                 properties: {
                   name: {
-                    type: 'string',
+                    type: "string",
+
                     maxLength: 150,
-                    example: 'Workly SaaS',
+
+                    example: "Workly SaaS",
                   },
+
                   description: {
-                    type: 'string',
+                    type: "string",
+
                     maxLength: 1000,
-                    example: 'Project management platform',
+
+                    example: "Project management platform",
                   },
+
                   status: {
-                    type: 'string',
+                    type: "string",
+
                     maxLength: 50,
-                    example: 'active',
+
+                    example: "active",
                   },
                 },
               },
@@ -225,71 +280,89 @@ export const openapi = {
 
         responses: {
           200: {
-            description: 'Created project',
+            description: "Created project",
           },
         },
       },
     },
 
-    '/projects/{id}': {
+    "/projects/{id}": {
       get: {
-        summary: 'Get project by ID',
+        summary: "Get project by ID",
 
         parameters: [
           {
-            name: 'id',
-            in: 'path',
+            name: "id",
+
+            in: "path",
+
             required: true,
+
             schema: {
-              type: 'string',
-              format: 'uuid',
+              type: "string",
+
+              format: "uuid",
             },
           },
         ],
 
         responses: {
           200: {
-            description: 'Project',
+            description: "Project",
           },
         },
       },
 
       patch: {
-        summary: 'Update project',
+        summary: "Update project",
 
         parameters: [
           {
-            name: 'id',
-            in: 'path',
+            name: "id",
+
+            in: "path",
+
             required: true,
+
             schema: {
-              type: 'string',
-              format: 'uuid',
+              type: "string",
+
+              format: "uuid",
             },
           },
         ],
 
         requestBody: {
           required: true,
+
           content: {
-            'application/json': {
+            "application/json": {
               schema: {
-                type: 'object',
+                type: "object",
+
                 properties: {
                   name: {
-                    type: 'string',
+                    type: "string",
+
                     maxLength: 150,
-                    example: 'Workly SaaS',
+
+                    example: "Workly SaaS",
                   },
+
                   description: {
-                    type: 'string',
+                    type: "string",
+
                     maxLength: 1000,
-                    example: 'Project management platform',
+
+                    example: "Project management platform",
                   },
+
                   status: {
-                    type: 'string',
+                    type: "string",
+
                     maxLength: 50,
-                    example: 'active',
+
+                    example: "active",
                   },
                 },
               },
@@ -299,74 +372,89 @@ export const openapi = {
 
         responses: {
           200: {
-            description: 'Updated project',
+            description: "Updated project",
           },
         },
       },
 
       delete: {
-        summary: 'Delete project',
+        summary: "Delete project",
 
         parameters: [
           {
-            name: 'id',
-            in: 'path',
+            name: "id",
+
+            in: "path",
+
             required: true,
+
             schema: {
-              type: 'string',
-              format: 'uuid',
+              type: "string",
+
+              format: "uuid",
             },
           },
         ],
 
         responses: {
           200: {
-            description: 'Deleted project',
+            description: "Deleted project",
           },
         },
       },
-    },
+    }, // =========================
 
-    // =========================
     // PROJECT MEMBERS
+
     // =========================
 
-    '/project-members': {
+    "/project-members": {
       get: {
-        summary: 'Get all project memberships',
+        summary: "Get all project memberships",
 
         responses: {
           200: {
-            description: 'List of project memberships',
+            description: "List of project memberships",
           },
         },
       },
 
       post: {
-        summary: 'Add a user to a project',
+        summary: "Add a user to a project",
 
         requestBody: {
           required: true,
+
           content: {
-            'application/json': {
+            "application/json": {
               schema: {
-                type: 'object',
-                required: ['userId', 'projectId', 'role'],
+                type: "object",
+
+                required: ["userId", "projectId", "role"],
+
                 properties: {
                   userId: {
-                    type: 'string',
-                    format: 'uuid',
-                    example: '9e47eb80-a52c-4278-9da2-9fe0ddc90883',
+                    type: "string",
+
+                    format: "uuid",
+
+                    example: "9e47eb80-a52c-4278-9da2-9fe0ddc90883",
                   },
+
                   projectId: {
-                    type: 'string',
-                    format: 'uuid',
-                    example: '448f98a7-0bb2-4025-9eb2-1790384c0c61',
+                    type: "string",
+
+                    format: "uuid",
+
+                    example: "448f98a7-0bb2-4025-9eb2-1790384c0c61",
                   },
+
                   role: {
-                    type: 'string',
+                    type: "string",
+
                     maxLength: 50,
-                    example: 'developer',
+
+                    example: "developer",
                   },
                 },
               },
@@ -376,87 +464,113 @@ export const openapi = {
 
         responses: {
           200: {
-            description: 'Created project membership',
+            description: "Created project membership",
           },
         },
       },
     },
 
-    '/projects/{projectId}/members': {
+    "/projects/{projectId}/members": {
       get: {
-        summary: 'Get project members',
+        summary: "Get project members",
 
         parameters: [
           {
-            name: 'projectId',
-            in: 'path',
+            name: "projectId",
+
+            in: "path",
+
             required: true,
+
             schema: {
-              type: 'string',
-              format: 'uuid',
+              type: "string",
+
+              format: "uuid",
             },
           },
         ],
 
         responses: {
           200: {
-            description: 'List of project members',
+            description: "List of project members",
           },
         },
       },
-    },
+    }, // =========================
 
-    // =========================
     // TASKS
+
     // =========================
 
-    '/tasks': {
+    "/tasks": {
       get: {
-        summary: 'Get all tasks',
+        summary: "Get all tasks",
 
         responses: {
           200: {
-            description: 'List of tasks',
+            description: "List of tasks with assignees",
           },
         },
       },
 
       post: {
-        summary: 'Create a task',
+        summary: "Create a task",
 
         requestBody: {
           required: true,
+
           content: {
-            'application/json': {
+            "application/json": {
               schema: {
-                type: 'object',
-                required: ['projectId', 'title'],
+                type: "object",
+
+                required: ["projectId", "title"],
+
                 properties: {
                   projectId: {
-                    type: 'string',
-                    format: 'uuid',
-                    example: '448f98a7-0bb2-4025-9eb2-1790384c0c61',
+                    type: "string",
+
+                    format: "uuid",
+
+                    example: "448f98a7-0bb2-4025-9eb2-1790384c0c61",
                   },
-                  assigneeId: {
-                    type: 'string',
-                    format: 'uuid',
-                    example: '9e47eb80-a52c-4278-9da2-9fe0ddc90883',
+
+                  assigneeIds: {
+                    type: "array",
+
+                    items: {
+                      type: "string",
+
+                      format: "uuid",
+                    },
+
+                    example: ["9e47eb80-a52c-4278-9da2-9fe0ddc90883"],
                   },
+
                   title: {
-                    type: 'string',
+                    type: "string",
+
                     maxLength: 150,
-                    example: 'Implement authentication',
+
+                    example: "Implement authentication",
                   },
+
                   description: {
-                    type: 'string',
+                    type: "string",
+
                     maxLength: 1000,
-                    example: 'Add login and registration',
+
+                    example: "Add login and registration",
                   },
+
                   status: {
-                    type: 'string',
+                    type: "string",
+
                     maxLength: 50,
-                    default: 'pending',
-                    example: 'pending',
+
+                    default: "pending",
+
+                    example: "pending",
                   },
                 },
               },
@@ -466,75 +580,98 @@ export const openapi = {
 
         responses: {
           200: {
-            description: 'Created task',
+            description: "Created task",
           },
         },
       },
     },
 
-    '/tasks/{id}': {
+    "/tasks/{id}": {
       get: {
-        summary: 'Get task by ID',
+        summary: "Get task by ID",
 
         parameters: [
           {
-            name: 'id',
-            in: 'path',
+            name: "id",
+
+            in: "path",
+
             required: true,
+
             schema: {
-              type: 'string',
-              format: 'uuid',
+              type: "string",
+
+              format: "uuid",
             },
           },
         ],
 
         responses: {
           200: {
-            description: 'Task',
+            description: "Task with assignees",
           },
         },
       },
 
       patch: {
-        summary: 'Update task',
+        summary: "Update task",
 
         parameters: [
           {
-            name: 'id',
-            in: 'path',
+            name: "id",
+
+            in: "path",
+
             required: true,
+
             schema: {
-              type: 'string',
-              format: 'uuid',
+              type: "string",
+
+              format: "uuid",
             },
           },
         ],
 
         requestBody: {
           required: true,
+
           content: {
-            'application/json': {
+            "application/json": {
               schema: {
-                type: 'object',
+                type: "object",
+
                 properties: {
                   projectId: {
-                    type: 'string',
-                    format: 'uuid',
+                    type: "string",
+
+                    format: "uuid",
                   },
-                  assigneeId: {
-                    type: 'string',
-                    format: 'uuid',
+
+                  assigneeIds: {
+                    type: "array",
+
+                    items: {
+                      type: "string",
+
+                      format: "uuid",
+                    },
                   },
+
                   title: {
-                    type: 'string',
+                    type: "string",
+
                     maxLength: 150,
                   },
+
                   description: {
-                    type: 'string',
+                    type: "string",
+
                     maxLength: 1000,
                   },
+
                   status: {
-                    type: 'string',
+                    type: "string",
+
                     maxLength: 50,
                   },
                 },
@@ -545,56 +682,155 @@ export const openapi = {
 
         responses: {
           200: {
-            description: 'Updated task',
+            description: "Updated task",
           },
         },
       },
 
       delete: {
-        summary: 'Delete task',
+        summary: "Delete task",
 
         parameters: [
           {
-            name: 'id',
-            in: 'path',
+            name: "id",
+
+            in: "path",
+
             required: true,
+
             schema: {
-              type: 'string',
-              format: 'uuid',
+              type: "string",
+
+              format: "uuid",
             },
           },
         ],
 
         responses: {
           200: {
-            description: 'Deleted task',
+            description: "Deleted task",
           },
         },
       },
     },
 
-    '/projects/{projectId}/tasks': {
+    "/tasks/{id}/assignees": {
       get: {
-        summary: 'Get project tasks',
+        summary: "Get task assignees",
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: {
+              type: "string",
+              format: "uuid",
+            },
+          },
+        ],
+        responses: {
+          200: {
+            description: "List of task assignees",
+          },
+        },
+      },
+
+      post: {
+        summary: "Add task assignee",
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: {
+              type: "string",
+              format: "uuid",
+            },
+          },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["userId"],
+                properties: {
+                  userId: {
+                    type: "string",
+                    format: "uuid",
+                    example: "9e47eb80-a52c-4278-9da2-9fe0ddc90883",
+                  },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          200: {
+            description: "Task assignee added",
+          },
+        },
+      },
+    },
+
+    "/tasks/{id}/assignees/{userId}": {
+      delete: {
+        summary: "Remove task assignee",
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: {
+              type: "string",
+              format: "uuid",
+            },
+          },
+          {
+            name: "userId",
+            in: "path",
+            required: true,
+            schema: {
+              type: "string",
+              format: "uuid",
+            },
+          },
+        ],
+        responses: {
+          200: {
+            description: "Task assignee removed",
+          },
+        },
+      },
+    },
+
+    "/projects/{projectId}/tasks": {
+      get: {
+        summary: "Get project tasks",
 
         parameters: [
           {
-            name: 'projectId',
-            in: 'path',
+            name: "projectId",
+
+            in: "path",
+
             required: true,
+
             schema: {
-              type: 'string',
-              format: 'uuid',
+              type: "string",
+
+              format: "uuid",
             },
           },
         ],
 
         responses: {
           200: {
-            description: 'List of project tasks',
+            description: "List of project tasks with assignees",
           },
         },
       },
     },
   },
-}
+};

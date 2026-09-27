@@ -1,65 +1,115 @@
 import { db } from "~~/server/db";
-import { tasks, projects, users, projectMembers } from "~~/server/db/schema";
+import { tasks, projects, users, projectMembers,  taskAssignees } from "~~/server/db/schema";
 import { eq, and } from "drizzle-orm";
+import { getTaskAssignees } from "./task-assignees.service"
 
 export async function createTask(data: {
-  projectId: string;
-  assigneeId?: string;
-  title: string;
-  description?: string;
-  status?: string;
+  projectId: string
+  assigneeIds?: string[]
+  title: string
+  description?: string
+  status?: string
 }) {
   const project = await db
     .select()
     .from(projects)
-    .where(eq(projects.id, data.projectId));
+    .where(eq(projects.id, data.projectId))
 
   if (!project[0]) {
     throw createError({
       statusCode: 404,
       statusMessage: "Project not found",
-    });
+    })
   }
-  if (data.assigneeId) {
+
+  const assigneeIds = data.assigneeIds ?? []
+
+  for (const userId of assigneeIds) {
     const user = await db
       .select()
       .from(users)
-      .where(eq(users.id, data.assigneeId));
+      .where(eq(users.id, userId))
 
     if (!user[0]) {
       throw createError({
         statusCode: 404,
         statusMessage: "User not found",
-      });
+      })
     }
+
     const member = await db
       .select()
       .from(projectMembers)
       .where(
         and(
           eq(projectMembers.projectId, data.projectId),
-          eq(projectMembers.userId, data.assigneeId),
+          eq(projectMembers.userId, userId),
         ),
-      );
+      )
+
     if (!member[0]) {
       throw createError({
         statusCode: 400,
         statusMessage: "User is not a member of this project",
-      });
+      })
     }
   }
 
-  const result = await db.insert(tasks).values(data).returning();
+ const [task] = await db
+  .insert(tasks)
+  .values({
+    projectId: data.projectId,
+    title: data.title,
+    description: data.description,
+    status: data.status,
+  })
+  .returning()
 
-  return result[0];
+if (!task) {
+  throw createError({
+    statusCode: 500,
+    statusMessage: "Failed to create task",
+  })
+}
+
+if (assigneeIds.length) {
+  await db.insert(taskAssignees).values(
+    assigneeIds.map((userId) => ({
+      taskId: task.id,
+      userId,
+    })),
+  )
+}
+
+return task
 }
 export async function getTasks() {
-  return await db.select().from(tasks);
-}
-export async function getTaskById(id: string) {
-  const result = await db.select().from(tasks).where(eq(tasks.id, id));
+  const taskList = await db.select().from(tasks)
 
-  return result[0];
+  return Promise.all(
+    taskList.map(async (task) => ({
+      ...task,
+      assignees: await getTaskAssignees(task.id),
+    })),
+  )
+}
+
+export async function getTaskById(id: string) {
+  const [task] = await db
+    .select()
+    .from(tasks)
+    .where(eq(tasks.id, id));
+
+  if (!task) {
+    return undefined;
+  }
+
+  const assignees = await getTaskAssignees(task.id);
+
+  return {
+    ...task,
+    assignees,
+  };
 }
 export async function updateTaskById(
   id: string,
