@@ -12,7 +12,7 @@
       </div>
     </template>
 
-    <UForm :schema="schema" :state="state" class="space-y-4">
+    <UForm :schema="schema" :state="state" class="space-y-4" @submit="onLogin">
       <UFormField :label="t('login.form.email')" name="email">
         <UInput
           v-model="state.email"
@@ -57,12 +57,16 @@
 <script setup lang="ts">
 import { useI18n } from "#imports";
 import { z } from "zod";
+import { useAuthStore } from "~/stores/auth";
+import type { Login } from "~/composables/api/useAuthApi/types";
+const authStore = useAuthStore();
+
 definePageMeta({
   layout: "auth",
 });
 const { t } = useI18n();
 
-const state = reactive({
+const state = reactive<Login>({
   email: "",
   password: "",
 });
@@ -71,4 +75,11 @@ const schema = z.object({
   email: z.string().email("Invalid email"),
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
+
+async function onLogin() {
+  await authStore.login(state);
+  if (authStore.user) {
+    await navigateTo("/");
+  }
+}
 </script>
