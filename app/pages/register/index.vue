@@ -12,17 +12,40 @@
       </div>
     </template>
 
-    <UForm :schema="schema" :state="state" class="space-y-4">
+    <UForm
+      :schema="schema"
+      :state="state"
+      class="space-y-4"
+      @submit="onRegister"
+    >
       <UFormField :label="t('register.form.name')" name="name">
-        <UInput type="text" autocomplete="name" class="w-full" placeholder="Name" v-model="state.name"/>
+        <UInput
+          type="text"
+          autocomplete="name"
+          class="w-full"
+          placeholder="Name"
+          v-model="state.name"
+        />
       </UFormField>
 
       <UFormField :label="t('register.form.email')" name="email">
-        <UInput type="email" autocomplete="email" class="w-full" placeholder="you@example.com" v-model="state.email"/>
+        <UInput
+          type="email"
+          autocomplete="email"
+          class="w-full"
+          placeholder="you@example.com"
+          v-model="state.email"
+        />
       </UFormField>
 
       <UFormField :label="t('register.form.password')" name="password">
-        <UInput type="password" autocomplete="new-password" class="w-full" placeholder="••••••••" v-model="state.password"/>
+        <UInput
+          type="password"
+          autocomplete="new-password"
+          class="w-full"
+          placeholder="••••••••"
+          v-model="state.password"
+        />
       </UFormField>
 
       <UButton block :label="t('register.form.createAcc')" type="submit" />
@@ -40,12 +63,17 @@
 
 <script setup lang="ts">
 import { useI18n } from "#imports";
+import { useAuthStore } from "~/stores/auth";
 import { z } from "zod";
+import type { Register } from "~/composables/api/useAuthApi/types";
 definePageMeta({
   layout: "auth",
 });
+const authStore = useAuthStore();
 const { t } = useI18n();
-const state = reactive({
+const toast = useToast();
+
+const state = reactive<Register>({
   name: "",
   email: "",
   password: "",
@@ -56,4 +84,35 @@ const schema = z.object({
   email: z.string().email("Invalid email"),
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
+
+async function onRegister() {
+  try {
+    await authStore.register(state);
+
+    toast.add({
+      title: t("register.toast.success.title"),
+      description: t("register.toast.success.subTitle"),
+      color: "success",
+      duration: 7000,
+    });
+    await navigateTo("/login");
+  } catch (error: any) {
+    if (error?.statusCode === 409) {
+      toast.add({
+        title: t("register.toast.error.wrongCreds.title"),
+        description: t("register.toast.error.wrongCreds.subTitle"),
+        color: "error",
+        duration: 7000,
+      });
+      return;
+    }
+
+    toast.add({
+      title: t("register.toast.error.somethingWentWrong.title"),
+      description: t("register.toast.error.somethingWentWrong.subTitle"),
+      color: "error",
+      duration: 7000,
+    });
+  }
+}
 </script>

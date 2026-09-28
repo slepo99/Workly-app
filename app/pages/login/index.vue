@@ -59,6 +59,7 @@ import { useI18n } from "#imports";
 import { z } from "zod";
 import { useAuthStore } from "~/stores/auth";
 import type { Login } from "~/composables/api/useAuthApi/types";
+const toast = useToast();
 const authStore = useAuthStore();
 
 definePageMeta({
@@ -77,9 +78,25 @@ const schema = z.object({
 });
 
 async function onLogin() {
-  await authStore.login(state);
-  if (authStore.user) {
-    await navigateTo("/");
+  try {
+    await authStore.login(state)
+
+    if (authStore.isAuthenticated) {
+      toast.add({
+        title: t("login.toast.success.title"),
+        description: t("login.toast.success.subTitle"),
+        color: "success",
+        duration: 7000,
+      })
+
+      await navigateTo("/")
+    }
+  } catch (error: any) {
+    toast.add({
+      title: t("login.toast.error.wrongCreds.title"),
+      description: error?.data?.statusMessage || t("login.toast.error.wrongCreds.subTitle"),
+      color: "error",
+    })
   }
 }
 </script>

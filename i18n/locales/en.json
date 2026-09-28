@@ -65,18 +65,46 @@
       "signIn": "Sign in",
       "noAcc": "Don't have an account?",
       "createAcc": "Create account"
+    },
+    "toast": {
+      "success": {
+        "title": "Authorization successful.",
+        "subTitle": "Welcome back."
+      },
+      "error": {
+        "wrongCreds": {
+          "title": "Login failed.",
+          "subTitle": "Invalid email or password."
+        }
+      }
     }
   },
   "register": {
-  "form": {
-    "title": "Create your Workly account",
-    "subTitle": "Enter your details to get started",
-    "name": "Name",
-    "email": "Email",
-    "password": "Password",
-    "createAcc": "Create account",
-    "hasAcc": "Already have an account?",
-    "signIn": "Sign in"
+    "form": {
+      "title": "Create your Workly account",
+      "subTitle": "Enter your details to get started",
+      "name": "Name",
+      "email": "Email",
+      "password": "Password",
+      "createAcc": "Create account",
+      "hasAcc": "Already have an account?",
+      "signIn": "Sign in"
+    },
+    "toast": {
+      "success": {
+        "title": "Registration successful.",
+        "subTitle": "You can now sign in to your account."
+      },
+      "error": {
+        "wrongCreds": {
+          "title": "Registration failed.",
+          "subTitle": "A user with this email already exists."
+        },
+        "somethingWentWrong": {
+          "title": "Something went wrong.",
+          "subTitle": "Please try again later."
+        }
+      }
+    }
   }
-}
 }

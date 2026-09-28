@@ -91,7 +91,7 @@ const items = computed<DropdownMenuItem[][]>(() => {
     ],
   ]
 
-  if (authStore.user) {
+  if (authStore.isAuthenticated) {
     menu.push([
       {
         label: "Logout",

@@ -1,7 +1,7 @@
 <template>
   <UHeader>
     <template #left>
-      <NuxtLink to="/auth">
+      <NuxtLink to="/login">
         <div class="flex items-center gap-2">
           <img src="~assets/images/logo.png" alt="Logo" class="h-16 w-auto" />
           <span class="font-bold text-2xl">{{ $t("header.title") }}</span>
