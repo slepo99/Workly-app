@@ -1,6 +1,7 @@
 import { db } from '~~/server/db'
 import { tasks, users } from '~~/server/db/schema'
 import { eq } from 'drizzle-orm'
+import type { Role } from "~~/server/constants/roles"
 
 export async function createUser(data: {
   name: string

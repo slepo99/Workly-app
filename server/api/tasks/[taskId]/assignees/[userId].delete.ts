@@ -1,5 +1,9 @@
 import { removeTaskAssignee } from "~~/server/services/task-assignees.service"
+import { ROLE_GROUPS } from "~~/server/constants/roles"
+import { requireRole } from "~~/server/utils/requireRole"
+
 export default defineEventHandler(async (event) => {
+  await requireRole(event, ROLE_GROUPS.MANAGEMENT)
   const taskId = getRouterParam(event, 'taskId')
   const userId = getRouterParam(event, 'userId')
 
