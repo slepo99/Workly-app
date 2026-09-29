@@ -23,28 +23,41 @@ export const openapi = {
     "/auth/register": {
       post: {
         summary: "Register a new user",
+
         requestBody: {
           required: true,
+
           content: {
             "application/json": {
               schema: {
                 type: "object",
+
                 required: ["name", "email", "password"],
+
                 properties: {
                   name: {
                     type: "string",
+
                     minLength: 2,
+
                     maxLength: 100,
+
                     example: "John Doe",
                   },
+
                   email: {
                     type: "string",
+
                     format: "email",
-                    example: "john@example.com",
+
+                    example: "john\@example.com",
                   },
+
                   password: {
                     type: "string",
+
                     minLength: 6,
+
                     example: "password123",
                   },
                 },
@@ -52,8 +65,10 @@ export const openapi = {
             },
           },
         },
+
         responses: {
           200: { description: "Registered user" },
+
           409: { description: "User with this email already exists" },
         },
       },
@@ -62,24 +77,34 @@ export const openapi = {
     "/auth/login": {
       post: {
         summary: "Log in",
+
         description:
           "Validates credentials and stores the JWT in the auth_token HttpOnly cookie.",
+
         requestBody: {
           required: true,
+
           content: {
             "application/json": {
               schema: {
                 type: "object",
+
                 required: ["email", "password"],
+
                 properties: {
                   email: {
                     type: "string",
+
                     format: "email",
-                    example: "john@example.com",
+
+                    example: "john\@example.com",
                   },
+
                   password: {
                     type: "string",
+
                     minLength: 6,
+
                     example: "password123",
                   },
                 },
@@ -87,8 +112,10 @@ export const openapi = {
             },
           },
         },
+
         responses: {
           200: { description: "Logged in user" },
+
           401: { description: "Invalid email or password" },
         },
       },
@@ -97,9 +124,12 @@ export const openapi = {
     "/auth/me": {
       get: {
         summary: "Get current authenticated user",
+
         security: [{ cookieAuth: [] }],
+
         responses: {
           200: { description: "Current user" },
+
           401: { description: "Unauthorized or invalid token" },
         },
       },
@@ -108,8 +138,11 @@ export const openapi = {
     "/auth/logout": {
       post: {
         summary: "Log out",
+
         description: "Deletes the auth_token cookie.",
+
         security: [{ cookieAuth: [] }],
+
         responses: {
           200: { description: "Logged out successfully" },
         },
@@ -118,7 +151,33 @@ export const openapi = {
 
     // =========================
 
-    // USERS
+    // ROLES
+
+    // =========================
+
+    "/roles": {
+      get: {
+        summary: "Get available user roles",
+        responses: {
+          200: {
+            description: "List of available user roles",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "array",
+                  items: {
+                    type: "string",
+                    enum: ["superadmin", "admin", "manager", "worker"],
+                  },
+                  example: ["superadmin", "admin", "manager", "worker"],
+                },
+              },
+            },
+          },
+        },
+      },
+    }, // USERS
+    // =========================
 
     // =========================
 
@@ -160,7 +219,7 @@ export const openapi = {
 
                     format: "email",
 
-                    example: "john\\@example.com",
+                    example: "john\\\\@example.com",
                   },
 
                   position: {
@@ -178,7 +237,7 @@ export const openapi = {
 
                     maxLength: 500,
 
-                    example: "https\\://example.com/avatar.jpg",
+                    example: "https\\\\://example.com/avatar.jpg",
                   },
                 },
               },
@@ -262,7 +321,7 @@ export const openapi = {
 
                     format: "email",
 
-                    example: "john\\@example.com",
+                    example: "john\\\\@example.com",
                   },
 
                   position: {
@@ -280,7 +339,7 @@ export const openapi = {
 
                     maxLength: 500,
 
-                    example: "https\\://example.com/avatar.jpg",
+                    example: "https\\\\://example.com/avatar.jpg",
                   },
                 },
               },
@@ -320,9 +379,53 @@ export const openapi = {
           },
         },
       },
-    }, // =========================
-
-    // PROJECTS
+    },
+    "/users/{id}/role": {
+      patch: {
+        summary: "Update user role",
+        description:
+          "Only superadmin and admin can change user roles. Superadmin can manage admin, manager and worker roles. Admin can manage manager and worker roles.",
+        security: [{ cookieAuth: [] }],
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: {
+              type: "string",
+              format: "uuid",
+            },
+          },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["role"],
+                properties: {
+                  role: {
+                    type: "string",
+                    enum: ["admin", "manager", "worker"],
+                    example: "manager",
+                  },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          200: { description: "Updated user" },
+          400: {
+            description: "User ID is required or request body is invalid",
+          },
+          403: { description: "Forbidden" },
+          404: { description: "User not found" },
+        },
+      },
+    }, // PROJECTS
+    // =========================
 
     // =========================
 
@@ -505,9 +608,7 @@ export const openapi = {
         },
       },
     }, // =========================
-
     // PROJECT MEMBERS
-
     // =========================
 
     "/project-members": {
@@ -599,9 +700,7 @@ export const openapi = {
         },
       },
     }, // =========================
-
     // TASKS
-
     // =========================
 
     "/tasks": {
@@ -819,17 +918,23 @@ export const openapi = {
     "/tasks/{id}/assignees": {
       get: {
         summary: "Get task assignees",
+
         parameters: [
           {
             name: "id",
+
             in: "path",
+
             required: true,
+
             schema: {
               type: "string",
+
               format: "uuid",
             },
           },
         ],
+
         responses: {
           200: {
             description: "List of task assignees",
@@ -839,28 +944,39 @@ export const openapi = {
 
       post: {
         summary: "Add task assignee",
+
         parameters: [
           {
             name: "id",
+
             in: "path",
+
             required: true,
+
             schema: {
               type: "string",
+
               format: "uuid",
             },
           },
         ],
+
         requestBody: {
           required: true,
+
           content: {
             "application/json": {
               schema: {
                 type: "object",
+
                 required: ["userId"],
+
                 properties: {
                   userId: {
                     type: "string",
+
                     format: "uuid",
+
                     example: "9e47eb80-a52c-4278-9da2-9fe0ddc90883",
                   },
                 },
@@ -868,6 +984,7 @@ export const openapi = {
             },
           },
         },
+
         responses: {
           200: {
             description: "Task assignee added",
@@ -879,26 +996,37 @@ export const openapi = {
     "/tasks/{id}/assignees/{userId}": {
       delete: {
         summary: "Remove task assignee",
+
         parameters: [
           {
             name: "id",
+
             in: "path",
+
             required: true,
+
             schema: {
               type: "string",
+
               format: "uuid",
             },
           },
+
           {
             name: "userId",
+
             in: "path",
+
             required: true,
+
             schema: {
               type: "string",
+
               format: "uuid",
             },
           },
         ],
+
         responses: {
           200: {
             description: "Task assignee removed",
@@ -940,7 +1068,9 @@ export const openapi = {
     securitySchemes: {
       cookieAuth: {
         type: "apiKey",
+
         in: "cookie",
+
         name: "auth_token",
       },
     },
