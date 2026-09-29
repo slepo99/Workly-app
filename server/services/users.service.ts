@@ -53,7 +53,15 @@ export async function updateUserById(
     .update(users)
     .set(data)
     .where(eq(users.id, id))
-    .returning()
+    .returning({
+      id: users.id,
+      name: users.name,
+      email: users.email,
+      role: users.role,
+      position: users.position,
+      avatar: users.avatar,
+      createdAt: users.createdAt,
+    })
 
   return result[0]
 }
@@ -64,4 +72,24 @@ export async function deleteTaskById(id: string) {
       .returning()
 
   return result[0]
+}
+export async function updateUserRole(
+  userId: string,
+  role: Role,
+) {
+  const [user] = await db
+    .update(users)
+    .set({ role })
+    .where(eq(users.id, userId))
+    .returning({
+      id: users.id,
+      name: users.name,
+      email: users.email,
+      role: users.role,
+      position: users.position,
+      avatar: users.avatar,
+      createdAt: users.createdAt,
+    })
+
+  return user
 }

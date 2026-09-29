@@ -35,9 +35,7 @@ export const ROLE_ASSIGNMENTS: Record<Role, readonly Role[]> = {
     ROLES.WORKER,
   ],
 
-  [ROLES.MANAGER]: [
-    ROLES.WORKER,
-  ],
+  [ROLES.MANAGER]: [],
 
   [ROLES.WORKER]: [],
 }

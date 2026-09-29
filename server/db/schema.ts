@@ -6,7 +6,7 @@ export const users = pgTable("users", {
   name: varchar("name", { length: 100 }).notNull(),
   email: varchar("email", { length: 255 }).notNull().unique(),
   passwordHash: varchar("password_hash", { length: 255 }),
-  role: varchar("role", { length: 50 }).notNull().default("admin"),
+  role: varchar("role", { length: 50 }).notNull().default("manager"),
   position: varchar("position", { length: 100 }),
   avatar: varchar("avatar", { length: 500 }),
   createdAt: timestamp("created_at").defaultNow().notNull(),

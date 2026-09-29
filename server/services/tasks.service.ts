@@ -1,40 +1,43 @@
 import { db } from "~~/server/db";
-import { tasks, projects, users, projectMembers,  taskAssignees } from "~~/server/db/schema";
+import {
+  tasks,
+  projects,
+  users,
+  projectMembers,
+  taskAssignees,
+} from "~~/server/db/schema";
 import { eq, and } from "drizzle-orm";
-import { getTaskAssignees } from "./task-assignees.service"
-
+import { getTaskAssignees } from "./task-assignees.service";
+import { ROLES, type Role } from "~~/server/constants/roles";
 export async function createTask(data: {
-  projectId: string
-  assigneeIds?: string[]
-  title: string
-  description?: string
-  status?: string
+  projectId: string;
+  assigneeIds?: string[];
+  title: string;
+  description?: string;
+  status?: string;
 }) {
   const project = await db
     .select()
     .from(projects)
-    .where(eq(projects.id, data.projectId))
+    .where(eq(projects.id, data.projectId));
 
   if (!project[0]) {
     throw createError({
       statusCode: 404,
       statusMessage: "Project not found",
-    })
+    });
   }
 
-  const assigneeIds = data.assigneeIds ?? []
+  const assigneeIds = data.assigneeIds ?? [];
 
   for (const userId of assigneeIds) {
-    const user = await db
-      .select()
-      .from(users)
-      .where(eq(users.id, userId))
+    const user = await db.select().from(users).where(eq(users.id, userId));
 
     if (!user[0]) {
       throw createError({
         statusCode: 404,
         statusMessage: "User not found",
-      })
+      });
     }
 
     const member = await db
@@ -45,60 +48,101 @@ export async function createTask(data: {
           eq(projectMembers.projectId, data.projectId),
           eq(projectMembers.userId, userId),
         ),
-      )
+      );
 
     if (!member[0]) {
       throw createError({
         statusCode: 400,
         statusMessage: "User is not a member of this project",
-      })
+      });
     }
   }
 
- const [task] = await db
-  .insert(tasks)
-  .values({
-    projectId: data.projectId,
-    title: data.title,
-    description: data.description,
-    status: data.status,
-  })
-  .returning()
+  const [task] = await db
+    .insert(tasks)
+    .values({
+      projectId: data.projectId,
+      title: data.title,
+      description: data.description,
+      status: data.status,
+    })
+    .returning();
 
-if (!task) {
-  throw createError({
-    statusCode: 500,
-    statusMessage: "Failed to create task",
-  })
+  if (!task) {
+    throw createError({
+      statusCode: 500,
+      statusMessage: "Failed to create task",
+    });
+  }
+
+  if (assigneeIds.length) {
+    await db.insert(taskAssignees).values(
+      assigneeIds.map((userId) => ({
+        taskId: task.id,
+        userId,
+      })),
+    );
+  }
+
+  return task;
 }
+export async function getTasks(userId: string, role: Role) {
+  if (role === ROLES.SUPERADMIN || role === ROLES.ADMIN) {
+    const taskList = await db.select().from(tasks);
 
-if (assigneeIds.length) {
-  await db.insert(taskAssignees).values(
-    assigneeIds.map((userId) => ({
-      taskId: task.id,
-      userId,
-    })),
-  )
-}
+    return Promise.all(
+      taskList.map(async (task) => ({
+        ...task,
+        assignees: await getTaskAssignees(task.id),
+      })),
+    );
+  }
+  if (role === ROLES.MANAGER) {
+    const taskList = await db
+      .select({
+        id: tasks.id,
+        projectId: tasks.projectId,
+        title: tasks.title,
+        description: tasks.description,
+        status: tasks.status,
+        createdAt: tasks.createdAt,
+      })
+      .from(tasks)
+      .innerJoin(projectMembers, eq(projectMembers.projectId, tasks.projectId))
+      .where(eq(projectMembers.userId, userId))
 
-return task
-}
-export async function getTasks() {
-  const taskList = await db.select().from(tasks)
-
-  return Promise.all(
-    taskList.map(async (task) => ({
-      ...task,
-      assignees: await getTaskAssignees(task.id),
-    })),
-  )
+    return Promise.all(
+      taskList.map(async (task) => ({
+        ...task,
+        assignees: await getTaskAssignees(task.id),
+      })),
+    );
+  }
+  if ((role === ROLES.WORKER)) {
+      const taskList = await db
+      .select({
+        id: tasks.id,
+        projectId: tasks.projectId,
+        title: tasks.title,
+        description: tasks.description,
+        status: tasks.status,
+        createdAt: tasks.createdAt,
+      })
+      .from(tasks)
+      .innerJoin(taskAssignees, eq(taskAssignees.taskId, tasks.id))
+      .where(eq(taskAssignees.userId, userId))
+      
+      return Promise.all(
+      taskList.map(async (task) => ({
+        ...task,
+        assignees: await getTaskAssignees(task.id),
+      })),
+    );
+  }
 }
 
 export async function getTaskById(id: string) {
-  const [task] = await db
-    .select()
-    .from(tasks)
-    .where(eq(tasks.id, id));
+  const [task] = await db.select().from(tasks).where(eq(tasks.id, id));
 
   if (!task) {
     return undefined;

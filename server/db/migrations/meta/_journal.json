@@ -71,6 +71,13 @@
       "when": 1790524644329,
       "tag": "0009_needy_chamber",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1790628119658,
+      "tag": "0010_shiny_sumo",
+      "breakpoints": true
     }
   ]
 }
