@@ -2,7 +2,9 @@ import { useAuthStore } from "~/stores/auth"
 export default defineNuxtRouteMiddleware(async (to) => {
   const authStore = useAuthStore()
 
-  await authStore.fetchMe()
+  await callOnce("auth-user", async () => {
+    await authStore.fetchMe()
+  })
 
   const isAuthPage = to.path === "/login" || to.path === "/register"
 

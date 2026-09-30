@@ -38,7 +38,14 @@
 
 <script lang="ts" setup>
 import { useI18n } from "vue-i18n";
+import { useDashboardStore } from "~/stores/dashboard";
 const { t } = useI18n()
+const  dashboardStore  = useDashboardStore()
+
+await callOnce("dashboard", async () => {
+  console.log("FETCH DASHBOARD", import.meta.server ? "SERVER" : "CLIENT")
+ await dashboardStore.getAllTasks()
+})
 </script>
 
 <style></style>

@@ -1,3 +1,4 @@
+//todo: change intrfaces name to model and word => example Login -> LoginModel
 export interface Login {
   email: string;
   password: string;

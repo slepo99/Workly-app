@@ -38,7 +38,7 @@ export const useAuthStore = defineStore("auth", {
       }
     },
     async fetchMe() {
-      if (this.isInitialized) return;
+     if (this.isInitialized) return;
       const { getMe } = useAuthApi();
       try {
         this.user = await getMe();
