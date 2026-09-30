@@ -29,7 +29,7 @@
 const props = withDefaults(defineProps<{
     icon: string
     title: string
-    value: string
+    value: string | number
 }>(), {})
 
 const emit = defineEmits<{

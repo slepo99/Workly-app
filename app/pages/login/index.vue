@@ -58,11 +58,9 @@
 <script setup lang="ts">
 import { useI18n } from "#imports";
 import { useLogin } from "~/composables/useLogin";
-import { useAuthStore } from "~/stores/auth";
 definePageMeta({
   layout: "auth",
 });
 const { t } = useI18n();
 const { state, schema, onLogin } = useLogin();
-const authStore = useAuthStore();
 </script>

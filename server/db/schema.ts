@@ -1,16 +1,33 @@
-import { pgTable, uuid, varchar, timestamp, unique } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  uuid,
+  varchar,
+  timestamp,
+  unique,
+  pgEnum,
+} from "drizzle-orm/pg-core";
+import { ROLES } from "~~/server/constants/roles";
+import { TASK_STATUSES } from "~~/server/constants/taskStatuses";
 
+export const userRoleEnum = pgEnum(
+  "user_role",
+  Object.values(ROLES) as [string, ...string[]],
+);
+export const taskStatusEnum = pgEnum(
+  "task_status",
+  Object.values(TASK_STATUSES) as [string, ...string[]],
+);
 
 export const users = pgTable("users", {
   id: uuid("id").defaultRandom().primaryKey(),
   name: varchar("name", { length: 100 }).notNull(),
   email: varchar("email", { length: 255 }).notNull().unique(),
   passwordHash: varchar("password_hash", { length: 255 }),
-  role: varchar("role", { length: 50 }).notNull().default("manager"),
+  role: userRoleEnum("role").notNull().default(ROLES.MANAGER),
   position: varchar("position", { length: 100 }),
   avatar: varchar("avatar", { length: 500 }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-})
+});
 export const projects = pgTable("projects", {
   id: uuid("id").defaultRandom().primaryKey(),
   name: varchar("name", { length: 150 }).notNull(),
@@ -47,10 +64,12 @@ export const tasks = pgTable("tasks", {
 
   title: varchar("title", { length: 150 }).notNull(),
   description: varchar("description", { length: 1000 }),
-  status: varchar("status", { length: 50 }).notNull().default("pending"),
+  status: taskStatusEnum("status").notNull().default(TASK_STATUSES.PENDING),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
-export const taskAssignees = pgTable("task_assignees", {
+export const taskAssignees = pgTable(
+  "task_assignees",
+  {
     id: uuid("id").defaultRandom().primaryKey(),
 
     taskId: uuid("task_id")
@@ -61,11 +80,7 @@ export const taskAssignees = pgTable("task_assignees", {
       .notNull()
       .references(() => users.id),
 
-    createdAt: timestamp("created_at")
-      .defaultNow()
-      .notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
   },
-  (table) => [
-    unique().on(table.taskId, table.userId),
-  ],
-)
+  (table) => [unique().on(table.taskId, table.userId)],
+);

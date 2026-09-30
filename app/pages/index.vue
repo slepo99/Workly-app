@@ -3,22 +3,22 @@
     <DashboardStatCard
         :icon="'i-lucide-clipboard-list'"
         :title="t('dashboard.statCard.totalTasks')"
-        :value="'120'"
+        :value="dashboardStore.tasks.length"
       />
       <DashboardStatCard
         :icon="'i-lucide-clipboard-list'"
         :title="t('dashboard.statCard.totalProjects')"
-        :value="'120'"
+        :value="dashboardStore.projects.length"
       />
       <DashboardStatCard
         :icon="'i-lucide-clipboard-list'"
         :title="t('dashboard.statCard.totalEmployee')"
-        :value="'120'"
+        :value="dashboardStore.users.length"
       />
       <DashboardStatCard
         :icon="'i-lucide-clipboard-list'"
         :title="t('dashboard.statCard.tasksComplited')"
-        :value="'120'"
+        :value="dashboardStore.getComplitedTasks.length"
       />
       
          <!-- <DashboardSkeletonsStatCardSkeleton/> -->
@@ -43,8 +43,13 @@ const { t } = useI18n()
 const  dashboardStore  = useDashboardStore()
 
 await callOnce("dashboard", async () => {
-  console.log("FETCH DASHBOARD", import.meta.server ? "SERVER" : "CLIENT")
- await dashboardStore.getAllTasks()
+  await Promise.all([
+    dashboardStore.loadAllTasks(),
+    dashboardStore.loadAllProjects(),
+    dashboardStore.loadAllUsers()
+  ])
+
+  console.log(dashboardStore.tasks)
 })
 </script>
 

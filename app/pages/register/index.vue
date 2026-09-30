@@ -16,6 +16,7 @@
       :schema="schema"
       :state="state"
       class="space-y-4"
+      loading-auto
       @submit="onRegister"
     >
       <UFormField :label="t('register.form.name')" name="name">
@@ -48,7 +49,12 @@
         />
       </UFormField>
 
-      <UButton block :label="t('register.form.createAcc')" type="submit" />
+      <UButton
+        block
+        :label="t('register.form.createAcc')"
+        type="submit"
+        loading-auto
+      />
 
       <p class="text-center text-sm text-muted">
         {{ t("register.form.hasAcc") }}
@@ -63,56 +69,12 @@
 
 <script setup lang="ts">
 import { useI18n } from "#imports";
-import { useAuthStore } from "~/stores/auth";
-import { z } from "zod";
-import type { Register } from "~/composables/api/useAuthApi/types";
+import { useRegister } from "~/composables/useRegister";
+
 definePageMeta({
   layout: "auth",
 });
-const authStore = useAuthStore();
+
 const { t } = useI18n();
-const toast = useToast();
-
-const state = reactive<Register>({
-  name: "",
-  email: "",
-  password: "",
-});
-
-const schema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
-  email: z.string().email("Invalid email"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-});
-
-async function onRegister() {
-  try {
-    await authStore.register(state);
-
-    toast.add({
-      title: t("register.toast.success.title"),
-      description: t("register.toast.success.subTitle"),
-      color: "success",
-      duration: 7000,
-    });
-    await navigateTo("/login");
-  } catch (error: any) {
-    if (error?.statusCode === 409) {
-      toast.add({
-        title: t("register.toast.error.wrongCreds.title"),
-        description: t("register.toast.error.wrongCreds.subTitle"),
-        color: "error",
-        duration: 7000,
-      });
-      return;
-    }
-
-    toast.add({
-      title: t("register.toast.error.somethingWentWrong.title"),
-      description: t("register.toast.error.somethingWentWrong.subTitle"),
-      color: "error",
-      duration: 7000,
-    });
-  }
-}
+const { state, schema, onRegister } = useRegister();
 </script>

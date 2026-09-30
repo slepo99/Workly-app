@@ -4,3 +4,10 @@ export interface CreateProjectInput {
     status?: string;
 }
 export interface UpdateProjectInput extends Partial<CreateProjectInput> {}
+export interface ProjectModel {
+    id: string,
+    name: string,
+    description: string,
+    status: string,
+    createdAt: string
+}

@@ -6,7 +6,6 @@
     }"
   >
     <UButton icon="i-lucide-settings" color="neutral" variant="ghost" />
-
     <template #theme>
       <div class="flex w-full items-center justify-between gap-4">
         <span>{{ currentTheme }}</span>
@@ -70,6 +69,7 @@
 <script setup lang="ts">
 import type { DropdownMenuItem } from "@nuxt/ui";
 import { useI18n } from "vue-i18n";
+import { toUpperCase } from "zod";
 import { useAuthStore } from "~/stores/auth";
 
 const authStore = useAuthStore();
@@ -89,7 +89,7 @@ const items = computed<DropdownMenuItem[][]>(() => {
         slot: "language" as const,
       },
     ],
-  ]
+  ];
 
   if (authStore.isAuthenticated) {
     menu.push([
@@ -99,15 +99,28 @@ const items = computed<DropdownMenuItem[][]>(() => {
         color: "error",
         kbds: ["shift", "meta", "q"],
         onSelect: async () => {
-          await authStore.logout()
-          await navigateTo("/login")
+          await authStore.logout();
+          await navigateTo("/login");
         },
       },
-    ])
+    ]);
+    menu.unshift([
+      {
+        label: authStore.user?.name,
+        avatar: {
+          src: authStore.user?.avatar ? authStore.user?.avatar : undefined,
+          loading: "lazy",
+          size: "sm",
+          chip: {
+            inset: true,
+          },
+        },
+        type: "label",
+      },
+    ]);
   }
-
-  return menu
-})
+  return menu;
+});
 const currentTheme = computed(() => {
   return t(`header.settings.theme.${colorMode.preference}`);
 });
