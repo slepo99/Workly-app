@@ -1,56 +1,61 @@
 <template>
   <div class="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
     <DashboardStatCard
-        :icon="'i-lucide-clipboard-list'"
-        :title="t('dashboard.statCard.totalTasks')"
-        :value="dashboardStore.tasks.length"
-      />
-      <DashboardStatCard
-        :icon="'i-lucide-clipboard-list'"
-        :title="t('dashboard.statCard.totalProjects')"
-        :value="dashboardStore.projects.length"
-      />
-      <DashboardStatCard
-        :icon="'i-lucide-clipboard-list'"
-        :title="t('dashboard.statCard.totalEmployee')"
-        :value="dashboardStore.users.length"
-      />
-      <DashboardStatCard
-        :icon="'i-lucide-clipboard-list'"
-        :title="t('dashboard.statCard.tasksComplited')"
-        :value="dashboardStore.getComplitedTasks.length"
-      />
-      
-         <!-- <DashboardSkeletonsStatCardSkeleton/> -->
-  
+      v-if="!tasksStore.isLoading"
+      :icon="'i-lucide-clipboard-list'"
+      :title="t('dashboard.statCard.totalTasks')"
+      :value="tasksStore.tasks.length"
+    />
+    <DashboardSkeletonsStatCardSkeleton v-else />
+    <DashboardStatCard
+      :icon="'i-lucide-clipboard-list'"
+      :title="t('dashboard.statCard.totalProjects')"
+      :value="projectsStore.projects.length"
+    />
+    <DashboardStatCard
+      :icon="'i-lucide-clipboard-list'"
+      :title="t('dashboard.statCard.totalEmployee')"
+      :value="usersStore.users.length"
+    />
+    <DashboardStatCard
+      :icon="'i-lucide-clipboard-list'"
+      :title="t('dashboard.statCard.tasksComplited')"
+      :value="tasksStore.getComplitedTasks.length"
+    />
   </div>
-<div class="mt-6 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
-    <DashboardRecentActivityCard  class="sm:col-span-2"/>
+  <div class="mt-6 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
+    <DashboardRecentActivityCard class="sm:col-span-2" />
     <DashboardDeadlinesCard />
     <DashboardUpcomingMeetingCard />
     <!-- <DashboardSkeletonsDeadlinesCardSkeleton/>
     <DashboardSkeletonsUpcomingMeetingsCardSkeleton/>
     <DashboardSkeletonsRecentActivityCardSkeleton/> -->
- 
-</div>
-<DashboardTasklistTable class="my-6"/>
+  </div>
+  <DashboardTasklistTable class="my-6" />
 </template>
 
 <script lang="ts" setup>
 import { useI18n } from "vue-i18n";
-import { useDashboardStore } from "~/stores/dashboard";
-const { t } = useI18n()
-const  dashboardStore  = useDashboardStore()
+import { useProjectsStore } from "~/stores/projects";
+import { useTasksStore } from "~/stores/tasks";
+import { useUsersStore } from "~/stores/users";
 
-await callOnce("dashboard", async () => {
-  await Promise.all([
-    dashboardStore.loadAllTasks(),
-    dashboardStore.loadAllProjects(),
-    dashboardStore.loadAllUsers()
-  ])
+const { t } = useI18n();
+const projectsStore = useProjectsStore();
+const tasksStore = useTasksStore();
+const usersStore = useUsersStore();
 
-  console.log(dashboardStore.tasks)
-})
+await callOnce(
+  "dashboard",
+  async () => {
+    await Promise.all([
+      tasksStore.loadAllTasks(),
+      projectsStore.loadAllProjects(),
+      usersStore.loadAllUsers(),
+    ]);
+  },
+  { mode: "navigation" },
+);
 </script>
 
 <style></style>

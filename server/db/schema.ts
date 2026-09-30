@@ -6,8 +6,8 @@ import {
   unique,
   pgEnum,
 } from "drizzle-orm/pg-core";
-import { ROLES } from "~~/server/constants/roles";
-import { TASK_STATUSES } from "~~/server/constants/taskStatuses";
+import { ROLES } from "../constants/roles";
+import { TASK_STATUSES } from "../constants/taskStatuses";
 
 export const userRoleEnum = pgEnum(
   "user_role",
@@ -66,6 +66,8 @@ export const tasks = pgTable("tasks", {
   description: varchar("description", { length: 1000 }),
   status: taskStatusEnum("status").notNull().default(TASK_STATUSES.PENDING),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+  startDate: timestamp("start_date"),
+  endDate: timestamp("end_date"),
 });
 export const taskAssignees = pgTable(
   "task_assignees",

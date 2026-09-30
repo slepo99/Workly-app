@@ -6,6 +6,8 @@ export interface TasksModel {
   projectId: string;
   status: string;
   title: string;
+  startDate: string;
+  endDate: string;
 }
 export interface AssigneesModel {
   id: string;

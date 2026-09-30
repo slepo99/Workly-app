@@ -64,7 +64,7 @@ const statusItems = [
 ];
 const sorting = ref([]);
 const data = ref<ProjectTableRow[]>(
-  Array(100)
+  Array(5)
     .fill(0)
     .map((_, i) => ({
       id: `PRJ-${String(i + 1).padStart(4, "0")}`,
