@@ -7,11 +7,9 @@ import { useDebounceFn } from "@vueuse/core";
 export function useProjectsPage() {
   const projectsStore = useProjectsStore();
 
-  const selectedStatus = ref<ProjectStatus[]>([]);
-
   const filters = [
-    { label: "Done", value: PROJECT_STATUSES.COMPLETED },
-    { label: "Pending", value: PROJECT_STATUSES.ON_HOLD },
+    { label: "Completed", value: PROJECT_STATUSES.COMPLETED },
+    { label: "On hold", value: PROJECT_STATUSES.ON_HOLD },
     { label: "Active", value: PROJECT_STATUSES.ACTIVE },
   ];
 
@@ -19,7 +17,7 @@ export function useProjectsPage() {
     await projectsStore.searchProjects();
   }, 500);
 
-  async function updateProjects(value: number) {
+  async function updateProjectsPage(value: number) {
     if (!projectsStore.search) {
       await projectsStore.loadAllProjects(value);
     } else {
@@ -39,11 +37,19 @@ export function useProjectsPage() {
       console.error("Failed to load projects:", error);
     }
   }
+
+  async function filterProjectsStatus() {
+    if (!projectsStore.search) {
+      await projectsStore.loadAllProjects();
+    } else {
+      await projectsStore.searchProjects();
+    }
+  }
   return {
-    selectedStatus,
     filters,
     searchProjects,
-    updateProjects,
+    updateProjectsPage,
     firstLoadProjects,
+    filterProjectsStatus
   };
 }

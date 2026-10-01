@@ -6,12 +6,12 @@ import {
   tasks,
   taskAssignees,
 } from "~~/server/db/schema";
-import { eq, and, count, desc, ilike } from "drizzle-orm";
+import { eq, and, count, desc, ilike, inArray } from "drizzle-orm";
 import { ROLES, type Role } from "~~/server/constants/roles";
 import { getTaskAssignees } from "./task-assignees.service";
 import { TASK_STATUSES } from "~~/server/constants/taskStatuses";
 import { deleteImageByUrl } from "~~/server/services/uploads.service";
-
+import type { ProjectStatus } from "~~/server/constants/projectStatuses";
 export async function createProject(
   userId: string,
   role: Role,
@@ -45,6 +45,7 @@ export async function getProjects(
   page: number,
   limit: number,
   search: string,
+  statuses: ProjectStatus[],
 ) {
   const offset = (page - 1) * limit;
 
@@ -55,20 +56,24 @@ export async function getProjects(
     ? ilike(projects.name, `%${search}%`)
     : undefined;
 
+  const statusCondition = statuses.length
+    ? inArray(projects.status, statuses)
+    : undefined;
+
   if (role === ROLES.SUPERADMIN || role === ROLES.ADMIN) {
     const totalResult = await db
       .select({
         count: count(),
       })
       .from(projects)
-      .where(searchCondition);
+      .where(and(searchCondition, statusCondition));
 
     total = totalResult[0]?.count ?? 0;
 
     projectList = await db
       .select()
       .from(projects)
-      .where(searchCondition)
+      .where(and(searchCondition, statusCondition))
       .orderBy(desc(projects.updatedAt))
       .limit(limit)
       .offset(offset);
@@ -79,7 +84,13 @@ export async function getProjects(
       })
       .from(projects)
       .innerJoin(projectMembers, eq(projectMembers.projectId, projects.id))
-      .where(and(eq(projectMembers.userId, userId), searchCondition));
+      .where(
+        and(
+          eq(projectMembers.userId, userId),
+          searchCondition,
+          statusCondition,
+        ),
+      );
 
     total = totalResult[0]?.count ?? 0;
 
@@ -89,12 +100,19 @@ export async function getProjects(
         name: projects.name,
         description: projects.description,
         status: projects.status,
+        image: projects.image,
         createdAt: projects.createdAt,
         updatedAt: projects.updatedAt,
       })
       .from(projects)
       .innerJoin(projectMembers, eq(projectMembers.projectId, projects.id))
-      .where(and(eq(projectMembers.userId, userId), searchCondition))
+      .where(
+        and(
+          eq(projectMembers.userId, userId),
+          searchCondition,
+          statusCondition,
+        ),
+      )
       .orderBy(desc(projects.updatedAt))
       .limit(limit)
       .offset(offset);

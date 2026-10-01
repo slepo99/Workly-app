@@ -17,4 +17,6 @@ export interface ProjectModel {
   description: string;
   status: string;
   createdAt: string;
+  completionPercent: number;
+  tasksCount: number;
 }

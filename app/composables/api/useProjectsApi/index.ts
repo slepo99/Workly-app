@@ -4,6 +4,8 @@ import type {
   ProjectsResponseModel,
 } from "./types";
 import { PROJECTS_PAGINATION } from "~/constants/api";
+import type { ProjectStatus } from "~/constants/projectStatuses";
+
 export function useProjectsApi() {
   const { $api } = useNuxtApp();
   enum API {
@@ -12,16 +14,23 @@ export function useProjectsApi() {
     UPDATE_PROJECT = "/projects",
     DELETE_PROJECT = "/projects",
   }
-  const getProjects = (
+  const getProjects = ({
     page = PROJECTS_PAGINATION.PAGE,
     limit = PROJECTS_PAGINATION.LIMIT,
     search = "",
-  ) => {
+    statuses = [],
+  }: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    statuses?: ProjectStatus[];
+  }) => {
     return $api<ProjectsResponseModel>(API.GET_PROJECTS, {
       query: {
         page,
         limit,
         search,
+        status: statuses,
       },
     });
   };

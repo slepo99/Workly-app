@@ -1,6 +1,10 @@
 import { defineStore } from "pinia";
 import type { ProjectModel } from "~/composables/api/useProjectsApi/types";
 import { PROJECTS_PAGINATION } from "~/constants/api";
+import {
+  PROJECT_STATUSES,
+  type ProjectStatus,
+} from "~/constants/projectStatuses";
 interface ProjectsStateModel {
   projects: ProjectModel[];
   isLoading: boolean;
@@ -8,7 +12,9 @@ interface ProjectsStateModel {
   total: number;
   totalPages: number;
   search: string;
+  selectedStatus: ProjectStatus[];
 }
+
 export const useProjectsStore = defineStore("projects", {
   state: (): ProjectsStateModel => {
     return {
@@ -17,7 +23,8 @@ export const useProjectsStore = defineStore("projects", {
       page: PROJECTS_PAGINATION.PAGE,
       total: 0,
       totalPages: 0,
-      search: ""
+      search: "",
+      selectedStatus: [],
     };
   },
 
@@ -28,9 +35,12 @@ export const useProjectsStore = defineStore("projects", {
       const { getProjects } = useProjectsApi();
 
       this.isLoading = true;
-
       try {
-        const projects = await getProjects(page, PROJECTS_PAGINATION.LIMIT);
+        const projects = await getProjects({
+          page: page,
+          limit: PROJECTS_PAGINATION.LIMIT,
+          statuses: this.selectedStatus,
+        });
 
         this.projects = projects.projects;
         this.page = projects.page;
@@ -46,11 +56,12 @@ export const useProjectsStore = defineStore("projects", {
       this.isLoading = true;
 
       try {
-        const projects = await getProjects(
-          page,
-          PROJECTS_PAGINATION.LIMIT,
-          this.search,
-        );
+        const projects = await getProjects({
+          page: page,
+          limit: PROJECTS_PAGINATION.LIMIT,
+          search: this.search,
+          statuses: this.selectedStatus,
+        });
 
         this.projects = projects.projects;
         this.page = projects.page;

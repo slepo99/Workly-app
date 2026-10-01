@@ -42,13 +42,21 @@
         </div>
       </div>
 
-      <FilterButtons v-model="selectedStatus" :filters="filters" />
+      <FilterButtons v-model="projectsStore.selectedStatus" :filters="filters" @change="filterProjectsStatus"/>
+    </div>
+    <div>
+      <div v-for="project in projectsStore.projects" class="border-b border-muted py-4" :key="project.id">
+        <span>{{ project.name }}</span>
+        <span>{{ project.description }}</span>
+        <span>{{ project.status }}</span>
+        <span>{{ project.tasksCount }}</span>
+      </div>
     </div>
     <UPagination
       v-model:page="projectsStore.page"
       :items-per-page="PROJECTS_PAGINATION.LIMIT"
       :total="projectsStore.total"
-      @update:page="updateProjects"
+      @update:page="updateProjectsPage"
     />
   </UPage>
 </template>
@@ -59,11 +67,11 @@ import { PROJECTS_PAGINATION } from "~/constants/api";
 import { useProjectsPage } from "~/composables/useProjectsPage";
 const projectsStore = useProjectsStore();
 const {
-  selectedStatus,
   filters,
   searchProjects,
-  updateProjects,
+  updateProjectsPage,
   firstLoadProjects,
+  filterProjectsStatus,
 } = useProjectsPage();
 
 
