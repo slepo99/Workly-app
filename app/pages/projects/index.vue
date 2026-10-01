@@ -19,7 +19,7 @@
           class="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center"
         >
           <UInput
-            v-model="search"
+            v-model="projectsStore.search"
             icon="i-lucide-search"
             size="lg"
             variant="soft"
@@ -44,27 +44,31 @@
 
       <FilterButtons v-model="selectedStatus" :filters="filters" />
     </div>
+    <UPagination
+      v-model:page="projectsStore.page"
+      :items-per-page="PROJECTS_PAGINATION.LIMIT"
+      :total="projectsStore.total"
+      @update:page="updateProjects"
+    />
   </UPage>
 </template>
 
 <script setup lang="ts">
-import {
-  PROJECT_STATUSES,
-  type ProjectStatus,
-} from "~/constants/projectStatuses";
-const selectedStatus = ref<ProjectStatus[]>([]);
-const search = ref("");
-
-const filters = [
-  { label: "Done", value: PROJECT_STATUSES.COMPLETED },
-  { label: "Pending", value: PROJECT_STATUSES.ON_HOLD },
-  { label: "Active", value: PROJECT_STATUSES.ACTIVE },
-];
-function searchProjects(value: string) {
-  console.log(value);
-}
+import { useProjectsStore } from "~/stores/projects";
+import { PROJECTS_PAGINATION } from "~/constants/api";
+import { useProjectsPage } from "~/composables/useProjectsPage";
+const projectsStore = useProjectsStore();
+const {
+  selectedStatus,
+  filters,
+  searchProjects,
+  updateProjects,
+  firstLoadProjects,
+} = useProjectsPage();
 
 
+
+await firstLoadProjects()
 </script>
 
 <style scoped></style>

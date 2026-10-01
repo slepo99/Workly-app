@@ -1,3 +1,4 @@
+// todo => change name to useRegisterPage
 import { z } from "zod";
 import type { Register } from "~/composables/api/useAuthApi/types";
 import { useAuthStore } from "~/stores/auth";
