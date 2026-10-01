@@ -35,6 +35,7 @@ export const projects = pgTable("projects", {
   status: varchar("status", { length: 50 }).notNull().default("active"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  image: varchar("image", { length: 500 }),
 });
 export const projectMembers = pgTable(
   "project_members",

@@ -10,36 +10,33 @@ import { eq, and, count, desc, ilike } from "drizzle-orm";
 import { ROLES, type Role } from "~~/server/constants/roles";
 import { getTaskAssignees } from "./task-assignees.service";
 import { TASK_STATUSES } from "~~/server/constants/taskStatuses";
+import { deleteImageByUrl } from "~~/server/services/uploads.service";
 
 export async function createProject(
   userId: string,
   role: Role,
   data: {
-    name: string
-    description?: string
-    status?: string
+    name: string;
+    description?: string;
+    status?: string;
+    image?: string;
   },
 ) {
   return await db.transaction(async (tx) => {
-    const [project] = await tx
-      .insert(projects)
-      .values(data)
-      .returning()
+    const [project] = await tx.insert(projects).values(data).returning();
 
     if (!project) {
-      throw new Error("Failed to create project")
+      throw new Error("Failed to create project");
     }
 
-    await tx
-      .insert(projectMembers)
-      .values({
-        projectId: project.id,
-        userId,
-        role,
-      })
+    await tx.insert(projectMembers).values({
+      projectId: project.id,
+      userId,
+      role,
+    });
 
-    return project
-  })
+    return project;
+  });
 }
 
 export async function getProjects(
@@ -49,27 +46,24 @@ export async function getProjects(
   limit: number,
   search: string,
 ) {
-  const offset = (page - 1) * limit
+  const offset = (page - 1) * limit;
 
-  let projectList
-  let total = 0
+  let projectList;
+  let total = 0;
 
   const searchCondition = search
     ? ilike(projects.name, `%${search}%`)
-    : undefined
+    : undefined;
 
-  if (
-    role === ROLES.SUPERADMIN ||
-    role === ROLES.ADMIN
-  ) {
+  if (role === ROLES.SUPERADMIN || role === ROLES.ADMIN) {
     const totalResult = await db
       .select({
         count: count(),
       })
       .from(projects)
-      .where(searchCondition)
+      .where(searchCondition);
 
-    total = totalResult[0]?.count ?? 0
+    total = totalResult[0]?.count ?? 0;
 
     projectList = await db
       .select()
@@ -77,31 +71,17 @@ export async function getProjects(
       .where(searchCondition)
       .orderBy(desc(projects.updatedAt))
       .limit(limit)
-      .offset(offset)
+      .offset(offset);
   } else {
     const totalResult = await db
       .select({
         count: count(),
       })
       .from(projects)
-      .innerJoin(
-        projectMembers,
-        eq(
-          projectMembers.projectId,
-          projects.id,
-        ),
-      )
-      .where(
-        and(
-          eq(
-            projectMembers.userId,
-            userId,
-          ),
-          searchCondition,
-        ),
-      )
+      .innerJoin(projectMembers, eq(projectMembers.projectId, projects.id))
+      .where(and(eq(projectMembers.userId, userId), searchCondition));
 
-    total = totalResult[0]?.count ?? 0
+    total = totalResult[0]?.count ?? 0;
 
     projectList = await db
       .select({
@@ -113,25 +93,11 @@ export async function getProjects(
         updatedAt: projects.updatedAt,
       })
       .from(projects)
-      .innerJoin(
-        projectMembers,
-        eq(
-          projectMembers.projectId,
-          projects.id,
-        ),
-      )
-      .where(
-        and(
-          eq(
-            projectMembers.userId,
-            userId,
-          ),
-          searchCondition,
-        ),
-      )
+      .innerJoin(projectMembers, eq(projectMembers.projectId, projects.id))
+      .where(and(eq(projectMembers.userId, userId), searchCondition))
       .orderBy(desc(projects.updatedAt))
       .limit(limit)
-      .offset(offset)
+      .offset(offset);
   }
 
   const projectsWithStats = await Promise.all(
@@ -141,12 +107,7 @@ export async function getProjects(
           count: count(),
         })
         .from(tasks)
-        .where(
-          eq(
-            tasks.projectId,
-            project.id,
-          ),
-        )
+        .where(eq(tasks.projectId, project.id));
 
       const completedTasksResult = await db
         .select({
@@ -155,37 +116,25 @@ export async function getProjects(
         .from(tasks)
         .where(
           and(
-            eq(
-              tasks.projectId,
-              project.id,
-            ),
-            eq(
-              tasks.status,
-              TASK_STATUSES.COMPLETED,
-            ),
+            eq(tasks.projectId, project.id),
+            eq(tasks.status, TASK_STATUSES.COMPLETED),
           ),
-        )
+        );
 
-      const tasksCount =
-        allTasksResult[0]?.count ?? 0
+      const tasksCount = allTasksResult[0]?.count ?? 0;
 
-      const completedCount =
-        completedTasksResult[0]?.count ?? 0
+      const completedCount = completedTasksResult[0]?.count ?? 0;
 
       const completionPercent =
-        tasksCount === 0
-          ? 0
-          : Math.round(
-              (completedCount / tasksCount) * 100,
-            )
+        tasksCount === 0 ? 0 : Math.round((completedCount / tasksCount) * 100);
 
       return {
         ...project,
         tasksCount,
         completionPercent,
-      }
+      };
     }),
-  )
+  );
 
   return {
     page,
@@ -193,7 +142,7 @@ export async function getProjects(
     total,
     totalPages: Math.ceil(total / limit),
     projects: projectsWithStats,
-  }
+  };
 }
 export async function getProjectById(id: string) {
   const result = await db.select().from(projects).where(eq(projects.id, id));
@@ -204,21 +153,35 @@ export async function getProjectById(id: string) {
 export async function updateProjectById(
   id: string,
   data: {
-    name?: string
-    description?: string
-    status?: string
+    name?: string;
+    description?: string;
+    status?: string;
+    image?: string;
   },
 ) {
-  const result = await db
+  const [oldProject] = await db
+    .select()
+    .from(projects)
+    .where(eq(projects.id, id));
+
+  if (!oldProject) {
+    return undefined;
+  }
+
+  const [updatedProject] = await db
     .update(projects)
     .set({
       ...data,
       updatedAt: new Date(),
     })
     .where(eq(projects.id, id))
-    .returning()
+    .returning();
 
-  return result[0]
+  if (data.image && oldProject.image && data.image !== oldProject.image) {
+    await deleteImageByUrl(oldProject.image);
+  }
+
+  return updatedProject;
 }
 export async function deleteProjectById(id: string) {
   const result = await db

@@ -1,20 +1,18 @@
-import { db } from '~~/server/db'
-import { tasks, users } from '~~/server/db/schema'
-import { eq } from 'drizzle-orm'
-import type { Role } from "~~/server/constants/roles"
+import { db } from "~~/server/db";
+import { tasks, users } from "~~/server/db/schema";
+import { eq } from "drizzle-orm";
+import type { Role } from "~~/server/constants/roles";
+import { deleteImageByUrl } from "~~/server/services/uploads.service";
 
 export async function createUser(data: {
-  name: string
-  email: string
-  position?: string
-  avatar?: string
+  name: string;
+  email: string;
+  position?: string;
+  avatar?: string;
 }) {
-  const result = await db
-    .insert(users)
-    .values(data)
-    .returning()
+  const result = await db.insert(users).values(data).returning();
 
-  return result[0]
+  return result[0];
 }
 export async function getUserById(id: string) {
   const [user] = await db
@@ -28,28 +26,31 @@ export async function getUserById(id: string) {
       createdAt: users.createdAt,
     })
     .from(users)
-    .where(eq(users.id, id))
+    .where(eq(users.id, id));
 
-  return user
+  return user;
 }
 export async function deleteUserById(id: string) {
-  const result = await db
-    .delete(users)
-    .where(eq(users.id, id))
-    .returning()
+  const result = await db.delete(users).where(eq(users.id, id)).returning();
 
-  return result[0]
+  return result[0];
 }
 export async function updateUserById(
   id: string,
   data: {
-    name?: string
-    email?: string
-    position?: string
-    avatar?: string
+    name?: string;
+    email?: string;
+    position?: string;
+    avatar?: string;
   },
 ) {
-  const result = await db
+  const [oldUser] = await db.select().from(users).where(eq(users.id, id));
+
+  if (!oldUser) {
+    return undefined;
+  }
+
+  const [updatedUser] = await db
     .update(users)
     .set(data)
     .where(eq(users.id, id))
@@ -61,22 +62,20 @@ export async function updateUserById(
       position: users.position,
       avatar: users.avatar,
       createdAt: users.createdAt,
-    })
+    });
 
-  return result[0]
+  if (data.avatar && oldUser.avatar && data.avatar !== oldUser.avatar) {
+    await deleteImageByUrl(oldUser.avatar);
+  }
+
+  return updatedUser;
 }
 export async function deleteTaskById(id: string) {
-  const result = await db
-      .delete(tasks)
-      .where(eq(tasks.id, id))
-      .returning()
+  const result = await db.delete(tasks).where(eq(tasks.id, id)).returning();
 
-  return result[0]
+  return result[0];
 }
-export async function updateUserRole(
-  userId: string,
-  role: Role,
-) {
+export async function updateUserRole(userId: string, role: Role) {
   const [user] = await db
     .update(users)
     .set({ role })
@@ -89,7 +88,7 @@ export async function updateUserRole(
       position: users.position,
       avatar: users.avatar,
       createdAt: users.createdAt,
-    })
+    });
 
-  return user
+  return user;
 }

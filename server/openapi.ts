@@ -449,7 +449,7 @@ export const openapi = {
         },
       },
     },
-        // DASHBOARD
+    // DASHBOARD
 
     // =========================
 
@@ -1329,6 +1329,137 @@ export const openapi = {
                 },
               },
             },
+          },
+        },
+      },
+    },
+    // =========================
+
+    // FILES
+
+    // =========================
+    "/uploads/image": {
+      post: {
+        summary: "Upload image",
+
+        security: [
+          {
+            cookieAuth: [],
+          },
+        ],
+
+        requestBody: {
+          required: true,
+          content: {
+            "multipart/form-data": {
+              schema: {
+                type: "object",
+                required: ["file"],
+                properties: {
+                  file: {
+                    type: "string",
+                    format: "binary",
+                  },
+                },
+              },
+            },
+          },
+        },
+
+        responses: {
+          200: {
+            description: "Image uploaded successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    url: {
+                      type: "string",
+                      format: "uri",
+                      example:
+                        "https://example.supabase.co/storage/v1/object/public/workly-images/image.jpg",
+                    },
+
+                    path: {
+                      type: "string",
+                      example: "08e18f96-a9ab-45c8-8b9f-731d8272e573.jpg",
+                    },
+                  },
+                },
+              },
+            },
+          },
+
+          400: {
+            description: "Invalid file",
+          },
+
+          401: {
+            description: "Unauthorized",
+          },
+
+          500: {
+            description: "Image upload failed",
+          },
+        },
+      },
+
+      delete: {
+        summary: "Delete image",
+
+        security: [
+          {
+            cookieAuth: [],
+          },
+        ],
+
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["path"],
+                properties: {
+                  path: {
+                    type: "string",
+                    example: "08e18f96-a9ab-45c8-8b9f-731d8272e573.jpg",
+                  },
+                },
+              },
+            },
+          },
+        },
+
+        responses: {
+          200: {
+            description: "Image deleted successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+
+          400: {
+            description: "Image path is required",
+          },
+
+          401: {
+            description: "Unauthorized",
+          },
+
+          500: {
+            description: "Image deletion failed",
           },
         },
       },

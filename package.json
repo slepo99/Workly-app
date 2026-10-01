@@ -13,6 +13,7 @@
     "@nuxt/ui": "^4.11.1",
     "@nuxtjs/i18n": "^10.6.0",
     "@pinia/nuxt": "^1.0.2",
+    "@supabase/supabase-js": "^2.117.2",
     "@vueuse/core": "^15.0.0",
     "bcryptjs": "^3.0.3",
     "drizzle-orm": "^0.45.2",
