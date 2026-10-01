@@ -47,17 +47,17 @@ const projectsStore = useProjectsStore();
 const tasksStore = useTasksStore();
 const usersStore = useUsersStore();
 
-await callOnce(
-  "dashboard",
-  async () => {
-    await Promise.all([
-      tasksStore.loadAllTasks(),
-      projectsStore.loadAllProjects(),
-      usersStore.loadAllUsers(),
-    ]);
-  },
-  { mode: "navigation" },
-);
+// await callOnce(
+//   "dashboard",
+//   async () => {
+//     await Promise.all([
+//       tasksStore.loadAllTasks(),
+//       projectsStore.loadAllProjects(),
+//       usersStore.loadAllUsers(),
+//     ]);
+//   },
+//   { mode: "navigation" },
+// );
 </script>
 
 <style></style>

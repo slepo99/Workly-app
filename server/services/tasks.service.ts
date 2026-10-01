@@ -6,7 +6,7 @@ import {
   projectMembers,
   taskAssignees,
 } from "~~/server/db/schema";
-import { eq, and } from "drizzle-orm";
+import { eq, and, count } from "drizzle-orm";
 import { getTaskAssignees } from "./task-assignees.service";
 import { ROLES, type Role } from "~~/server/constants/roles";
 export async function createTask(data: {
@@ -86,58 +86,115 @@ export async function createTask(data: {
 
   return task;
 }
-export async function getTasks(userId: string, role: Role) {
-  if (role === ROLES.SUPERADMIN || role === ROLES.ADMIN) {
-    const taskList = await db.select().from(tasks);
+export async function getTasks(
+  userId: string,
+  role: Role,
+  page: number,
+  limit: number,
+) {
+  const offset = (page - 1) * limit
 
-    return Promise.all(
-      taskList.map(async (task) => ({
-        ...task,
-        assignees: await getTaskAssignees(task.id),
-      })),
-    );
-  }
-  if (role === ROLES.MANAGER) {
-    const taskList = await db
+  let taskList
+  let total = 0
+
+  if (
+    role === ROLES.SUPERADMIN ||
+    role === ROLES.ADMIN
+  ) {
+    const totalResult = await db
       .select({
-        id: tasks.id,
-        projectId: tasks.projectId,
-        title: tasks.title,
-        description: tasks.description,
-        status: tasks.status,
-        createdAt: tasks.createdAt,
+        count: count(),
       })
       .from(tasks)
-      .innerJoin(projectMembers, eq(projectMembers.projectId, tasks.projectId))
+
+    total = totalResult[0]?.count ?? 0
+
+    taskList = await db
+      .select()
+      .from(tasks)
+      .limit(limit)
+      .offset(offset)
+  } else if (role === ROLES.MANAGER) {
+    const totalResult = await db
+      .select({
+        count: count(),
+      })
+      .from(tasks)
+      .innerJoin(
+        projectMembers,
+        eq(projectMembers.projectId, tasks.projectId),
+      )
       .where(eq(projectMembers.userId, userId))
 
-    return Promise.all(
-      taskList.map(async (task) => ({
-        ...task,
-        assignees: await getTaskAssignees(task.id),
-      })),
-    );
-  }
-  if ((role === ROLES.WORKER)) {
-      const taskList = await db
+    total = totalResult[0]?.count ?? 0
+
+    taskList = await db
       .select({
         id: tasks.id,
         projectId: tasks.projectId,
         title: tasks.title,
         description: tasks.description,
         status: tasks.status,
+        startDate: tasks.startDate,
+        endDate: tasks.endDate,
         createdAt: tasks.createdAt,
       })
       .from(tasks)
-      .innerJoin(taskAssignees, eq(taskAssignees.taskId, tasks.id))
+      .innerJoin(
+        projectMembers,
+        eq(projectMembers.projectId, tasks.projectId),
+      )
+      .where(eq(projectMembers.userId, userId))
+      .limit(limit)
+      .offset(offset)
+  } else {
+    const totalResult = await db
+      .select({
+        count: count(),
+      })
+      .from(tasks)
+      .innerJoin(
+        taskAssignees,
+        eq(taskAssignees.taskId, tasks.id),
+      )
       .where(eq(taskAssignees.userId, userId))
-      
-      return Promise.all(
-      taskList.map(async (task) => ({
-        ...task,
-        assignees: await getTaskAssignees(task.id),
-      })),
-    );
+
+    total = totalResult[0]?.count ?? 0
+
+    taskList = await db
+      .select({
+        id: tasks.id,
+        projectId: tasks.projectId,
+        title: tasks.title,
+        description: tasks.description,
+        status: tasks.status,
+        startDate: tasks.startDate,
+        endDate: tasks.endDate,
+        createdAt: tasks.createdAt,
+      })
+      .from(tasks)
+      .innerJoin(
+        taskAssignees,
+        eq(taskAssignees.taskId, tasks.id),
+      )
+      .where(eq(taskAssignees.userId, userId))
+      .limit(limit)
+      .offset(offset)
+  }
+
+  const tasksWithAssignees = await Promise.all(
+    taskList.map(async (task) => ({
+      ...task,
+      assignees: await getTaskAssignees(task.id),
+    })),
+  )
+
+  return {
+    page,
+    limit,
+    total,
+    totalPages: Math.ceil(total / limit),
+    tasks: tasksWithAssignees,
   }
 }
 

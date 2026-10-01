@@ -50,7 +50,7 @@ export const openapi = {
 
                     format: "email",
 
-                    example: "john\@example.com",
+                    example: "john\\@example.com",
                   },
 
                   password: {
@@ -97,7 +97,7 @@ export const openapi = {
 
                     format: "email",
 
-                    example: "john\@example.com",
+                    example: "john\\@example.com",
                   },
 
                   password: {
@@ -158,17 +158,22 @@ export const openapi = {
     "/roles": {
       get: {
         summary: "Get available user roles",
+
         responses: {
           200: {
             description: "List of available user roles",
+
             content: {
               "application/json": {
                 schema: {
                   type: "array",
+
                   items: {
                     type: "string",
+
                     enum: ["superadmin", "admin", "manager", "worker"],
                   },
+
                   example: ["superadmin", "admin", "manager", "worker"],
                 },
               },
@@ -177,6 +182,7 @@ export const openapi = {
         },
       },
     }, // USERS
+
     // =========================
 
     // =========================
@@ -219,7 +225,7 @@ export const openapi = {
 
                     format: "email",
 
-                    example: "john\\\\@example.com",
+                    example: "john\\\\\\\\@example.com",
                   },
 
                   position: {
@@ -237,7 +243,7 @@ export const openapi = {
 
                     maxLength: 500,
 
-                    example: "https\\\\://example.com/avatar.jpg",
+                    example: "https\\\\\\\\://example.com/avatar.jpg",
                   },
                 },
               },
@@ -321,7 +327,7 @@ export const openapi = {
 
                     format: "email",
 
-                    example: "john\\\\@example.com",
+                    example: "john\\\\\\\\@example.com",
                   },
 
                   position: {
@@ -339,7 +345,7 @@ export const openapi = {
 
                     maxLength: 500,
 
-                    example: "https\\\\://example.com/avatar.jpg",
+                    example: "https\\\\\\\\://example.com/avatar.jpg",
                   },
                 },
               },
@@ -380,34 +386,48 @@ export const openapi = {
         },
       },
     },
+
     "/users/{id}/role": {
       patch: {
         summary: "Update user role",
+
         description:
           "Only superadmin and admin can change user roles. Superadmin can manage admin, manager and worker roles. Admin can manage manager and worker roles.",
+
         security: [{ cookieAuth: [] }],
+
         parameters: [
           {
             name: "id",
+
             in: "path",
+
             required: true,
+
             schema: {
               type: "string",
+
               format: "uuid",
             },
           },
         ],
+
         requestBody: {
           required: true,
+
           content: {
             "application/json": {
               schema: {
                 type: "object",
+
                 required: ["role"],
+
                 properties: {
                   role: {
                     type: "string",
+
                     enum: ["admin", "manager", "worker"],
+
                     example: "manager",
                   },
                 },
@@ -415,16 +435,21 @@ export const openapi = {
             },
           },
         },
+
         responses: {
           200: { description: "Updated user" },
+
           400: {
             description: "User ID is required or request body is invalid",
           },
+
           403: { description: "Forbidden" },
+
           404: { description: "User not found" },
         },
       },
     }, // PROJECTS
+
     // =========================
 
     // =========================
@@ -433,9 +458,60 @@ export const openapi = {
       get: {
         summary: "Get all projects",
 
+        parameters: [
+          {
+            name: "page",
+            in: "query",
+            required: false,
+            schema: {
+              type: "integer",
+              minimum: 1,
+              default: 1,
+            },
+          },
+          {
+            name: "limit",
+            in: "query",
+            required: false,
+            schema: {
+              type: "integer",
+              minimum: 1,
+              default: 12,
+            },
+          },
+        ],
+
         responses: {
           200: {
-            description: "List of projects",
+            description: "Paginated list of projects",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    page: { type: "integer", example: 1 },
+                    limit: { type: "integer", example: 12 },
+                    total: { type: "integer", example: 37 },
+                    totalPages: { type: "integer", example: 4 },
+                    projects: {
+                      type: "array",
+                      items: {
+                        type: "object",
+                        properties: {
+                          id: { type: "string", format: "uuid" },
+                          name: { type: "string" },
+                          description: { type: "string", nullable: true },
+                          status: { type: "string" },
+                          createdAt: { type: "string", format: "date-time" },
+                          tasksCount: { type: "integer", example: 10000 },
+                          completionPercent: { type: "integer", example: 63 },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
           },
         },
       },
@@ -608,7 +684,9 @@ export const openapi = {
         },
       },
     }, // =========================
+
     // PROJECT MEMBERS
+
     // =========================
 
     "/project-members": {
@@ -700,16 +778,89 @@ export const openapi = {
         },
       },
     }, // =========================
+
     // TASKS
+
     // =========================
 
     "/tasks": {
       get: {
         summary: "Get all tasks",
 
+        parameters: [
+          {
+            name: "page",
+            in: "query",
+            required: false,
+            schema: {
+              type: "integer",
+              minimum: 1,
+              default: 1,
+            },
+          },
+          {
+            name: "limit",
+            in: "query",
+            required: false,
+            schema: {
+              type: "integer",
+              minimum: 1,
+              default: 20,
+            },
+          },
+        ],
+
         responses: {
           200: {
-            description: "List of tasks with assignees",
+            description: "Paginated list of tasks with assignees",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    page: { type: "integer", example: 1 },
+                    limit: { type: "integer", example: 20 },
+                    total: { type: "integer", example: 137 },
+                    totalPages: { type: "integer", example: 7 },
+                    tasks: {
+                      type: "array",
+                      items: {
+                        type: "object",
+                        properties: {
+                          id: { type: "string", format: "uuid" },
+                          projectId: { type: "string", format: "uuid" },
+                          title: { type: "string" },
+                          description: { type: "string", nullable: true },
+                          status: { type: "string" },
+                          startDate: {
+                            type: "string",
+                            format: "date-time",
+                            nullable: true,
+                          },
+                          endDate: {
+                            type: "string",
+                            format: "date-time",
+                            nullable: true,
+                          },
+                          createdAt: { type: "string", format: "date-time" },
+                          assignees: {
+                            type: "array",
+                            items: {
+                              type: "object",
+                              properties: {
+                                id: { type: "string", format: "uuid" },
+                                name: { type: "string" },
+                                avatar: { type: "string", nullable: true },
+                              },
+                            },
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
           },
         },
       },
@@ -1042,22 +1193,86 @@ export const openapi = {
         parameters: [
           {
             name: "projectId",
-
             in: "path",
-
             required: true,
-
             schema: {
               type: "string",
-
               format: "uuid",
+            },
+          },
+          {
+            name: "page",
+            in: "query",
+            required: false,
+            schema: {
+              type: "integer",
+              minimum: 1,
+              default: 1,
+            },
+          },
+          {
+            name: "limit",
+            in: "query",
+            required: false,
+            schema: {
+              type: "integer",
+              minimum: 1,
+              default: 20,
             },
           },
         ],
 
         responses: {
           200: {
-            description: "List of project tasks with assignees",
+            description: "Paginated list of project tasks with assignees",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    page: { type: "integer", example: 1 },
+                    limit: { type: "integer", example: 20 },
+                    total: { type: "integer", example: 137 },
+                    totalPages: { type: "integer", example: 7 },
+                    tasks: {
+                      type: "array",
+                      items: {
+                        type: "object",
+                        properties: {
+                          id: { type: "string", format: "uuid" },
+                          projectId: { type: "string", format: "uuid" },
+                          title: { type: "string" },
+                          description: { type: "string", nullable: true },
+                          status: { type: "string" },
+                          startDate: {
+                            type: "string",
+                            format: "date-time",
+                            nullable: true,
+                          },
+                          endDate: {
+                            type: "string",
+                            format: "date-time",
+                            nullable: true,
+                          },
+                          createdAt: { type: "string", format: "date-time" },
+                          assignees: {
+                            type: "array",
+                            items: {
+                              type: "object",
+                              properties: {
+                                id: { type: "string", format: "uuid" },
+                                name: { type: "string" },
+                                avatar: { type: "string", nullable: true },
+                              },
+                            },
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
           },
         },
       },
