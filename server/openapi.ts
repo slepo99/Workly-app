@@ -448,7 +448,63 @@ export const openapi = {
           404: { description: "User not found" },
         },
       },
-    }, // PROJECTS
+    },
+        // DASHBOARD
+
+    // =========================
+
+    // =========================
+    "/dashboard/stats": {
+      get: {
+        summary: "Get dashboard statistics",
+
+        security: [{ cookieAuth: [] }],
+
+        responses: {
+          200: {
+            description: "Dashboard statistics for the current user",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    totalTasks: {
+                      type: "integer",
+                      example: 120,
+                    },
+
+                    completedTasks: {
+                      type: "integer",
+                      example: 84,
+                    },
+
+                    totalProjects: {
+                      type: "integer",
+                      example: 12,
+                    },
+
+                    totalUsers: {
+                      type: "integer",
+                      example: 37,
+                    },
+                  },
+                },
+              },
+            },
+          },
+
+          401: {
+            description: "Unauthorized",
+          },
+
+          403: {
+            description: "Forbidden",
+          },
+        },
+      },
+    },
+
+    // PROJECTS
 
     // =========================
 

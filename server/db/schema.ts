@@ -34,6 +34,7 @@ export const projects = pgTable("projects", {
   description: varchar("description", { length: 1000 }),
   status: varchar("status", { length: 50 }).notNull().default("active"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 export const projectMembers = pgTable(
   "project_members",
@@ -68,6 +69,7 @@ export const tasks = pgTable("tasks", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   startDate: timestamp("start_date"),
   endDate: timestamp("end_date"),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 export const taskAssignees = pgTable(
   "task_assignees",

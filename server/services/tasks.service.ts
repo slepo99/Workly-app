@@ -6,7 +6,7 @@ import {
   projectMembers,
   taskAssignees,
 } from "~~/server/db/schema";
-import { eq, and, count } from "drizzle-orm";
+import { eq, and, count, desc } from "drizzle-orm";
 import { getTaskAssignees } from "./task-assignees.service";
 import { ROLES, type Role } from "~~/server/constants/roles";
 export async function createTask(data: {
@@ -112,6 +112,7 @@ export async function getTasks(
     taskList = await db
       .select()
       .from(tasks)
+      .orderBy(desc(tasks.updatedAt))
       .limit(limit)
       .offset(offset)
   } else if (role === ROLES.MANAGER) {
@@ -138,6 +139,7 @@ export async function getTasks(
         startDate: tasks.startDate,
         endDate: tasks.endDate,
         createdAt: tasks.createdAt,
+        updatedAt: tasks.updatedAt,
       })
       .from(tasks)
       .innerJoin(
@@ -145,6 +147,7 @@ export async function getTasks(
         eq(projectMembers.projectId, tasks.projectId),
       )
       .where(eq(projectMembers.userId, userId))
+      .orderBy(desc(tasks.updatedAt))
       .limit(limit)
       .offset(offset)
   } else {
@@ -171,6 +174,7 @@ export async function getTasks(
         startDate: tasks.startDate,
         endDate: tasks.endDate,
         createdAt: tasks.createdAt,
+        updatedAt: tasks.updatedAt,
       })
       .from(tasks)
       .innerJoin(
@@ -178,6 +182,7 @@ export async function getTasks(
         eq(taskAssignees.taskId, tasks.id),
       )
       .where(eq(taskAssignees.userId, userId))
+      .orderBy(desc(tasks.updatedAt))
       .limit(limit)
       .offset(offset)
   }
@@ -215,18 +220,21 @@ export async function getTaskById(id: string) {
 export async function updateTaskById(
   id: string,
   data: {
-    projectId?: string;
-    assigneeId?: string;
-    title?: string;
-    description?: string;
-    status?: string;
+    projectId?: string
+    assigneeId?: string
+    title?: string
+    description?: string
+    status?: string
   },
 ) {
   const result = await db
     .update(tasks)
-    .set(data)
+    .set({
+      ...data,
+      updatedAt: new Date(),
+    })
     .where(eq(tasks.id, id))
-    .returning();
+    .returning()
 
-  return result[0];
+  return result[0]
 }

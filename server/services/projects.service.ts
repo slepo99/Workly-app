@@ -6,7 +6,7 @@ import {
   tasks,
   taskAssignees,
 } from "~~/server/db/schema";
-import { eq, and, count } from "drizzle-orm";
+import { eq, and, count, desc } from "drizzle-orm";
 import { ROLES, type Role } from "~~/server/constants/roles";
 import { getTaskAssignees } from "./task-assignees.service";
 import { TASK_STATUSES } from "~~/server/constants/taskStatuses";
@@ -41,7 +41,12 @@ export async function getProjects(
 
     total = totalResult[0]?.count ?? 0;
 
-    projectList = await db.select().from(projects).limit(limit).offset(offset);
+    projectList = await db
+      .select()
+      .from(projects)
+      .orderBy(desc(projects.updatedAt))
+      .limit(limit)
+      .offset(offset);
   } else {
     const totalResult = await db
       .select({
@@ -60,10 +65,12 @@ export async function getProjects(
         description: projects.description,
         status: projects.status,
         createdAt: projects.createdAt,
+        updatedAt: projects.updatedAt,
       })
       .from(projects)
       .innerJoin(projectMembers, eq(projectMembers.projectId, projects.id))
       .where(eq(projectMembers.userId, userId))
+      .orderBy(desc(projects.updatedAt))
       .limit(limit)
       .offset(offset);
   }
@@ -121,18 +128,21 @@ export async function getProjectById(id: string) {
 export async function updateProjectById(
   id: string,
   data: {
-    name?: string;
-    description?: string;
-    status?: string;
+    name?: string
+    description?: string
+    status?: string
   },
 ) {
   const result = await db
     .update(projects)
-    .set(data)
+    .set({
+      ...data,
+      updatedAt: new Date(),
+    })
     .where(eq(projects.id, id))
-    .returning();
+    .returning()
 
-  return result[0];
+  return result[0]
 }
 export async function deleteProjectById(id: string) {
   const result = await db
