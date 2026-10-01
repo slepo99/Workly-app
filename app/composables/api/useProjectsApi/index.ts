@@ -1,4 +1,4 @@
-import type { CreateProjectInput, UpdateProjectInput, ProjectModel } from './types'
+import type { CreateProjectInput, UpdateProjectInput, ProjectsResponseModel } from './types'
 export function useProjectsApi() {
   const { $api } = useNuxtApp()
   enum API {
@@ -8,7 +8,7 @@ export function useProjectsApi() {
     DELETE_PROJECT = '/projects',
   }
   const getProjects = () => {
-    return $api<ProjectModel[]>(API.GET_PROJECTS)
+    return $api<ProjectsResponseModel>(API.GET_PROJECTS)
   }
 
   const createProject = (data: CreateProjectInput) => {
