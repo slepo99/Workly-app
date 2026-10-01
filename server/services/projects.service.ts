@@ -6,19 +6,40 @@ import {
   tasks,
   taskAssignees,
 } from "~~/server/db/schema";
-import { eq, and, count, desc } from "drizzle-orm";
+import { eq, and, count, desc, ilike } from "drizzle-orm";
 import { ROLES, type Role } from "~~/server/constants/roles";
 import { getTaskAssignees } from "./task-assignees.service";
 import { TASK_STATUSES } from "~~/server/constants/taskStatuses";
 
-export async function createProject(data: {
-  name: string;
-  description?: string;
-  status?: string;
-}) {
-  const result = await db.insert(projects).values(data).returning();
+export async function createProject(
+  userId: string,
+  role: Role,
+  data: {
+    name: string
+    description?: string
+    status?: string
+  },
+) {
+  return await db.transaction(async (tx) => {
+    const [project] = await tx
+      .insert(projects)
+      .values(data)
+      .returning()
 
-  return result[0];
+    if (!project) {
+      throw new Error("Failed to create project")
+    }
+
+    await tx
+      .insert(projectMembers)
+      .values({
+        projectId: project.id,
+        userId,
+        role,
+      })
+
+    return project
+  })
 }
 
 export async function getProjects(
@@ -26,37 +47,61 @@ export async function getProjects(
   role: Role,
   page: number,
   limit: number,
+  search: string,
 ) {
-  const offset = (page - 1) * limit;
+  const offset = (page - 1) * limit
 
-  let projectList;
-  let total = 0;
+  let projectList
+  let total = 0
 
-  if (role === ROLES.SUPERADMIN || role === ROLES.ADMIN) {
+  const searchCondition = search
+    ? ilike(projects.name, `%${search}%`)
+    : undefined
+
+  if (
+    role === ROLES.SUPERADMIN ||
+    role === ROLES.ADMIN
+  ) {
     const totalResult = await db
       .select({
         count: count(),
       })
-      .from(projects);
+      .from(projects)
+      .where(searchCondition)
 
-    total = totalResult[0]?.count ?? 0;
+    total = totalResult[0]?.count ?? 0
 
     projectList = await db
       .select()
       .from(projects)
+      .where(searchCondition)
       .orderBy(desc(projects.updatedAt))
       .limit(limit)
-      .offset(offset);
+      .offset(offset)
   } else {
     const totalResult = await db
       .select({
         count: count(),
       })
       .from(projects)
-      .innerJoin(projectMembers, eq(projectMembers.projectId, projects.id))
-      .where(eq(projectMembers.userId, userId));
+      .innerJoin(
+        projectMembers,
+        eq(
+          projectMembers.projectId,
+          projects.id,
+        ),
+      )
+      .where(
+        and(
+          eq(
+            projectMembers.userId,
+            userId,
+          ),
+          searchCondition,
+        ),
+      )
 
-    total = totalResult[0]?.count ?? 0;
+    total = totalResult[0]?.count ?? 0
 
     projectList = await db
       .select({
@@ -68,11 +113,25 @@ export async function getProjects(
         updatedAt: projects.updatedAt,
       })
       .from(projects)
-      .innerJoin(projectMembers, eq(projectMembers.projectId, projects.id))
-      .where(eq(projectMembers.userId, userId))
+      .innerJoin(
+        projectMembers,
+        eq(
+          projectMembers.projectId,
+          projects.id,
+        ),
+      )
+      .where(
+        and(
+          eq(
+            projectMembers.userId,
+            userId,
+          ),
+          searchCondition,
+        ),
+      )
       .orderBy(desc(projects.updatedAt))
       .limit(limit)
-      .offset(offset);
+      .offset(offset)
   }
 
   const projectsWithStats = await Promise.all(
@@ -82,7 +141,12 @@ export async function getProjects(
           count: count(),
         })
         .from(tasks)
-        .where(eq(tasks.projectId, project.id));
+        .where(
+          eq(
+            tasks.projectId,
+            project.id,
+          ),
+        )
 
       const completedTasksResult = await db
         .select({
@@ -91,25 +155,37 @@ export async function getProjects(
         .from(tasks)
         .where(
           and(
-            eq(tasks.projectId, project.id),
-            eq(tasks.status, TASK_STATUSES.COMPLETED),
+            eq(
+              tasks.projectId,
+              project.id,
+            ),
+            eq(
+              tasks.status,
+              TASK_STATUSES.COMPLETED,
+            ),
           ),
-        );
+        )
 
-      const tasksCount = allTasksResult[0]?.count ?? 0;
+      const tasksCount =
+        allTasksResult[0]?.count ?? 0
 
-      const completedCount = completedTasksResult[0]?.count ?? 0;
+      const completedCount =
+        completedTasksResult[0]?.count ?? 0
 
       const completionPercent =
-        tasksCount === 0 ? 0 : Math.round((completedCount / tasksCount) * 100);
+        tasksCount === 0
+          ? 0
+          : Math.round(
+              (completedCount / tasksCount) * 100,
+            )
 
       return {
         ...project,
         tasksCount,
         completionPercent,
-      };
+      }
     }),
-  );
+  )
 
   return {
     page,
@@ -117,7 +193,7 @@ export async function getProjects(
     total,
     totalPages: Math.ceil(total / limit),
     projects: projectsWithStats,
-  };
+  }
 }
 export async function getProjectById(id: string) {
   const result = await db.select().from(projects).where(eq(projects.id, id));
