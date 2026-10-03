@@ -4,6 +4,7 @@ import {
 } from "~/constants/projectStatuses";
 import { useProjectsStore } from "~/stores/projects";
 import { useDebounceFn } from "@vueuse/core";
+
 export function useProjectsPage() {
   const projectsStore = useProjectsStore();
 

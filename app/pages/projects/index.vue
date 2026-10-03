@@ -10,7 +10,7 @@
           <p class="mt-1 text-sm text-muted">Manage and track your projects</p>
 
           <div class="mt-3 flex gap-4 text-sm text-muted">
-            <span>Total: 4</span>
+            <span>Total: {{ projectsStore.total }}</span>
             <span>Active: 2</span>
           </div>
         </div>
@@ -42,22 +42,28 @@
         </div>
       </div>
 
-      <FilterButtons v-model="projectsStore.selectedStatus" :filters="filters" @change="filterProjectsStatus"/>
+      <FilterButtons
+        v-model="projectsStore.selectedStatus"
+        :filters="filters"
+        @change="filterProjectsStatus"
+      />
     </div>
-    <div>
-      <div v-for="project in projectsStore.projects" class="border-b border-muted py-4" :key="project.id">
-        <span>{{ project.name }}</span>
-        <span>{{ project.description }}</span>
-        <span>{{ project.status }}</span>
-        <span>{{ project.tasksCount }}</span>
-      </div>
+
+    <div
+      class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mt-8"
+    >
+      
+      <ProjectsCard v-for="project in projectsStore.projects" :project />
     </div>
-    <UPagination
-      v-model:page="projectsStore.page"
-      :items-per-page="PROJECTS_PAGINATION.LIMIT"
-      :total="projectsStore.total"
-      @update:page="updateProjectsPage"
-    />
+
+    <div class="w-full flex items-center justify-center mt-8">
+      <UPagination
+        v-model:page="projectsStore.page"
+        :items-per-page="PROJECTS_PAGINATION.LIMIT"
+        :total="projectsStore.total"
+        @update:page="updateProjectsPage"
+      />
+    </div>
   </UPage>
 </template>
 
@@ -65,6 +71,7 @@
 import { useProjectsStore } from "~/stores/projects";
 import { PROJECTS_PAGINATION } from "~/constants/api";
 import { useProjectsPage } from "~/composables/useProjectsPage";
+
 const projectsStore = useProjectsStore();
 const {
   filters,
@@ -74,9 +81,7 @@ const {
   filterProjectsStatus,
 } = useProjectsPage();
 
-
-
-await firstLoadProjects()
+await firstLoadProjects();
 </script>
 
 <style scoped></style>

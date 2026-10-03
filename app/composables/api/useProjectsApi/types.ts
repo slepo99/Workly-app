@@ -19,4 +19,5 @@ export interface ProjectModel {
   createdAt: string;
   completionPercent: number;
   tasksCount: number;
+  image: string;
 }
