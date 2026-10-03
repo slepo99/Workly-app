@@ -8,6 +8,7 @@
       body: 'lg:p-4 lg:pt-2',
       footer: 'flex items-center justify-between lg:p-4 lg:pt-0',
     }"
+    @click="openProject"
   >
     <template #header>
       <img
@@ -87,6 +88,10 @@ function getProgressColor(
   }
 
   return "success";
+}
+
+function openProject() {
+  return navigateTo(`/projects/${props.project.id}`)
 }
 </script>
 

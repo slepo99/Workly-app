@@ -13,6 +13,7 @@ interface ProjectsStateModel {
   totalPages: number;
   search: string;
   selectedStatus: ProjectStatus[];
+  project: ProjectModel | null
 }
 
 export const useProjectsStore = defineStore("projects", {
@@ -25,6 +26,7 @@ export const useProjectsStore = defineStore("projects", {
       totalPages: 0,
       search: "",
       selectedStatus: [],
+      project: null
     };
   },
 
@@ -71,5 +73,15 @@ export const useProjectsStore = defineStore("projects", {
         this.isLoading = false;
       }
     },
+    async loadProjectById(id: string) {
+      const { getProjectById } = useProjectsApi()
+      this.isLoading = true;
+      try {
+        const project = await getProjectById(id)
+        this.project = project
+      } finally {
+        this.isLoading = false;
+      }
+    }
   },
 });

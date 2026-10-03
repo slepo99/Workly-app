@@ -2,6 +2,7 @@ import type {
   CreateProjectInput,
   UpdateProjectInput,
   ProjectsResponseModel,
+  ProjectModel
 } from "./types";
 import { PROJECTS_PAGINATION } from "~/constants/api";
 import type { ProjectStatus } from "~/constants/projectStatuses";
@@ -55,10 +56,15 @@ export function useProjectsApi() {
     });
   };
 
+  const getProjectById = (id: string) => {
+    return $api<ProjectModel>(`${API.GET_PROJECTS}/${id}`);
+  };
+
   return {
     getProjects,
     createProject,
     updateProject,
     deleteProject,
+    getProjectById
   };
 }
