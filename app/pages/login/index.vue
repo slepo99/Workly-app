@@ -57,7 +57,7 @@
 
 <script setup lang="ts">
 import { useI18n } from "#imports";
-import { useLogin } from "~/composables/useLogin";
+import { useLogin } from "~/composables/pages/useLogin";
 definePageMeta({
   layout: "auth",
 });

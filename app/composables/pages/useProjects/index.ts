@@ -25,6 +25,7 @@ export function useProjectsPage() {
       await projectsStore.searchProjects(value);
     }
   }
+
   async function firstLoadProjects() {
     try {
       await callOnce(
@@ -46,6 +47,7 @@ export function useProjectsPage() {
       await projectsStore.searchProjects();
     }
   }
+  
   return {
     filters,
     searchProjects,

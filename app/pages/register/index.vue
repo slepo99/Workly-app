@@ -69,7 +69,7 @@
 
 <script setup lang="ts">
 import { useI18n } from "#imports";
-import { useRegister } from "~/composables/useRegister";
+import { useRegister } from "~/composables/pages/useRegister";
 
 definePageMeta({
   layout: "auth",

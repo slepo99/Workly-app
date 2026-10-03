@@ -74,7 +74,7 @@
 <script setup lang="ts">
 import { useProjectsStore } from "~/stores/projects";
 import { PROJECTS_PAGINATION } from "~/constants/api";
-import { useProjectsPage } from "~/composables/useProjectsPage";
+import { useProjectsPage } from "~/composables/pages/useProjects";
 
 const projectsStore = useProjectsStore();
 const {

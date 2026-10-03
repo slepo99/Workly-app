@@ -1,25 +1,26 @@
 <template>
-    <div v-if="projectsStore.project">
-        {{ projectsStore.project.name }}
+  <UPage>
+    <UBreadcrumb :items="getBreadcumbs(projectId)" />
+    <div v-if="projectStore.project">
+      <ProjectDetails :project="projectStore.project"/>
     </div>
+  </UPage>
 </template>
 
 <script setup lang="ts">
-import { useProjectsStore } from '~/stores/projects'
-const route = useRoute()
-const projectsStore = useProjectsStore()
+import { useProjectStore } from "~/stores/project";
+import { useProject } from "~/composables/pages/useProject";
 
-const projectId = route.params.id as string
+const route = useRoute();
+const projectStore = useProjectStore();
 
-await callOnce(
-  `project-${projectId}`,
-  async () => {
-    await projectsStore.loadProjectById(projectId)
-  },
-  { mode: "navigation" },
-)
+const projectId = route.params.id as string;
+
+const { onFirstLoadProject, getBreadcumbs } = useProject();
+
+await onFirstLoadProject(projectId);
+
+
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>
