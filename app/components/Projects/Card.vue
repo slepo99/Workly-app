@@ -1,7 +1,7 @@
 <template>
   <UCard
 
-    :key="project.id"
+
     class="group cursor-pointer bg-elevated transition-all duration-200 ease-out hover:-translate-y-1 hover:shadow-lg hover:ring-1 hover:ring-primary/20 dark:hover:shadow-black/30 active:translate-y-0"
     :ui="{
       header: 'flex items-center justify-between lg:p-4 lg:pb-2',

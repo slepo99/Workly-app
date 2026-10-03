@@ -38,7 +38,7 @@ export const useProjectsStore = defineStore("projects", {
       try {
         const projects = await getProjects({
           page: page,
-          limit: PROJECTS_PAGINATION.LIMIT,
+          limit: this.page === 1 ? 11 : PROJECTS_PAGINATION.LIMIT,
           statuses: this.selectedStatus,
         });
 
@@ -58,7 +58,7 @@ export const useProjectsStore = defineStore("projects", {
       try {
         const projects = await getProjects({
           page: page,
-          limit: PROJECTS_PAGINATION.LIMIT,
+          limit: this.page === 1 ? 11 : PROJECTS_PAGINATION.LIMIT,
           search: this.search,
           statuses: this.selectedStatus,
         });

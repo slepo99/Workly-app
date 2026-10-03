@@ -38,7 +38,7 @@ export const useAuthStore = defineStore("auth", {
       }
     },
     async fetchMe() {
-     if (this.isInitialized) return;
+      if (this.isInitialized) return;
       const { getMe } = useAuthApi();
       try {
         this.user = await getMe();
@@ -48,14 +48,25 @@ export const useAuthStore = defineStore("auth", {
         this.isInitialized = true;
       }
     },
-    
+
     async logout() {
       const { logout } = useAuthApi();
       await logout();
+      this.clearAuth();
+      if (import.meta.client) {
+        const channel = new BroadcastChannel("auth");
+
+        channel.postMessage({
+          type: "logout",
+        });
+
+        channel.close();
+      }
+    },
+    clearAuth() {
       this.user = null;
       this.isInitialized = true;
     },
-
     async register(data: Register) {
       const { register } = useAuthApi();
       this.isLoading = true;
