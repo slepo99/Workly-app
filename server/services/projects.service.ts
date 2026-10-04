@@ -163,9 +163,52 @@ export async function getProjects(
   };
 }
 export async function getProjectById(id: string) {
-  const result = await db.select().from(projects).where(eq(projects.id, id));
+  const result = await db
+    .select()
+    .from(projects)
+    .where(eq(projects.id, id))
 
-  return result[0];
+  const project = result[0]
+
+  if (!project) {
+    return undefined
+  }
+
+  const allTasksResult = await db
+    .select({
+      count: count(),
+    })
+    .from(tasks)
+    .where(eq(tasks.projectId, project.id))
+
+  const completedTasksResult = await db
+    .select({
+      count: count(),
+    })
+    .from(tasks)
+    .where(
+      and(
+        eq(tasks.projectId, project.id),
+        eq(tasks.status, TASK_STATUSES.COMPLETED),
+      ),
+    )
+
+  const tasksCount = allTasksResult[0]?.count ?? 0
+  const completedCount =
+    completedTasksResult[0]?.count ?? 0
+
+  const completionPercent =
+    tasksCount === 0
+      ? 0
+      : Math.round(
+          (completedCount / tasksCount) * 100,
+        )
+
+  return {
+    ...project,
+    tasksCount,
+    completionPercent,
+  }
 }
 
 export async function updateProjectById(

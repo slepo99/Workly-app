@@ -3,5 +3,10 @@ export default defineAppConfig({
     colors: {
       neutral: 'zinc',
     },
+    separator: {
+      slots: {
+        border: "dark:border-neutral-600",
+      },
+    },
   },
 })

@@ -21,6 +21,7 @@
 </template>
 
 <script setup lang="ts">
+
 defineProps<{
   filters: {
     label: string
@@ -48,13 +49,12 @@ function onSelectedStatus(currentStatus: string) {
         (status) => status !== currentStatus,
       )
   }
-
   emit("change", selectedStatus.value)
 }
 
 function clearSelectedStatus() {
   selectedStatus.value = []
-
   emit("change", selectedStatus.value)
 }
+
 </script>

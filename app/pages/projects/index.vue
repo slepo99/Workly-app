@@ -74,16 +74,17 @@
 <script setup lang="ts">
 import { useProjectsStore } from "~/stores/projects";
 import { PROJECTS_PAGINATION } from "~/constants/api";
-import { useProjectsPage } from "~/composables/pages/useProjects";
+import { useProjects } from "~/composables/pages/useProjects";
 
 const projectsStore = useProjectsStore();
+
 const {
   filters,
   searchProjects,
   updateProjectsPage,
   firstLoadProjects,
   filterProjectsStatus,
-} = useProjectsPage();
+} = useProjects();
 
 await firstLoadProjects();
 </script>

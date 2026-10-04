@@ -5,7 +5,7 @@ import {
 import { useProjectsStore } from "~/stores/projects";
 import { useDebounceFn } from "@vueuse/core";
 
-export function useProjectsPage() {
+export function useProjects() {
   const projectsStore = useProjectsStore();
 
   const filters = [
