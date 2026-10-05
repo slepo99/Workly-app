@@ -2,7 +2,7 @@
   <UPage>
     <UBreadcrumb :items="getBreadcumbs(projectId)" />
     <div v-if="projectStore.project">
-      <ProjectDetails :project="projectStore.project"/>
+      <ProjectDetails :project="projectStore.project" :members="projectStore.projectMembers" />
     </div>
   </UPage>
 </template>
@@ -16,11 +16,11 @@ const projectStore = useProjectStore();
 
 const projectId = route.params.id as string;
 
-const { onFirstLoadProject, getBreadcumbs } = useProject();
+const { onFirstLoadProject, onLoadProjectMembers, getBreadcumbs } =
+  useProject();
 
 await onFirstLoadProject(projectId);
-
-
+await onLoadProjectMembers(projectId)
 </script>
 
 <style scoped></style>

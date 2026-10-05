@@ -1,6 +1,6 @@
 <template>
   <UCard
-    class="group cursor-pointer border-2 border-dashed border-gray-300 bg-transparent transition-all duration-200 ease-out hover:-translate-y-1 hover:border-primary hover:shadow-lg dark:border-gray-700 dark:hover:border-primary active:translate-y-0"
+    class="card-shadow group cursor-pointer border-2 border-dashed border-gray-300 bg-transparent transition-all duration-200 ease-out hover:-translate-y-1 hover:border-primary hover:shadow-lg dark:border-gray-700 dark:hover:border-primary active:translate-y-0"
     :ui="{
       body: 'flex min-h-64 items-center justify-center',
     }"
