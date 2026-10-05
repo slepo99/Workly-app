@@ -1,6 +1,6 @@
 <template>
   <div
-    class="card-shadow mt-4 flex flex-col gap-4 rounded-xl bg-elevated p-3 sm:p-4 lg:gap-6 lg:p-6"
+    class="card-shadow  flex flex-col gap-4 rounded-xl bg-elevated p-3 sm:p-4 lg:gap-6 lg:p-6"
   >
     <div class="flex flex-col gap-4 md:flex-row lg:gap-6">
       <div

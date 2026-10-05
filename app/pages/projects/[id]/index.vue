@@ -2,7 +2,8 @@
   <UPage>
     <UBreadcrumb :items="getBreadcumbs(projectId)" />
     <div v-if="projectStore.project">
-      <ProjectDetails :project="projectStore.project" :members="projectStore.projectMembers" />
+      <ProjectDetails :project="projectStore.project" :members="projectStore.projectMembers" class="mt-4"/>
+      <ProjectMembersTable :members="projectStore.projectMembers" class="mt-4"/>
     </div>
   </UPage>
 </template>
