@@ -1,5 +1,7 @@
 <template>
-  <UCard>
+  <UCard  class="card-shadow" :ui="{
+    body: 'p-2 sm:p-4'
+  }">
     <template #default>
       <div class="flex items-center gap-3">
         <div class="flex items-start justify-center">
