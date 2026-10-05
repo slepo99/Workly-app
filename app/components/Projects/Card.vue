@@ -1,7 +1,5 @@
 <template>
   <UCard
-
-
     class="card-shadow group cursor-pointer bg-elevated transition-all duration-200 ease-out hover:-translate-y-1 hover:shadow-lg hover:ring-1 hover:ring-primary/20 dark:hover:shadow-black/30 active:translate-y-0"
     :ui="{
       header: 'flex items-center justify-between lg:p-4 lg:pb-2',
@@ -11,18 +9,20 @@
     @click="openProject"
   >
     <template #header>
-      <img
-        v-if="project.image"
-        :src="project.image"
-        :alt="project.name"
-        class="h-28 w-full rounded-t-xl"
-      />
-      <img
-        v-else
-        src="../../assets/images/no-image.jpg"
-        :alt="project.name"
-        class="h-28 w-full rounded-t-xl"
-      />
+      <div class="aspect-[16/7] w-full overflow-hidden rounded-t-xl">
+        <img
+          v-if="project.image"
+          :src="project.image"
+          :alt="project.name"
+          class="h-full w-full object-cover"
+        />
+        <div
+          v-else
+          class="flex h-full w-full items-center justify-center rounded-t-xl border border-dashed border-neutral-300 text-muted dark:border-neutral-600"
+        >
+          <UIcon name="i-lucide-image" class="size-8" />
+        </div>
+      </div>
     </template>
     <template #default>
       <div class="flex items-center justify-between">
@@ -52,7 +52,6 @@
         class="mt-4"
       />
     </template>
-
   </UCard>
 </template>
 
@@ -61,8 +60,8 @@ import { PROJECT_STATUSES } from "~/constants/projectStatuses";
 import type { ProjectModel } from "~/composables/api/useProjectsApi/types";
 
 const props = defineProps<{
-  project: ProjectModel
-}>()
+  project: ProjectModel;
+}>();
 function getProjectStatusColor(status: string) {
   if (PROJECT_STATUSES.ACTIVE === status) {
     return "success";
@@ -91,7 +90,7 @@ function getProgressColor(
 }
 
 function openProject() {
-  return navigateTo(`/projects/${props.project.id}`)
+  return navigateTo(`/projects/${props.project.id}`);
 }
 </script>
 

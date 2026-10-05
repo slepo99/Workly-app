@@ -1,10 +1,10 @@
 <template>
   <div
-    class="card-shadow flex flex-col bg-elevated p-3 sm:p-4 lg:p-6 mt-4 rounded-xl gap-2 sm:gap-4 lg:gap-6"
+    class="card-shadow mt-4 flex flex-col gap-4 rounded-xl bg-elevated p-3 sm:p-4 lg:gap-6 lg:p-6"
   >
-    <div class="flex gap-2 sm:gap-4 lg:gap-6">
+    <div class="flex flex-col gap-4 md:flex-row lg:gap-6">
       <div
-        class="flex h-40 w-60 items-center justify-center overflow-hidden rounded-xl bg-muted"
+        class="flex aspect-video w-full shrink-0 items-center justify-center overflow-hidden rounded-xl bg-muted md:aspect-auto md:h-40 md:w-60"
       >
         <img
           v-if="project.image"
@@ -22,102 +22,110 @@
       </div>
 
       <div
-        class="flex flex-col items-start justify-between w-full gap-4 sm:gap-6 lg:gap-8 lg:flex-row"
+        class="flex min-w-0 flex-1 flex-col gap-4 xl:flex-row xl:items-start xl:justify-between xl:gap-6"
       >
-        <div class="flex flex-col gap-2 sm:gap-3 lg:gap-4">
-          <div class="flex items-center gap-4">
-            <span class="text-2xl font-semibold truncate">{{
-              project.name
-            }}</span>
-            <UBadge :color="getProjectStatusColor(project.status)" size="lg">{{
-              project.status
-            }}</UBadge>
+        <div class="flex min-w-0 flex-1 flex-col gap-3">
+          <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
+            <span
+              class="min-w-0 max-w-full text-xl font-semibold [overflow-wrap:anywhere] sm:text-2xl"
+            >
+              {{ project.name }}
+            </span>
+
+            <UBadge
+              :color="getProjectStatusColor(project.status)"
+              size="lg"
+              class="shrink-0"
+            >
+              {{ project.status }}
+            </UBadge>
           </div>
-          <p class="text-md text-neutral-500 line-clamp-2 truncate">
+
+          <p
+            class="text-base whitespace-normal text-neutral-500 [overflow-wrap:anywhere]"
+          >
             {{ project.description }}
           </p>
-          <div class="flex items-center gap-4">
-            <ProjectSmallStat>
-              <template #icon>
-                <UIcon name="i-lucide-calendar" class="text-xl" />
-              </template>
-              <template #title> Created at </template>
-              <template #value>{{
-                formatDateShort(project.createdAt)
-              }}</template>
-            </ProjectSmallStat>
-
-            <ProjectSmallStat>
-              <template #icon>
-                <UIcon name="i-lucide-clock" class="text-xl" />
-              </template>
-              <template #title> Updated at </template>
-              <template #value>{{
-                formatDateShort(project.updatedAt)
-              }}</template>
-            </ProjectSmallStat>
-          </div>
         </div>
-        <div class="flex items-start gap-4">
+
+        <div
+          class="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-wrap xl:shrink-0"
+        >
           <UButton
-            class="!bg-transparent !text-primary hover:!bg-primary/10 w-full justify-center sm:w-auto"
+            class="min-w-0 justify-center !bg-transparent !text-primary hover:!bg-primary/10"
             variant="outline"
             icon="i-lucide-edit-2"
           >
             Edit Project
           </UButton>
+
           <UButton
             label="Add task"
             icon="i-lucide-plus"
             color="secondary"
-            class="w-full justify-center sm:w-auto cursor-pointer"
+            class="min-w-0 cursor-pointer justify-center"
           />
         </div>
       </div>
     </div>
+
     <USeparator />
-    <div class="flex items-center gap-4">
-      <ProjectSmallStat class="w-full">
+
+    <div class="grid grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-6">
+      <ProjectSmallStat class="min-w-0 w-full">
         <template #icon>
-          <UIcon class="text-2xl" name="i-lucide:clipboard-check" />
+          <UIcon name="i-lucide-calendar" class="text-xl" />
         </template>
-        <template #title> Total tasks </template>
+        <template #title>Created at</template>
+        <template #value>
+          {{ formatDateShort(project.createdAt) }}
+        </template>
+      </ProjectSmallStat>
+
+      <ProjectSmallStat class="min-w-0 w-full">
+        <template #icon>
+          <UIcon name="i-lucide-clock" class="text-xl" />
+        </template>
+        <template #title>Updated at</template>
+        <template #value>
+          {{ formatDateShort(project.updatedAt) }}
+        </template>
+      </ProjectSmallStat>
+
+      <ProjectSmallStat class="min-w-0 w-full">
+        <template #icon>
+          <UIcon name="i-lucide-clipboard-check" class="text-2xl" />
+        </template>
+        <template #title>Total tasks</template>
         <template #value>{{ project.tasksCount }}</template>
       </ProjectSmallStat>
 
-      <ProjectSmallStat class="w-full">
+      <ProjectSmallStat class="min-w-0 w-full">
         <template #icon>
-          <UIcon class="text-2xl" name="i-lucide-circle-check" />
+          <UIcon name="i-lucide-circle-check" class="text-2xl" />
         </template>
-        <template #title> Completed tasks </template>
-        <template #value>{{
-          getPercentageValue(project.tasksCount, project.completionPercent)
-        }}</template>
+        <template #title>Completed tasks</template>
+        <template #value>
+          {{
+            getPercentageValue(project.tasksCount, project.completionPercent)
+          }}
+        </template>
       </ProjectSmallStat>
 
-      <ProjectSmallStat class="w-full">
+      <ProjectSmallStat class="min-w-0 w-full">
         <template #icon>
           <UIRoundedProgress :percent="project.completionPercent" size="24" />
         </template>
-        <template #title> Completiton rate </template>
+        <template #title>Completion rate</template>
         <template #value>{{ project.completionPercent }}%</template>
       </ProjectSmallStat>
 
-      <ProjectSmallStat class="w-full">
+      <ProjectSmallStat class="min-w-0 w-full">
         <template #icon>
-          <UIcon class="text-2xl" name="i-lucide-users" />
+          <UIcon name="i-lucide-users" class="text-2xl" />
         </template>
-        <template #title> Project members </template>
+        <template #title>Project members</template>
         <template #value>{{ members.length }}</template>
-        <template #extra-value>
-          <UAvatarGroup max="3">
-            <UAvatar
-              v-for="member in membersWithAvatar"
-              :src="String(member.user.avatar)"
-              :alt="member.user.name"
-            />
-          </UAvatarGroup>
-        </template>
       </ProjectSmallStat>
     </div>
   </div>
@@ -132,18 +140,6 @@ const props = defineProps<{
   members: ProjectMemberModel[];
 }>();
 
-function getProjectStatusColor(status: string) {
-  if (PROJECT_STATUSES.ACTIVE === status) {
-    return "success";
-  } else if (PROJECT_STATUSES.COMPLETED === status) {
-    return "info";
-  } else {
-    return "warning";
-  }
-}
-const membersWithAvatar = computed(() =>
-  props.members.filter((member) => member.user.avatar),
-);
 </script>
 
 <style scoped></style>

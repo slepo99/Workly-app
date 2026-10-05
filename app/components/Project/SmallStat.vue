@@ -1,6 +1,6 @@
 <template>
   <UCard  class="card-shadow" :ui="{
-    body: 'p-1 sm:p-2'
+    body: 'py-1 sm:py-2 px-2 sm:px-3'
   }">
     <template #default>
       <div class="flex items-center gap-3">
@@ -15,9 +15,9 @@
             <slot name="value"/>
          </span>
         </div>
-        <div class="flex items-center justify-center gap-3">
+        <!-- <div class="flex items-center justify-center gap-3">
             <slot name="extra-value"/>
-        </div>
+        </div> -->
       </div>
     </template>
   </UCard>
