@@ -1,9 +1,7 @@
 <template>
   <div class="overflow-hidden rounded-lg border border-default">
     <div class="border-b border-default px-4 py-3">
-      <span class="text-lg font-semibold">
-        Tasks list
-      </span>
+      <span class="text-lg font-semibold"> Tasks list </span>
     </div>
 
     <UTable
@@ -19,49 +17,49 @@
 </template>
 
 <script setup lang="ts">
-import type { TableColumn } from "@nuxt/ui"
-import type { Column } from "@tanstack/vue-table"
-import { formatDate } from "~/utils/date"
+import type { TableColumn } from "@nuxt/ui";
+import type { Column } from "@tanstack/vue-table";
+import { formatDate } from "~/utils/date";
 
 interface TaskAssigneeModel {
-  id: string
-  name: string
-  avatar: string | null
+  id: string;
+  name: string;
+  avatar: string | null;
 }
 
 interface ProjectTaskModel {
-  id: string
-  projectId: string
-  title: string
-  description: string
-  status: string
-  startDate: string | null
-  endDate: string | null
-  createdAt: string
-  assignees: TaskAssigneeModel[]
+  id: string;
+  projectId: string;
+  title: string;
+  description: string;
+  status: string;
+  startDate: string | null;
+  endDate: string | null;
+  createdAt: string;
+  assignees: TaskAssigneeModel[];
 }
 
 defineProps<{
-  tasks: ProjectTaskModel[]
-}>()
+  tasks: ProjectTaskModel[];
+}>();
 
 const emit = defineEmits<{
   "update-status": [
     payload: {
-      taskId: string
-      status: string
+      taskId: string;
+      status: string;
     },
-  ]
-  open: [taskId: string]
-  delete: [taskId: string]
-}>()
+  ];
+  open: [taskId: string];
+  delete: [taskId: string];
+}>();
 
-const USelect = resolveComponent("USelect")
-const UAvatarGroup = resolveComponent("UAvatarGroup")
-const UAvatar = resolveComponent("UAvatar")
-const UButton = resolveComponent("UButton")
+const USelect = resolveComponent("USelect");
+const UAvatarGroup = resolveComponent("UAvatarGroup");
+const UAvatar = resolveComponent("UAvatar");
+const UButton = resolveComponent("UButton");
 
-const sorting = ref([])
+const sorting = ref([]);
 
 const statusItems = [
   {
@@ -80,14 +78,13 @@ const statusItems = [
     label: "Cancelled",
     value: "cancelled",
   },
-]
+];
 
 const columns: TableColumn<ProjectTaskModel>[] = [
   {
     accessorKey: "id",
 
-    header: ({ column }) =>
-      getHeader(column, "ID"),
+    header: ({ column }) => getHeader(column, "ID"),
 
     cell: ({ row }) =>
       h(
@@ -103,8 +100,7 @@ const columns: TableColumn<ProjectTaskModel>[] = [
   {
     accessorKey: "title",
 
-    header: ({ column }) =>
-      getHeader(column, "Task Name"),
+    header: ({ column }) => getHeader(column, "Task Name"),
 
     cell: ({ row }) =>
       h(
@@ -120,11 +116,10 @@ const columns: TableColumn<ProjectTaskModel>[] = [
   {
     accessorKey: "status",
 
-    header: ({ column }) =>
-      getHeader(column, "Status"),
+    header: ({ column }) => getHeader(column, "Status"),
 
     cell: ({ row }) => {
-      const status = row.original.status
+      const status = row.original.status;
 
       const statusClass: Record<string, string> = {
         pending:
@@ -138,7 +133,7 @@ const columns: TableColumn<ProjectTaskModel>[] = [
 
         cancelled:
           "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300",
-      }
+      };
 
       return h(USelect, {
         modelValue: status,
@@ -150,50 +145,40 @@ const columns: TableColumn<ProjectTaskModel>[] = [
         class: "w-36",
 
         ui: {
-          base: `rounded-full ${
-            statusClass[status] ?? ""
-          } outline-none ring-0`,
+          base: `rounded-full ${statusClass[status] ?? ""} outline-none ring-0`,
         },
 
         "onUpdate:modelValue": (value: string) => {
           emit("update-status", {
             taskId: row.original.id,
             status: value,
-          })
+          });
         },
-      })
+      });
     },
   },
 
   {
     accessorKey: "startDate",
 
-    header: ({ column }) =>
-      getHeader(column, "Start Date"),
+    header: ({ column }) => getHeader(column, "Start Date"),
 
     cell: ({ row }) => {
-      const startDate =
-        row.original.startDate
+      const startDate = row.original.startDate;
 
-      return startDate
-        ? formatDate(startDate)
-        : "—"
+      return startDate ? formatDate(startDate) : "—";
     },
   },
 
   {
     accessorKey: "endDate",
 
-    header: ({ column }) =>
-      getHeader(column, "End Date"),
+    header: ({ column }) => getHeader(column, "End Date"),
 
     cell: ({ row }) => {
-      const endDate =
-        row.original.endDate
+      const endDate = row.original.endDate;
 
-      return endDate
-        ? formatDate(endDate)
-        : "—"
+      return endDate ? formatDate(endDate) : "—";
     },
   },
 
@@ -203,8 +188,7 @@ const columns: TableColumn<ProjectTaskModel>[] = [
     header: "Assigned to",
 
     cell: ({ row }) => {
-      const assignees =
-        row.original.assignees
+      const assignees = row.original.assignees;
 
       if (!assignees.length) {
         return h(
@@ -213,7 +197,7 @@ const columns: TableColumn<ProjectTaskModel>[] = [
             class: "text-muted",
           },
           "—",
-        )
+        );
       }
 
       return h(
@@ -226,25 +210,19 @@ const columns: TableColumn<ProjectTaskModel>[] = [
             h(UAvatar, {
               key: user.id,
               alt: user.name,
-              src:
-                user.avatar ??
-                undefined,
+              src: user.avatar ?? undefined,
             }),
           ),
-      )
+      );
     },
   },
 
   {
     accessorKey: "createdAt",
 
-    header: ({ column }) =>
-      getHeader(column, "Created At"),
+    header: ({ column }) => getHeader(column, "Created At"),
 
-    cell: ({ row }) =>
-      formatDate(
-        row.original.createdAt,
-      ),
+    cell: ({ row }) => formatDate(row.original.createdAt),
   },
 
   {
@@ -256,8 +234,7 @@ const columns: TableColumn<ProjectTaskModel>[] = [
       h(
         "div",
         {
-          class:
-            "flex items-center gap-1",
+          class: "flex items-center gap-1",
         },
         [
           h(UButton, {
@@ -267,10 +244,7 @@ const columns: TableColumn<ProjectTaskModel>[] = [
             size: "sm",
 
             onClick: () => {
-              emit(
-                "open",
-                row.original.id,
-              )
+              emit("open", row.original.id);
             },
           }),
 
@@ -281,21 +255,15 @@ const columns: TableColumn<ProjectTaskModel>[] = [
             size: "sm",
 
             onClick: () => {
-              emit(
-                "delete",
-                row.original.id,
-              )
+              emit("delete", row.original.id);
             },
           }),
         ],
       ),
   },
-]
+];
 
-function getHeader(
-  column: Column<ProjectTaskModel>,
-  label: string,
-) {
+function getHeader(column: Column<ProjectTaskModel>, label: string) {
   return h(UButton, {
     color: "neutral",
     variant: "ghost",
@@ -307,10 +275,7 @@ function getHeader(
         : "i-lucide-arrow-down"
       : "i-lucide-arrow-up-down",
 
-    onClick: () =>
-      column.toggleSorting(
-        column.getIsSorted() === "asc",
-      ),
-  })
+    onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
+  });
 }
 </script>

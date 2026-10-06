@@ -1,4 +1,4 @@
-import { deleteTaskById } from "~~/server/services/users.service";
+import { deleteTaskById } from "~~/server/services/tasks.service";
 import { ROLE_GROUPS } from "~~/server/constants/roles"
 import { requireRole } from "~~/server/utils/requireRole"
 

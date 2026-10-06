@@ -1,5 +1,5 @@
 import { db } from "~~/server/db";
-import { tasks, users } from "~~/server/db/schema";
+import {  users } from "~~/server/db/schema";
 import { eq } from "drizzle-orm";
 import type { Role } from "~~/server/constants/roles";
 import { deleteImageByUrl } from "~~/server/services/uploads.service";
@@ -31,9 +31,20 @@ export async function getUserById(id: string) {
   return user;
 }
 export async function deleteUserById(id: string) {
-  const result = await db.delete(users).where(eq(users.id, id)).returning();
+  const [deletedUser] = await db
+    .delete(users)
+    .where(eq(users.id, id))
+    .returning();
 
-  return result[0];
+  if (!deletedUser) {
+    return undefined;
+  }
+
+  if (deletedUser.avatar) {
+    await deleteImageByUrl(deletedUser.avatar);
+  }
+
+  return deletedUser;
 }
 export async function updateUserById(
   id: string,
@@ -64,17 +75,13 @@ export async function updateUserById(
       createdAt: users.createdAt,
     });
 
-  if (data.avatar && oldUser.avatar && data.avatar !== oldUser.avatar) {
+  if ("avatar" in data && oldUser.avatar && data.avatar !== oldUser.avatar) {
     await deleteImageByUrl(oldUser.avatar);
   }
 
   return updatedUser;
 }
-export async function deleteTaskById(id: string) {
-  const result = await db.delete(tasks).where(eq(tasks.id, id)).returning();
 
-  return result[0];
-}
 export async function updateUserRole(userId: string, role: Role) {
   const [user] = await db
     .update(users)

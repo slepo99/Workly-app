@@ -163,15 +163,12 @@ export async function getProjects(
   };
 }
 export async function getProjectById(id: string) {
-  const result = await db
-    .select()
-    .from(projects)
-    .where(eq(projects.id, id))
+  const result = await db.select().from(projects).where(eq(projects.id, id));
 
-  const project = result[0]
+  const project = result[0];
 
   if (!project) {
-    return undefined
+    return undefined;
   }
 
   const allTasksResult = await db
@@ -179,7 +176,7 @@ export async function getProjectById(id: string) {
       count: count(),
     })
     .from(tasks)
-    .where(eq(tasks.projectId, project.id))
+    .where(eq(tasks.projectId, project.id));
 
   const completedTasksResult = await db
     .select({
@@ -191,24 +188,19 @@ export async function getProjectById(id: string) {
         eq(tasks.projectId, project.id),
         eq(tasks.status, TASK_STATUSES.COMPLETED),
       ),
-    )
+    );
 
-  const tasksCount = allTasksResult[0]?.count ?? 0
-  const completedCount =
-    completedTasksResult[0]?.count ?? 0
+  const tasksCount = allTasksResult[0]?.count ?? 0;
+  const completedCount = completedTasksResult[0]?.count ?? 0;
 
   const completionPercent =
-    tasksCount === 0
-      ? 0
-      : Math.round(
-          (completedCount / tasksCount) * 100,
-        )
+    tasksCount === 0 ? 0 : Math.round((completedCount / tasksCount) * 100);
 
   return {
     ...project,
     tasksCount,
     completionPercent,
-  }
+  };
 }
 
 export async function updateProjectById(
@@ -238,19 +230,27 @@ export async function updateProjectById(
     .where(eq(projects.id, id))
     .returning();
 
-  if (data.image && oldProject.image && data.image !== oldProject.image) {
+  if ("image" in data && oldProject.image && data.image !== oldProject.image) {
     await deleteImageByUrl(oldProject.image);
   }
 
   return updatedProject;
 }
 export async function deleteProjectById(id: string) {
-  const result = await db
+  const [deletedProject] = await db
     .delete(projects)
     .where(eq(projects.id, id))
     .returning();
 
-  return result[0];
+  if (!deletedProject) {
+    return undefined;
+  }
+
+  if (deletedProject.image) {
+    await deleteImageByUrl(deletedProject.image);
+  }
+
+  return deletedProject;
 }
 export async function getMembersByProjectId(
   projectId: string,

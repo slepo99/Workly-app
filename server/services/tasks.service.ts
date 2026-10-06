@@ -236,5 +236,34 @@ export async function updateTaskById(
     .where(eq(tasks.id, id))
     .returning()
 
-  return result[0]
+  const updatedTask = result[0]
+
+  if (!updatedTask) {
+    return undefined
+  }
+
+  const assignees = await db
+    .select({
+      id: users.id,
+      name: users.name,
+      avatar: users.avatar,
+    })
+    .from(taskAssignees)
+    .innerJoin(
+      users,
+      eq(taskAssignees.userId, users.id),
+    )
+    .where(
+      eq(taskAssignees.taskId, updatedTask.id),
+    )
+
+  return {
+    ...updatedTask,
+    assignees,
+  }
+}
+export async function deleteTaskById(id: string) {
+  const result = await db.delete(tasks).where(eq(tasks.id, id)).returning();
+
+  return result[0];
 }

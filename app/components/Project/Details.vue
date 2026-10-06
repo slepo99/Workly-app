@@ -1,6 +1,6 @@
 <template>
   <div
-    class="card-shadow  flex flex-col gap-4 rounded-xl bg-elevated p-3 sm:p-4 lg:gap-6 lg:p-6"
+    class="card-shadow flex flex-col gap-4 rounded-xl bg-elevated p-3 sm:p-4 lg:gap-6 lg:p-6"
   >
     <div class="flex flex-col gap-4 md:flex-row lg:gap-6">
       <div
@@ -51,14 +51,15 @@
         <div
           class="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-wrap xl:shrink-0"
         >
-          <UButton
+          <!-- <UButton
             class="min-w-0 justify-center !bg-transparent !text-primary hover:!bg-primary/10"
             variant="outline"
             icon="i-lucide-edit-2"
+            @click="editProject"
           >
             Edit Project
-          </UButton>
-
+          </UButton> -->
+          <ProjectEdit :project="props.project"/>
           <UButton
             label="Add task"
             icon="i-lucide-plus"
@@ -139,7 +140,11 @@ const props = defineProps<{
   project: ProjectModel;
   members: ProjectMemberModel[];
 }>();
+const emits = defineEmits(["editProject"]);
 
+function editProject() {
+  emits("editProject");
+}
 </script>
 
 <style scoped></style>
