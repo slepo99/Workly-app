@@ -1,13 +1,15 @@
 <template>
-  <div class="rounded-lg border border-default overflow-hidden">
-    <div class="px-4 py-3 border-b border-default">
-      <span class="text-lg font-semibold">Tasks list</span>
+  <div class="overflow-hidden rounded-lg border border-default">
+    <div class="border-b border-default px-4 py-3">
+      <span class="text-lg font-semibold">
+        Tasks list
+      </span>
     </div>
 
     <UTable
-      sticky
-      :data="data"
       v-model:sorting="sorting"
+      sticky
+      :data="tasks"
       :columns="columns"
       :ui="{
         root: 'max-h-[500px] overflow-y-auto scrollbar-thin border border-default rounded-b-lg',
@@ -17,113 +19,127 @@
 </template>
 
 <script setup lang="ts">
-import type { TableColumn } from "@nuxt/ui";
-import { formatDate } from "~/utils/date";
-import type { Column } from "@tanstack/vue-table";
-interface ProjectTableRow {
-  id: string;
-  taskName: string;
-  projectName: string;
-  status: "active" | "completed" | "on-hold";
-  startDate: string;
-  endDate: string | null;
-  assignedUsers: string[];
-  priority: "low" | "medium" | "high";
-}
-const statuses = ["active", "completed", "on-hold"] as const;
-const priorities = ["low", "medium", "high"] as const;
-const USelect = resolveComponent("USelect");
-const UAvatarGroup = resolveComponent("UAvatarGroup");
-const UAvatar = resolveComponent("UAvatar");
-const UBadge = resolveComponent("UBadge");
-const UButton = resolveComponent("UButton");
-const UDropdownMenu = resolveComponent("UDropdownMenu");
+import type { TableColumn } from "@nuxt/ui"
+import type { Column } from "@tanstack/vue-table"
+import { formatDate } from "~/utils/date"
 
-const users = [
-  "John Smith",
-  "Emma Wilson",
-  "Michael Brown",
-  "Olivia Davis",
-  "Daniel Miller",
-  "Sophia Taylor",
-];
+interface TaskAssigneeModel {
+  id: string
+  name: string
+  avatar: string | null
+}
+
+interface ProjectTaskModel {
+  id: string
+  projectId: string
+  title: string
+  description: string
+  status: string
+  startDate: string | null
+  endDate: string | null
+  createdAt: string
+  assignees: TaskAssigneeModel[]
+}
+
+defineProps<{
+  tasks: ProjectTaskModel[]
+}>()
+
+const emit = defineEmits<{
+  "update-status": [
+    payload: {
+      taskId: string
+      status: string
+    },
+  ]
+  open: [taskId: string]
+  delete: [taskId: string]
+}>()
+
+const USelect = resolveComponent("USelect")
+const UAvatarGroup = resolveComponent("UAvatarGroup")
+const UAvatar = resolveComponent("UAvatar")
+const UButton = resolveComponent("UButton")
+
+const sorting = ref([])
 
 const statusItems = [
   {
-    label: "Active",
-    value: "active",
+    label: "Pending",
+    value: "pending",
+  },
+  {
+    label: "In progress",
+    value: "in_progress",
   },
   {
     label: "Completed",
     value: "completed",
   },
   {
-    label: "On hold",
-    value: "on-hold",
+    label: "Cancelled",
+    value: "cancelled",
   },
-];
-const sorting = ref([]);
-const data = ref<ProjectTableRow[]>(
-  Array(5)
-    .fill(0)
-    .map((_, i) => ({
-      id: `PRJ-${String(i + 1).padStart(4, "0")}`,
-      taskName: `Task ${i + 1}`,
-      projectName: `Project ${i + 1}`,
-      status: statuses[i % statuses.length]!,
-      startDate: `2026-09-${String((i % 28) + 1).padStart(2, "0")}`,
-      endDate: `2026-10-${String((i % 28) + 1).padStart(2, "0")}`,
-      assignedUsers: [users[i % users.length]!, users[(i + 1) % users.length]!],
-      priority: priorities[i % priorities.length]!,
-    })),
-);
+]
 
-const columns: TableColumn<ProjectTableRow>[] = [
+const columns: TableColumn<ProjectTaskModel>[] = [
   {
     accessorKey: "id",
-    header: ({ column }) => getHeader(column, "ID"),
-    cell: ({ row }) => `#${row.getValue("id")}`,
+
+    header: ({ column }) =>
+      getHeader(column, "ID"),
+
+    cell: ({ row }) =>
+      h(
+        "div",
+        {
+          class: "max-w-32 truncate text-muted",
+          title: row.original.id,
+        },
+        `#${row.original.id}`,
+      ),
   },
+
   {
-    accessorKey: "taskName",
-    header: ({ column }) => getHeader(column, "Task Name"),
+    accessorKey: "title",
+
+    header: ({ column }) =>
+      getHeader(column, "Task Name"),
+
     cell: ({ row }) =>
       h(
         "div",
         {
           class: "max-w-48 truncate",
-          title: row.getValue("taskName") as string,
+          title: row.original.title,
         },
-        row.getValue("taskName") as string,
-      ),
-  },
-  {
-    accessorKey: "projectName",
-    header: ({ column }) => getHeader(column, "Project Name"),
-    cell: ({ row }) =>
-      h(
-        "div",
-        {
-          class: "max-w-40 truncate",
-          title: row.getValue("projectName") as string,
-        },
-        row.getValue("projectName") as string,
+        row.original.title,
       ),
   },
 
   {
     accessorKey: "status",
-    header: ({ column }) => getHeader(column, "Status"),
+
+    header: ({ column }) =>
+      getHeader(column, "Status"),
+
     cell: ({ row }) => {
-      const status = row.original.status;
-      const statusClass = {
-        active:
-          "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300",
-        completed:
-          "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300",
-        "on-hold":
+      const status = row.original.status
+
+      const statusClass: Record<string, string> = {
+        pending:
           "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300",
-      }[status];
+
+        in_progress:
+          "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300",
+
+        completed:
+          "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300",
+
+        cancelled:
+          "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300",
+      }
+
       return h(USelect, {
         modelValue: status,
         items: statusItems,
@@ -131,43 +147,74 @@ const columns: TableColumn<ProjectTableRow>[] = [
         labelKey: "label",
         size: "sm",
         color: "neutral",
-        class: "w-32",
+        class: "w-36",
+
         ui: {
-          base: `rounded-full ${statusClass} outline-none ring-0`,
+          base: `rounded-full ${
+            statusClass[status] ?? ""
+          } outline-none ring-0`,
         },
 
-        "onUpdate:modelValue": (value: ProjectTableRow["status"]) => {
-          row.original.status = value;
+        "onUpdate:modelValue": (value: string) => {
+          emit("update-status", {
+            taskId: row.original.id,
+            status: value,
+          })
         },
-      });
+      })
     },
   },
+
   {
     accessorKey: "startDate",
-    header: ({ column }) => getHeader(column, "Start Date"),
-    cell: ({ row }) => formatDate(row.getValue("startDate")),
+
+    header: ({ column }) =>
+      getHeader(column, "Start Date"),
+
+    cell: ({ row }) => {
+      const startDate =
+        row.original.startDate
+
+      return startDate
+        ? formatDate(startDate)
+        : "—"
+    },
   },
+
   {
     accessorKey: "endDate",
+
     header: ({ column }) =>
-      h(UButton, {
-        color: "neutral",
-        variant: "ghost",
-        label: "End Date",
-        icon: column.getIsSorted()
-          ? column.getIsSorted() === "asc"
-            ? "i-lucide-arrow-up"
-            : "i-lucide-arrow-down"
-          : "i-lucide-arrow-up-down",
-        onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
-      }),
-    cell: ({ row }) => formatDate(row.getValue("endDate")),
-  },
-  {
-    accessorKey: "assignedUsers",
-    header: "Assigned to",
+      getHeader(column, "End Date"),
+
     cell: ({ row }) => {
-      const users = row.getValue("assignedUsers") as string[];
+      const endDate =
+        row.original.endDate
+
+      return endDate
+        ? formatDate(endDate)
+        : "—"
+    },
+  },
+
+  {
+    accessorKey: "assignees",
+
+    header: "Assigned to",
+
+    cell: ({ row }) => {
+      const assignees =
+        row.original.assignees
+
+      if (!assignees.length) {
+        return h(
+          "span",
+          {
+            class: "text-muted",
+          },
+          "—",
+        )
+      }
 
       return h(
         UAvatarGroup,
@@ -175,49 +222,42 @@ const columns: TableColumn<ProjectTableRow>[] = [
           max: 3,
         },
         () =>
-          users.map((user) =>
+          assignees.map((user) =>
             h(UAvatar, {
-              alt: user,
-              src: "https://github.com/benjamincanac.png",
+              key: user.id,
+              alt: user.name,
+              src:
+                user.avatar ??
+                undefined,
             }),
           ),
-      );
+      )
     },
   },
-  {
-    accessorKey: "priority",
-    header: ({ column }) => getPriorityHeader(column, "Priority"),
-    sortingFn: (rowA, rowB) => {
-      const order = {
-        low: 1,
-        medium: 2,
-        high: 3,
-      } as const;
 
-      return order[rowA.original.priority] - order[rowB.original.priority];
-    },
-    cell: ({ row }) => {
-      const priority = row.getValue("priority");
-      const colors = {
-        low: "success",
-        medium: "warning",
-        high: "error",
-      }[priority as string];
-      return h(UBadge, {
-        label: priority,
-        color: colors,
-      });
-    },
+  {
+    accessorKey: "createdAt",
+
+    header: ({ column }) =>
+      getHeader(column, "Created At"),
+
+    cell: ({ row }) =>
+      formatDate(
+        row.original.createdAt,
+      ),
   },
+
   {
     id: "actions",
     header: "Actions",
     enableSorting: false,
-    cell: ({ row }) => {
-      return h(
+
+    cell: ({ row }) =>
+      h(
         "div",
         {
-          class: "flex items-center gap-1",
+          class:
+            "flex items-center gap-1",
         },
         [
           h(UButton, {
@@ -225,8 +265,12 @@ const columns: TableColumn<ProjectTableRow>[] = [
             color: "neutral",
             variant: "ghost",
             size: "sm",
+
             onClick: () => {
-              console.log("Open task:", row.original.id);
+              emit(
+                "open",
+                row.original.id,
+              )
             },
           }),
 
@@ -235,80 +279,38 @@ const columns: TableColumn<ProjectTableRow>[] = [
             color: "error",
             variant: "ghost",
             size: "sm",
+
             onClick: () => {
-              console.log("Delete task:", row.original.id);
+              emit(
+                "delete",
+                row.original.id,
+              )
             },
           }),
         ],
-      );
-    },
+      ),
   },
-];
+]
 
-function getHeader(column: Column<ProjectTableRow>, label: string) {
+function getHeader(
+  column: Column<ProjectTaskModel>,
+  label: string,
+) {
   return h(UButton, {
     color: "neutral",
     variant: "ghost",
-    label: label,
+    label,
+
     icon: column.getIsSorted()
       ? column.getIsSorted() === "asc"
         ? "i-lucide-arrow-up"
         : "i-lucide-arrow-down"
       : "i-lucide-arrow-up-down",
-    onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
-  });
-}
-function getPriorityHeader(column: Column<ProjectTableRow>, label: string) {
-  const isSorted = column.getIsSorted();
 
-  return h(
-    UDropdownMenu,
-    {
-      content: {
-        align: "start",
-      },
-      "aria-label": "Actions dropdown",
-      items: [
-        {
-          label: "Low → High",
-          type: "checkbox",
-          checked: isSorted === "asc",
-          onSelect: () => {
-            if (isSorted === "asc") {
-              column.clearSorting();
-            } else {
-              column.toggleSorting(false);
-            }
-          },
-        },
-        {
-          label: "High → Low",
-          type: "checkbox",
-          checked: isSorted === "desc",
-          onSelect: () => {
-            if (isSorted === "desc") {
-              column.clearSorting();
-            } else {
-              column.toggleSorting(true);
-            }
-          },
-        },
-      ],
-    },
-    () =>
-      h(UButton, {
-        color: "neutral",
-        variant: "ghost",
-        label,
-        icon: isSorted
-          ? isSorted === "asc"
-            ? "i-lucide-arrow-up-narrow-wide"
-            : "i-lucide-arrow-down-wide-narrow"
-          : "i-lucide-arrow-up-down",
-        class: "-mx-2.5 data-[state=open]:bg-elevated",
-      }),
-  );
+    onClick: () =>
+      column.toggleSorting(
+        column.getIsSorted() === "asc",
+      ),
+  })
 }
 </script>
-
-<style scoped></style>

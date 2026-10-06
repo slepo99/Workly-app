@@ -10,7 +10,7 @@
       :data="members"
       :columns="columns"
       :ui="{
-        root: 'max-h-[500px] overflow-auto scrollbar-thin bg-elevated',
+        root: 'max-h-[500px] overflow-auto scrollbar-thin',
       }"
     >
       <template #empty>
@@ -134,6 +134,39 @@ const columns: TableColumn<ProjectMemberModel>[] = [
             row.original.user.id,
           ),
       },
+    ),
+},
+{
+  id: "actions",
+  header: "Actions",
+  enableSorting: false,
+  cell: ({ row }) =>
+    h(
+      "div",
+      { class: "flex items-center gap-1" },
+      [
+        h(UButton, {
+          icon: "i-lucide-eye",
+          color: "neutral",
+          variant: "ghost",
+          size: "sm",
+          "aria-label": "View member",
+          onClick: () => {
+            console.log("Open member:", row.original.user.id);
+          },
+        }),
+
+        h(UButton, {
+          icon: "i-lucide-trash-2",
+          color: "error",
+          variant: "ghost",
+          size: "sm",
+          "aria-label": "Remove member",
+          onClick: () => {
+            console.log("Remove member:", row.original.user.id);
+          },
+        }),
+      ],
     ),
 },
 ];

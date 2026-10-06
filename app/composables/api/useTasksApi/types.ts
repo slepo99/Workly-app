@@ -14,3 +14,10 @@ export interface AssigneesModel {
   name: string;
   avatar: string;
 }
+export interface TasksResponseModel {
+  page: number
+  limit: number
+  total: number
+  totalPages: number
+  tasks: TasksModel[]
+}

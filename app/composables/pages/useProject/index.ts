@@ -21,6 +21,15 @@ export function useProject() {
       { mode: "navigation" },
     );
   }
+  async function onLoadProjectTasks(projectId: string) {
+     await callOnce(
+      `project-tasks-${projectId}`,
+      async () => {
+        await projectStore.loadProjectTasks(projectId);
+      },
+      { mode: "navigation" },
+    );
+  }
   function getBreadcumbs(projectId: string): BreadcrumbItem[] {
     return [
       {
@@ -38,6 +47,7 @@ export function useProject() {
   return {
     onFirstLoadProject,
     getBreadcumbs,
-    onLoadProjectMembers
+    onLoadProjectMembers,
+    onLoadProjectTasks
   };
 }
