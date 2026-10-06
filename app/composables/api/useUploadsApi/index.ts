@@ -4,7 +4,7 @@ export function useUploadsApi() {
   const { $api } = useNuxtApp();
 
   enum API {
-    POST_IMAGE = "/uploads/file",
+    POST_IMAGE = "/uploads/image",
   }
 
   const uploadFile = (file: File): Promise<UploadFileResponseModel> => {

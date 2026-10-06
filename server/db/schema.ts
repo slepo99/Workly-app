@@ -48,7 +48,9 @@ export const projectMembers = pgTable(
 
     projectId: uuid("project_id")
       .notNull()
-      .references(() => projects.id),
+      .references(() => projects.id, {
+        onDelete: "cascade",
+      }),
 
     role: varchar("role", { length: 50 }).notNull(),
 
@@ -60,7 +62,9 @@ export const tasks = pgTable("tasks", {
   id: uuid("id").defaultRandom().primaryKey(),
   projectId: uuid("project_id")
     .notNull()
-    .references(() => projects.id),
+    .references(() => projects.id, {
+      onDelete: "cascade",
+    }),
 
   // assigneeId: uuid("assignee_id").references(() => users.id),
 
@@ -79,7 +83,9 @@ export const taskAssignees = pgTable(
 
     taskId: uuid("task_id")
       .notNull()
-      .references(() => tasks.id),
+      .references(() => tasks.id, {
+        onDelete: "cascade",
+      }),
 
     userId: uuid("user_id")
       .notNull()

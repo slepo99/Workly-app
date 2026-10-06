@@ -158,6 +158,7 @@ function onFormClose() {
 }
 
 async function saveProject() {
+  const { updateProject } = useProjectsApi()
   try {
     isSaving.value = true;
     let imageUrl: string | null = props.project.image
@@ -170,13 +171,13 @@ async function saveProject() {
       imageUrl = null
     }
 
-    await projectStore.updateProject(props.project.id, {
+    await updateProject(props.project.id, {
       name: form.name,
       description: form.description,
       status: form.status,
       image: imageUrl,
     });
-
+    await projectStore.loadProjectById(props.project.id)
     isOpen.value = false;
   } finally {
     isSaving.value = false;

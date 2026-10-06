@@ -2,6 +2,7 @@ export interface CreateProjectInput {
   name: string;
   description?: string;
   status?: string;
+  image: string | null;
 }
 export interface UpdateProjectInput extends Partial<CreateProjectInput> {}
 export interface ProjectsResponseModel {

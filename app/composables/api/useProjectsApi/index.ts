@@ -44,7 +44,7 @@ export function useProjectsApi() {
   };
 
   const updateProject = (id: string, data: UpdateProjectInput) => {
-    return $api(API.UPDATE_PROJECT, {
+    return $api(`${API.UPDATE_PROJECT}/${id}`, {
       method: "PATCH",
       body: data,
     });
