@@ -35,7 +35,7 @@
         <UFormField label="Status" name="status" required>
           <USelect
             v-model="form.status"
-            :items="projectStatuses"
+            :items="getProjectStatuses"
             value-key="value"
             label-key="label"
             class="w-full"
@@ -102,7 +102,7 @@
 
 <script setup lang="ts">
 import type { ProjectModel } from "~/composables/api/useProjectsApi/types";
-import type { UploadFileResponseModel } from "~/composables/api/useUploadsApi/types";
+
 import {
   PROJECT_STATUSES,
   type ProjectStatus,
@@ -114,7 +114,7 @@ const props = defineProps<{
 }>();
 
 const projectStore = useProjectStore();
-const { projectStatuses } = useStatuses()
+const { getProjectStatuses } = useStatuses()
 const isOpen = ref(false);
 const isSaving = ref(false);
 const isImageRemoved = ref(false);

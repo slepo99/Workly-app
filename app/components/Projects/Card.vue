@@ -28,7 +28,7 @@
       <div class="flex items-center justify-between">
         <span class="text-lg font-semibold truncate">{{ project.name }}</span>
         <UBadge :color="getProjectStatusColor(project.status)">{{
-         projectStatuses.find((status) => status.value === project.status)?.label
+          getProjectStatusLabel(project.status)
         }}</UBadge>
       </div>
       <div class="mt-2 text-sm text-neutral-500 line-clamp-2">
@@ -56,31 +56,14 @@
 </template>
 
 <script setup lang="ts">
-import { PROJECT_STATUSES } from "~/constants/projectStatuses";
 import type { ProjectModel } from "~/composables/api/useProjectsApi/types";
 import { useStatuses } from "~/composables/useStatuses";
+
 const props = defineProps<{
   project: ProjectModel;
 }>();
-const {getProjectStatusColor, projectStatuses } = useStatuses()
 
-function getProgressColor(
-  percent: number,
-): "error" | "warning" | "info" | "success" {
-  if (percent < 20) {
-    return "error";
-  }
-
-  if (percent < 40) {
-    return "warning";
-  }
-
-  if (percent < 60) {
-    return "info";
-  }
-
-  return "success";
-}
+const { getProjectStatusColor, getProjectStatusLabel } = useStatuses();
 
 function openProject() {
   return navigateTo(`/projects/${props.project.id}`);

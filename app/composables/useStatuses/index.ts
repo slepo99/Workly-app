@@ -2,7 +2,7 @@ import { PROJECT_STATUSES } from "~/constants/projectStatuses";
 import { useI18n } from "#imports";
 export function useStatuses() {
   const { t } = useI18n();
-  const projectStatuses = computed(() => {
+  const getProjectStatuses = computed(() => {
     return [
       {
         label: t("projects.statuses.active"),
@@ -22,6 +22,7 @@ export function useStatuses() {
       },
     ];
   });
+
   const getProjectStatusColor = (status: string) => {
     if (PROJECT_STATUSES.ACTIVE === status) {
       return "success";
@@ -33,5 +34,9 @@ export function useStatuses() {
       return "warning";
     }
   };
-  return { projectStatuses, getProjectStatusColor };
+
+  const getProjectStatusLabel = (status: string) => {
+    return getProjectStatuses.value.find((s) => s.value === status)?.label || "";
+  }
+  return { getProjectStatuses, getProjectStatusColor, getProjectStatusLabel };
 }

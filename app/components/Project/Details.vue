@@ -38,9 +38,7 @@
               class="shrink-0"
             >
               {{
-                projectStatuses.find(
-                  (status) => status.value === project.status,
-                )?.label
+                getProjectStatusLabel(project.status)
               }}
             </UBadge>
           </div>
@@ -138,7 +136,7 @@ const props = defineProps<{
   members: ProjectMemberModel[];
 }>();
 
-const { projectStatuses, getProjectStatusColor } = useStatuses();
+const { getProjectStatusLabel, getProjectStatusColor } = useStatuses();
 </script>
 
 <style scoped></style>

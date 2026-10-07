@@ -44,7 +44,7 @@
 
       <FilterButtons
         v-model="projectsStore.selectedStatus"
-        :filters="filters"
+        :filters="getProjectStatuses"
         @change="filterProjectsStatus"
       />
     </div>
@@ -52,7 +52,7 @@
     <div
       class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mt-8"
     >
-    <ProjectsCardNew v-if="projectsStore.page === 1"/>
+      <ProjectsCardNew v-if="projectsStore.page === 1" />
       <ProjectsCard
         v-for="project in projectsStore.projects"
         :key="project.id"
@@ -75,17 +75,16 @@
 import { useProjectsStore } from "~/stores/projects";
 import { PROJECTS_PAGINATION } from "~/constants/api";
 import { useProjects } from "~/composables/pages/useProjects";
-
+import { useStatuses } from "~/composables/useStatuses";
 const projectsStore = useProjectsStore();
 
 const {
-  filters,
   searchProjects,
   updateProjectsPage,
   firstLoadProjects,
   filterProjectsStatus,
 } = useProjects();
-
+const { getProjectStatuses } = useStatuses();
 await firstLoadProjects();
 </script>
 

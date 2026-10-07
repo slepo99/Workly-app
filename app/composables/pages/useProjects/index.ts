@@ -8,11 +8,6 @@ import { useDebounceFn } from "@vueuse/core";
 export function useProjects() {
   const projectsStore = useProjectsStore();
 
-  const filters = [
-    { label: "Completed", value: PROJECT_STATUSES.COMPLETED },
-    { label: "On hold", value: PROJECT_STATUSES.ON_HOLD },
-    { label: "Active", value: PROJECT_STATUSES.ACTIVE },
-  ];
 
   const searchProjects = useDebounceFn(async () => {
     await projectsStore.searchProjects();
@@ -49,7 +44,6 @@ export function useProjects() {
   }
   
   return {
-    filters,
     searchProjects,
     updateProjectsPage,
     firstLoadProjects,
