@@ -9,7 +9,7 @@ const taskStatusSchema = z.enum(
 );
 export const createTaskSchema = z.object({
   projectId: z.uuid(),
-  assigneeId: z.uuid().optional(),
+  assigneeIds: z.array(z.uuid()).optional(),
   title: z.string().min(1).max(150),
   description: z.string().max(1000).optional(),
   status: taskStatusSchema.optional(),

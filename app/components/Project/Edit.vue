@@ -3,7 +3,7 @@
     v-model:open="isOpen"
     title="Edit project"
     description="Update project information"
-    @after:leave="onFormClose"
+    @after:leave="resetForm"
   >
     <UButton
       class="min-w-0 justify-center !bg-transparent !text-primary hover:!bg-primary/10"
@@ -102,72 +102,14 @@
 
 <script setup lang="ts">
 import type { ProjectModel } from "~/composables/api/useProjectsApi/types";
-
-import {
-  PROJECT_STATUSES,
-  type ProjectStatus,
-} from "~/constants/projectStatuses";
-import { useProjectStore } from "~/stores/project";
 import { useStatuses } from "~/composables/useStatuses";
+import { useProjectEdit } from "~/composables/components/project/useProjectEdit";
 const props = defineProps<{
   project: ProjectModel;
 }>();
 
-const projectStore = useProjectStore();
-const { getProjectStatuses } = useStatuses()
-const isOpen = ref(false);
-const isSaving = ref(false);
-const isImageRemoved = ref(false);
+const { getProjectStatuses } = useStatuses();
 
-
-const form = reactive<{
-  name: string;
-  description: string;
-  status: ProjectStatus;
-  image: File | null;
-}>({
-  name: props.project.name,
-  description: props.project.description,
-  status: props.project.status as ProjectStatus,
-  image: null,
-});
-
-function resetForm() {
-  form.name = props.project.name;
-  form.description = props.project.description;
-  form.status = props.project.status as ProjectStatus;
-  form.image = null;
-  isImageRemoved.value = false
-}
-
-function onFormClose() {
-  resetForm();
-}
-
-async function saveProject() {
-  const { updateProject } = useProjectsApi()
-  try {
-    isSaving.value = true;
-    let imageUrl: string | null = props.project.image
-
-    if (form.image) {
-      const { uploadFile } = useUploadsApi();
-      const uploadedImage = await uploadFile(form.image);
-      imageUrl = uploadedImage.url;
-    } else if (isImageRemoved.value) {
-      imageUrl = null
-    }
-
-    await updateProject(props.project.id, {
-      name: form.name,
-      description: form.description,
-      status: form.status,
-      image: imageUrl,
-    });
-    await projectStore.loadProjectById(props.project.id)
-    isOpen.value = false;
-  } finally {
-    isSaving.value = false;
-  }
-}
+const { isOpen, isSaving, isImageRemoved, form, resetForm, saveProject } =
+  useProjectEdit(props.project);
 </script>

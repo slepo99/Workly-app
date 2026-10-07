@@ -19,9 +19,15 @@ export function useTasksApi() {
       method: "PATCH",
     });
   };
+  const postTask = (taskId: string) => {
+    return $api<TasksModel>(`${API.GET_TASKS}/${taskId}`, {
+      method: "POST",
+    });
+  }
   return {
     getTasks,
     getProjectTasks,
     updateTask,
+    postTask,
   };
 }

@@ -1,8 +1,18 @@
 import { db } from "~~/server/db";
-import {  users } from "~~/server/db/schema";
+import { users } from "~~/server/db/schema";
 import { eq } from "drizzle-orm";
 import type { Role } from "~~/server/constants/roles";
 import { deleteImageByUrl } from "~~/server/services/uploads.service";
+
+const publicUserFields = {
+  id: users.id,
+  name: users.name,
+  email: users.email,
+  role: users.role,
+  position: users.position,
+  avatar: users.avatar,
+  createdAt: users.createdAt,
+};
 
 export async function createUser(data: {
   name: string;
@@ -10,31 +20,28 @@ export async function createUser(data: {
   position?: string;
   avatar?: string;
 }) {
-  const result = await db.insert(users).values(data).returning();
+  const [user] = await db
+    .insert(users)
+    .values(data)
+    .returning(publicUserFields);
 
-  return result[0];
+  return user;
 }
+
 export async function getUserById(id: string) {
   const [user] = await db
-    .select({
-      id: users.id,
-      name: users.name,
-      email: users.email,
-      role: users.role,
-      position: users.position,
-      avatar: users.avatar,
-      createdAt: users.createdAt,
-    })
+    .select(publicUserFields)
     .from(users)
     .where(eq(users.id, id));
 
   return user;
 }
+
 export async function deleteUserById(id: string) {
   const [deletedUser] = await db
     .delete(users)
     .where(eq(users.id, id))
-    .returning();
+    .returning(publicUserFields);
 
   if (!deletedUser) {
     return undefined;
@@ -46,6 +53,7 @@ export async function deleteUserById(id: string) {
 
   return deletedUser;
 }
+
 export async function updateUserById(
   id: string,
   data: {
@@ -55,7 +63,10 @@ export async function updateUserById(
     avatar?: string;
   },
 ) {
-  const [oldUser] = await db.select().from(users).where(eq(users.id, id));
+  const [oldUser] = await db
+    .select()
+    .from(users)
+    .where(eq(users.id, id));
 
   if (!oldUser) {
     return undefined;
@@ -65,37 +76,28 @@ export async function updateUserById(
     .update(users)
     .set(data)
     .where(eq(users.id, id))
-    .returning({
-      id: users.id,
-      name: users.name,
-      email: users.email,
-      role: users.role,
-      position: users.position,
-      avatar: users.avatar,
-      createdAt: users.createdAt,
-    });
+    .returning(publicUserFields);
 
-  if ("avatar" in data && oldUser.avatar && data.avatar !== oldUser.avatar) {
+  if (
+    "avatar" in data &&
+    oldUser.avatar &&
+    data.avatar !== oldUser.avatar
+  ) {
     await deleteImageByUrl(oldUser.avatar);
   }
 
   return updatedUser;
 }
 
-export async function updateUserRole(userId: string, role: Role) {
+export async function updateUserRole(
+  userId: string,
+  role: Role,
+) {
   const [user] = await db
     .update(users)
     .set({ role })
     .where(eq(users.id, userId))
-    .returning({
-      id: users.id,
-      name: users.name,
-      email: users.email,
-      role: users.role,
-      position: users.position,
-      avatar: users.avatar,
-      createdAt: users.createdAt,
-    });
+    .returning(publicUserFields);
 
   return user;
 }

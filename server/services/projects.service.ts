@@ -162,10 +162,30 @@ export async function getProjects(
     projects: projectsWithStats,
   };
 }
-export async function getProjectById(id: string) {
-  const result = await db.select().from(projects).where(eq(projects.id, id));
+export async function getProjectById(id: string, userId: string, role: Role) {
+  let project;
 
-  const project = result[0];
+  if (role === ROLES.SUPERADMIN || role === ROLES.ADMIN) {
+    const result = await db.select().from(projects).where(eq(projects.id, id));
+
+    project = result[0];
+  } else {
+    const result = await db
+      .select({
+        id: projects.id,
+        name: projects.name,
+        description: projects.description,
+        status: projects.status,
+        image: projects.image,
+        createdAt: projects.createdAt,
+        updatedAt: projects.updatedAt,
+      })
+      .from(projects)
+      .innerJoin(projectMembers, eq(projectMembers.projectId, projects.id))
+      .where(and(eq(projects.id, id), eq(projectMembers.userId, userId)));
+
+    project = result[0];
+  }
 
   if (!project) {
     return undefined;
@@ -261,7 +281,15 @@ export async function getMembersByProjectId(
     const rows = await db
       .select({
         role: projectMembers.role,
-        user: users,
+        user: {
+          id: users.id,
+          name: users.name,
+          email: users.email,
+          role: users.role,
+          position: users.position,
+          avatar: users.avatar,
+          createdAt: users.createdAt,
+        },
         projectId: projectMembers.projectId,
       })
       .from(projectMembers)
@@ -287,7 +315,15 @@ export async function getMembersByProjectId(
     const rows = await db
       .select({
         role: projectMembers.role,
-        user: users,
+        user: {
+          id: users.id,
+          name: users.name,
+          email: users.email,
+          role: users.role,
+          position: users.position,
+          avatar: users.avatar,
+          createdAt: users.createdAt,
+        },
         projectId: projectMembers.projectId,
       })
       .from(projectMembers)
@@ -296,6 +332,7 @@ export async function getMembersByProjectId(
 
     return rows;
   }
+  return null;
 }
 export async function getTasksByProjectId(
   projectId: string,

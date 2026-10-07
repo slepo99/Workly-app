@@ -1,10 +1,17 @@
-import { updateTaskById } from "~~/server/services/tasks.service";
+import { getTaskById, updateTaskById } from "~~/server/services/tasks.service";
 import { updateTaskSchema } from "~~/server/validation/tasks.schema";
-import { ROLE_GROUPS } from "~~/server/constants/roles";
+import {
+  ROLE_GROUPS,
+  type Role,
+} from "~~/server/constants/roles";
 import { requireRole } from "~~/server/utils/requireRole";
 
 export default defineEventHandler(async (event) => {
-  await requireRole(event, ROLE_GROUPS.MANAGEMENT);
+  const currentUser = await requireRole(
+    event,
+    ROLE_GROUPS.MANAGEMENT,
+  );
+
   const id = getRouterParam(event, "id");
 
   if (!id) {
@@ -13,6 +20,20 @@ export default defineEventHandler(async (event) => {
       statusMessage: "Task ID is required",
     });
   }
+
+  const existingTask = await getTaskById(
+    id,
+    currentUser.id,
+    currentUser.role as Role,
+  );
+
+  if (!existingTask) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: "Task not found",
+    });
+  }
+
   const body = await readBody(event);
   const data = updateTaskSchema.parse(body);
 

@@ -15,6 +15,8 @@ export async function createTask(data: {
   title: string;
   description?: string;
   status?: string;
+  startDate?: Date;
+  endDate?: Date;
 }) {
   const project = await db
     .select()
@@ -65,6 +67,8 @@ export async function createTask(data: {
       title: data.title,
       description: data.description,
       status: data.status,
+      startDate: data.startDate,
+      endDate: data.endDate,
     })
     .returning();
 
@@ -84,7 +88,20 @@ export async function createTask(data: {
     );
   }
 
-  return task;
+  const assignees = await db
+    .select({
+      id: users.id,
+      name: users.name,
+      avatar: users.avatar,
+    })
+    .from(taskAssignees)
+    .innerJoin(users, eq(taskAssignees.userId, users.id))
+    .where(eq(taskAssignees.taskId, task.id));
+
+  return {
+    ...task,
+    assignees,
+  };
 }
 export async function getTasks(
   userId: string,
@@ -92,42 +109,36 @@ export async function getTasks(
   page: number,
   limit: number,
 ) {
-  const offset = (page - 1) * limit
+  const offset = (page - 1) * limit;
 
-  let taskList
-  let total = 0
+  let taskList;
+  let total = 0;
 
-  if (
-    role === ROLES.SUPERADMIN ||
-    role === ROLES.ADMIN
-  ) {
+  if (role === ROLES.SUPERADMIN || role === ROLES.ADMIN) {
     const totalResult = await db
       .select({
         count: count(),
       })
-      .from(tasks)
+      .from(tasks);
 
-    total = totalResult[0]?.count ?? 0
+    total = totalResult[0]?.count ?? 0;
 
     taskList = await db
       .select()
       .from(tasks)
       .orderBy(desc(tasks.updatedAt))
       .limit(limit)
-      .offset(offset)
+      .offset(offset);
   } else if (role === ROLES.MANAGER) {
     const totalResult = await db
       .select({
         count: count(),
       })
       .from(tasks)
-      .innerJoin(
-        projectMembers,
-        eq(projectMembers.projectId, tasks.projectId),
-      )
-      .where(eq(projectMembers.userId, userId))
+      .innerJoin(projectMembers, eq(projectMembers.projectId, tasks.projectId))
+      .where(eq(projectMembers.userId, userId));
 
-    total = totalResult[0]?.count ?? 0
+    total = totalResult[0]?.count ?? 0;
 
     taskList = await db
       .select({
@@ -142,27 +153,21 @@ export async function getTasks(
         updatedAt: tasks.updatedAt,
       })
       .from(tasks)
-      .innerJoin(
-        projectMembers,
-        eq(projectMembers.projectId, tasks.projectId),
-      )
+      .innerJoin(projectMembers, eq(projectMembers.projectId, tasks.projectId))
       .where(eq(projectMembers.userId, userId))
       .orderBy(desc(tasks.updatedAt))
       .limit(limit)
-      .offset(offset)
+      .offset(offset);
   } else {
     const totalResult = await db
       .select({
         count: count(),
       })
       .from(tasks)
-      .innerJoin(
-        taskAssignees,
-        eq(taskAssignees.taskId, tasks.id),
-      )
-      .where(eq(taskAssignees.userId, userId))
+      .innerJoin(taskAssignees, eq(taskAssignees.taskId, tasks.id))
+      .where(eq(taskAssignees.userId, userId));
 
-    total = totalResult[0]?.count ?? 0
+    total = totalResult[0]?.count ?? 0;
 
     taskList = await db
       .select({
@@ -177,14 +182,11 @@ export async function getTasks(
         updatedAt: tasks.updatedAt,
       })
       .from(tasks)
-      .innerJoin(
-        taskAssignees,
-        eq(taskAssignees.taskId, tasks.id),
-      )
+      .innerJoin(taskAssignees, eq(taskAssignees.taskId, tasks.id))
       .where(eq(taskAssignees.userId, userId))
       .orderBy(desc(tasks.updatedAt))
       .limit(limit)
-      .offset(offset)
+      .offset(offset);
   }
 
   const tasksWithAssignees = await Promise.all(
@@ -192,7 +194,7 @@ export async function getTasks(
       ...task,
       assignees: await getTaskAssignees(task.id),
     })),
-  )
+  );
 
   return {
     page,
@@ -200,11 +202,53 @@ export async function getTasks(
     total,
     totalPages: Math.ceil(total / limit),
     tasks: tasksWithAssignees,
-  }
+  };
 }
 
-export async function getTaskById(id: string) {
-  const [task] = await db.select().from(tasks).where(eq(tasks.id, id));
+export async function getTaskById(id: string, userId: string, role: Role) {
+  let task;
+
+  if (role === ROLES.SUPERADMIN || role === ROLES.ADMIN) {
+    const [result] = await db.select().from(tasks).where(eq(tasks.id, id));
+
+    task = result;
+  } else if (role === ROLES.MANAGER) {
+    const [result] = await db
+      .select({
+        id: tasks.id,
+        projectId: tasks.projectId,
+        title: tasks.title,
+        description: tasks.description,
+        status: tasks.status,
+        startDate: tasks.startDate,
+        endDate: tasks.endDate,
+        createdAt: tasks.createdAt,
+        updatedAt: tasks.updatedAt,
+      })
+      .from(tasks)
+      .innerJoin(projectMembers, eq(projectMembers.projectId, tasks.projectId))
+      .where(and(eq(tasks.id, id), eq(projectMembers.userId, userId)));
+
+    task = result;
+  } else {
+    const [result] = await db
+      .select({
+        id: tasks.id,
+        projectId: tasks.projectId,
+        title: tasks.title,
+        description: tasks.description,
+        status: tasks.status,
+        startDate: tasks.startDate,
+        endDate: tasks.endDate,
+        createdAt: tasks.createdAt,
+        updatedAt: tasks.updatedAt,
+      })
+      .from(tasks)
+      .innerJoin(taskAssignees, eq(taskAssignees.taskId, tasks.id))
+      .where(and(eq(tasks.id, id), eq(taskAssignees.userId, userId)));
+
+    task = result;
+  }
 
   if (!task) {
     return undefined;
@@ -220,26 +264,70 @@ export async function getTaskById(id: string) {
 export async function updateTaskById(
   id: string,
   data: {
-    projectId?: string
-    assigneeId?: string
-    title?: string
-    description?: string
-    status?: string
+    projectId?: string;
+    assigneeIds?: string[];
+    title?: string;
+    description?: string;
+    status?: string;
+    startDate?: Date;
+    endDate?: Date;
   },
 ) {
-  const result = await db
+  const { assigneeIds, ...taskData } = data;
+
+  const currentTask = await db.select().from(tasks).where(eq(tasks.id, id));
+
+  if (!currentTask[0]) {
+    return undefined;
+  }
+
+  const projectId = taskData.projectId ?? currentTask[0].projectId;
+
+  if (assigneeIds !== undefined) {
+    for (const userId of assigneeIds) {
+      const member = await db
+        .select()
+        .from(projectMembers)
+        .where(
+          and(
+            eq(projectMembers.projectId, projectId),
+            eq(projectMembers.userId, userId),
+          ),
+        );
+
+      if (!member[0]) {
+        throw createError({
+          statusCode: 400,
+          statusMessage: "User is not a member of this project",
+        });
+      }
+    }
+  }
+
+  const [updatedTask] = await db
     .update(tasks)
     .set({
-      ...data,
+      ...taskData,
       updatedAt: new Date(),
     })
     .where(eq(tasks.id, id))
-    .returning()
-
-  const updatedTask = result[0]
+    .returning();
 
   if (!updatedTask) {
-    return undefined
+    return undefined;
+  }
+
+  if (assigneeIds !== undefined) {
+    await db.delete(taskAssignees).where(eq(taskAssignees.taskId, id));
+
+    if (assigneeIds.length) {
+      await db.insert(taskAssignees).values(
+        assigneeIds.map((userId) => ({
+          taskId: id,
+          userId,
+        })),
+      );
+    }
   }
 
   const assignees = await db
@@ -249,18 +337,13 @@ export async function updateTaskById(
       avatar: users.avatar,
     })
     .from(taskAssignees)
-    .innerJoin(
-      users,
-      eq(taskAssignees.userId, users.id),
-    )
-    .where(
-      eq(taskAssignees.taskId, updatedTask.id),
-    )
+    .innerJoin(users, eq(taskAssignees.userId, users.id))
+    .where(eq(taskAssignees.taskId, updatedTask.id));
 
   return {
     ...updatedTask,
     assignees,
-  }
+  };
 }
 export async function deleteTaskById(id: string) {
   const result = await db.delete(tasks).where(eq(tasks.id, id)).returning();

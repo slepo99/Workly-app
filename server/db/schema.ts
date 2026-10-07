@@ -8,14 +8,20 @@ import {
 } from "drizzle-orm/pg-core";
 import { ROLES } from "../constants/roles";
 import { TASK_STATUSES } from "../constants/taskStatuses";
+import { PROJECT_STATUSES } from "../constants/projectStatuses";
 
 export const userRoleEnum = pgEnum(
   "user_role",
   Object.values(ROLES) as [string, ...string[]],
 );
+
 export const taskStatusEnum = pgEnum(
   "task_status",
   Object.values(TASK_STATUSES) as [string, ...string[]],
+);
+export const projectStatusEnum = pgEnum(
+  "project_status",
+  Object.values(PROJECT_STATUSES) as [string, ...string[]],
 );
 
 export const users = pgTable("users", {
@@ -32,7 +38,9 @@ export const projects = pgTable("projects", {
   id: uuid("id").defaultRandom().primaryKey(),
   name: varchar("name", { length: 150 }).notNull(),
   description: varchar("description", { length: 1000 }),
-  status: varchar("status", { length: 50 }).notNull().default("active"),
+  status: projectStatusEnum("status")
+    .notNull()
+    .default(PROJECT_STATUSES.ACTIVE),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
   image: varchar("image", { length: 500 }),

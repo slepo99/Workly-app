@@ -1,1353 +1,660 @@
+type OpenApiSchema = Record<string, unknown>;
+
+const cookieSecurity = [{ cookieAuth: [] }];
+
+const jsonRequest = (schema: OpenApiSchema) => ({
+  required: true,
+  content: {
+    "application/json": {
+      schema,
+    },
+  },
+});
+
+const jsonResponse = (
+  description: string,
+  schema: OpenApiSchema,
+) => ({
+  description,
+  content: {
+    "application/json": {
+      schema,
+    },
+  },
+});
+
+const ref = (name: string) => ({
+  $ref: `#/components/schemas/${name}`,
+});
+
+const responseRef = (name: string) => ({
+  $ref: `#/components/responses/${name}`,
+});
+
 export const openapi = {
-  openapi: "3.0.0",
+  openapi: "3.0.3",
 
   info: {
     title: "Workly API",
-
     version: "1.0.0",
+    description:
+      "REST API for Workly project management. Authentication uses the auth_token HttpOnly cookie.",
   },
 
   servers: [
     {
-      url: "http://localhost:3000/api",
+      url: "/api",
+      description: "Current Workly server",
     },
   ],
 
+  tags: [
+    { name: "Auth", description: "Authentication and current session" },
+    { name: "Dashboard", description: "Dashboard statistics" },
+    { name: "Roles", description: "Application roles" },
+    { name: "Users", description: "Users and role management" },
+    { name: "Projects", description: "Projects, project members and project tasks" },
+    { name: "Project members", description: "Project membership records" },
+    { name: "Tasks", description: "Tasks and task assignees" },
+    { name: "Uploads", description: "Image upload and deletion" },
+  ],
+
   paths: {
-    // =========================
-
-    // AUTH
-
-    // =========================
-
     "/auth/register": {
       post: {
-        summary: "Register a new user",
-
-        requestBody: {
-          required: true,
-
-          content: {
-            "application/json": {
-              schema: {
-                type: "object",
-
-                required: ["name", "email", "password"],
-
-                properties: {
-                  name: {
-                    type: "string",
-
-                    minLength: 2,
-
-                    maxLength: 100,
-
-                    example: "John Doe",
-                  },
-
-                  email: {
-                    type: "string",
-
-                    format: "email",
-
-                    example: "john\\@example.com",
-                  },
-
-                  password: {
-                    type: "string",
-
-                    minLength: 6,
-
-                    example: "password123",
-                  },
-                },
-              },
-            },
-          },
-        },
-
+        tags: ["Auth"],
+        operationId: "register",
+        summary: "Register user",
+        requestBody: jsonRequest(ref("RegisterRequest")),
         responses: {
-          200: { description: "Registered user" },
-
-          409: { description: "User with this email already exists" },
+          200: jsonResponse("Registered user", ref("User")),
+          400: responseRef("ValidationError"),
+          409: responseRef("Conflict"),
+          500: responseRef("ServerError"),
         },
       },
     },
 
     "/auth/login": {
       post: {
+        tags: ["Auth"],
+        operationId: "login",
         summary: "Log in",
-
         description:
-          "Validates credentials and stores the JWT in the auth_token HttpOnly cookie.",
-
-        requestBody: {
-          required: true,
-
-          content: {
-            "application/json": {
-              schema: {
-                type: "object",
-
-                required: ["email", "password"],
-
-                properties: {
-                  email: {
-                    type: "string",
-
-                    format: "email",
-
-                    example: "john\\@example.com",
-                  },
-
-                  password: {
-                    type: "string",
-
-                    minLength: 6,
-
-                    example: "password123",
-                  },
-                },
-              },
-            },
-          },
-        },
-
+          "Validates credentials and sets the auth_token HttpOnly cookie for 7 days.",
+        requestBody: jsonRequest(ref("LoginRequest")),
         responses: {
-          200: { description: "Logged in user" },
-
-          401: { description: "Invalid email or password" },
+          200: jsonResponse("Logged in user", ref("User")),
+          400: responseRef("ValidationError"),
+          401: responseRef("Unauthorized"),
         },
       },
     },
 
     "/auth/me": {
       get: {
-        summary: "Get current authenticated user",
-
-        security: [{ cookieAuth: [] }],
-
+        tags: ["Auth"],
+        operationId: "getCurrentUser",
+        summary: "Get current user",
+        security: cookieSecurity,
         responses: {
-          200: { description: "Current user" },
-
-          401: { description: "Unauthorized or invalid token" },
+          200: jsonResponse("Current authenticated user", ref("User")),
+          401: responseRef("Unauthorized"),
         },
       },
     },
 
     "/auth/logout": {
       post: {
+        tags: ["Auth"],
+        operationId: "logout",
         summary: "Log out",
-
         description: "Deletes the auth_token cookie.",
-
-        security: [{ cookieAuth: [] }],
-
         responses: {
-          200: { description: "Logged out successfully" },
+          200: jsonResponse("Logged out", ref("SuccessResponse")),
         },
       },
     },
 
-    // =========================
-
-    // ROLES
-
-    // =========================
+    "/dashboard/stats": {
+      get: {
+        tags: ["Dashboard"],
+        operationId: "getDashboardStats",
+        summary: "Get dashboard statistics",
+        description:
+          "Statistics are scoped by the current user's global role and project/task membership.",
+        security: cookieSecurity,
+        responses: {
+          200: jsonResponse("Dashboard statistics", ref("DashboardStats")),
+          401: responseRef("Unauthorized"),
+          403: responseRef("Forbidden"),
+        },
+      },
+    },
 
     "/roles": {
       get: {
-        summary: "Get available user roles",
-
+        tags: ["Roles"],
+        operationId: "getRoles",
+        summary: "Get application roles",
         responses: {
-          200: {
-            description: "List of available user roles",
-
-            content: {
-              "application/json": {
-                schema: {
-                  type: "array",
-
-                  items: {
-                    type: "string",
-
-                    enum: ["superadmin", "admin", "manager", "worker"],
-                  },
-
-                  example: ["superadmin", "admin", "manager", "worker"],
-                },
-              },
-            },
-          },
+          200: jsonResponse("Role constants", ref("RolesResponse")),
         },
       },
-    }, // USERS
-
-    // =========================
-
-    // =========================
+    },
 
     "/users": {
       get: {
+        tags: ["Users"],
+        operationId: "getUsers",
         summary: "Get all users",
-
         responses: {
-          200: {
-            description: "List of users",
-          },
+          200: jsonResponse("Users", {
+            type: "array",
+            items: ref("User"),
+          }),
         },
       },
 
       post: {
-        summary: "Create a user",
-
-        requestBody: {
-          required: true,
-
-          content: {
-            "application/json": {
-              schema: {
-                type: "object",
-
-                required: ["name", "email"],
-
-                properties: {
-                  name: {
-                    type: "string",
-
-                    maxLength: 100,
-
-                    example: "John Doe",
-                  },
-
-                  email: {
-                    type: "string",
-
-                    format: "email",
-
-                    example: "john\\\\\\\\@example.com",
-                  },
-
-                  position: {
-                    type: "string",
-
-                    maxLength: 100,
-
-                    example: "Frontend Developer",
-                  },
-
-                  avatar: {
-                    type: "string",
-
-                    format: "uri",
-
-                    maxLength: 500,
-
-                    example: "https\\\\\\\\://example.com/avatar.jpg",
-                  },
-                },
-              },
-            },
-          },
-        },
-
+        tags: ["Users"],
+        operationId: "createUser",
+        summary: "Create user",
+        description: "Allowed for superadmin, admin and manager.",
+        security: cookieSecurity,
+        requestBody: jsonRequest(ref("CreateUserRequest")),
         responses: {
-          200: {
-            description: "Created user",
-          },
+          200: jsonResponse("Created user record", ref("UserRecord")),
+          400: responseRef("ValidationError"),
+          401: responseRef("Unauthorized"),
+          403: responseRef("Forbidden"),
+          409: responseRef("Conflict"),
         },
       },
     },
 
     "/users/{id}": {
+      parameters: [
+        {
+          name: "id",
+          in: "path",
+          required: true,
+          description: "User ID",
+          schema: { type: "string", format: "uuid" },
+        },
+      ],
+
       get: {
+        tags: ["Users"],
+        operationId: "getUserById",
         summary: "Get user by ID",
-
-        parameters: [
-          {
-            name: "id",
-
-            in: "path",
-
-            required: true,
-
-            schema: {
-              type: "string",
-
-              format: "uuid",
-            },
-          },
-        ],
-
         responses: {
-          200: {
-            description: "User",
-          },
+          200: jsonResponse("User", ref("User")),
+          404: responseRef("NotFound"),
         },
       },
 
       patch: {
+        tags: ["Users"],
+        operationId: "updateUser",
         summary: "Update user",
-
-        parameters: [
-          {
-            name: "id",
-
-            in: "path",
-
-            required: true,
-
-            schema: {
-              type: "string",
-
-              format: "uuid",
-            },
-          },
-        ],
-
-        requestBody: {
-          required: true,
-
-          content: {
-            "application/json": {
-              schema: {
-                type: "object",
-
-                properties: {
-                  name: {
-                    type: "string",
-
-                    maxLength: 100,
-
-                    example: "John Doe",
-                  },
-
-                  email: {
-                    type: "string",
-
-                    format: "email",
-
-                    example: "john\\\\\\\\@example.com",
-                  },
-
-                  position: {
-                    type: "string",
-
-                    maxLength: 100,
-
-                    example: "Senior Frontend Developer",
-                  },
-
-                  avatar: {
-                    type: "string",
-
-                    format: "uri",
-
-                    maxLength: 500,
-
-                    example: "https\\\\\\\\://example.com/avatar.jpg",
-                  },
-                },
-              },
-            },
-          },
-        },
-
+        description:
+          "A user can update themselves. Admin and superadmin can update other users.",
+        security: cookieSecurity,
+        requestBody: jsonRequest(ref("UpdateUserRequest")),
         responses: {
-          200: {
-            description: "Updated user",
-          },
+          200: jsonResponse("Updated user", ref("User")),
+          400: responseRef("ValidationError"),
+          401: responseRef("Unauthorized"),
+          403: responseRef("Forbidden"),
+          404: responseRef("NotFound"),
         },
       },
 
       delete: {
+        tags: ["Users"],
+        operationId: "deleteUser",
         summary: "Delete user",
-
-        parameters: [
-          {
-            name: "id",
-
-            in: "path",
-
-            required: true,
-
-            schema: {
-              type: "string",
-
-              format: "uuid",
-            },
-          },
-        ],
-
+        description: "Allowed for superadmin, admin and manager.",
+        security: cookieSecurity,
         responses: {
-          200: {
-            description: "Deleted user",
-          },
+          200: jsonResponse("Deleted user record", ref("UserRecord")),
+          401: responseRef("Unauthorized"),
+          403: responseRef("Forbidden"),
+          404: responseRef("NotFound"),
         },
       },
     },
 
     "/users/{id}/role": {
       patch: {
+        tags: ["Users"],
+        operationId: "updateUserRole",
         summary: "Update user role",
-
         description:
-          "Only superadmin and admin can change user roles. Superadmin can manage admin, manager and worker roles. Admin can manage manager and worker roles.",
-
-        security: [{ cookieAuth: [] }],
-
+          "Only superadmin/admin can use this endpoint. Assignable roles are additionally restricted by ROLE_ASSIGNMENTS.",
+        security: cookieSecurity,
         parameters: [
           {
             name: "id",
-
             in: "path",
-
             required: true,
-
-            schema: {
-              type: "string",
-
-              format: "uuid",
-            },
+            description: "User ID",
+            schema: { type: "string", format: "uuid" },
           },
         ],
-
-        requestBody: {
-          required: true,
-
-          content: {
-            "application/json": {
-              schema: {
-                type: "object",
-
-                required: ["role"],
-
-                properties: {
-                  role: {
-                    type: "string",
-
-                    enum: ["admin", "manager", "worker"],
-
-                    example: "manager",
-                  },
-                },
-              },
-            },
-          },
-        },
-
+        requestBody: jsonRequest(ref("UpdateUserRoleRequest")),
         responses: {
-          200: { description: "Updated user" },
-
-          400: {
-            description: "User ID is required or request body is invalid",
-          },
-
-          403: { description: "Forbidden" },
-
-          404: { description: "User not found" },
+          200: jsonResponse("Updated user", ref("User")),
+          400: responseRef("ValidationError"),
+          401: responseRef("Unauthorized"),
+          403: responseRef("Forbidden"),
+          404: responseRef("NotFound"),
         },
       },
     },
-    // DASHBOARD
-
-    // =========================
-
-    // =========================
-    "/dashboard/stats": {
-      get: {
-        summary: "Get dashboard statistics",
-
-        security: [{ cookieAuth: [] }],
-
-        responses: {
-          200: {
-            description: "Dashboard statistics for the current user",
-            content: {
-              "application/json": {
-                schema: {
-                  type: "object",
-                  properties: {
-                    totalTasks: {
-                      type: "integer",
-                      example: 120,
-                    },
-
-                    completedTasks: {
-                      type: "integer",
-                      example: 84,
-                    },
-
-                    totalProjects: {
-                      type: "integer",
-                      example: 12,
-                    },
-
-                    totalUsers: {
-                      type: "integer",
-                      example: 37,
-                    },
-                  },
-                },
-              },
-            },
-          },
-
-          401: {
-            description: "Unauthorized",
-          },
-
-          403: {
-            description: "Forbidden",
-          },
-        },
-      },
-    },
-
-    // PROJECTS
-
-    // =========================
-
-    // =========================
 
     "/projects": {
       get: {
-        summary: "Get all projects",
-
+        tags: ["Projects"],
+        operationId: "getProjects",
+        summary: "Get projects",
+        description:
+          "Admin/superadmin see all projects. Manager/worker see projects where they are members.",
+        security: cookieSecurity,
         parameters: [
           {
             name: "page",
             in: "query",
-            required: false,
-            schema: {
-              type: "integer",
-              minimum: 1,
-              default: 1,
-            },
+            schema: { type: "integer", minimum: 1, default: 1 },
           },
           {
             name: "limit",
             in: "query",
-            required: false,
+            schema: { type: "integer", minimum: 1, default: 12 },
+          },
+          {
+            name: "search",
+            in: "query",
+            description: "Case-insensitive project name search",
+            schema: { type: "string" },
+          },
+          {
+            name: "status",
+            in: "query",
+            description:
+              "Project status filter. The query can contain one status or repeated status parameters.",
+            style: "form",
+            explode: true,
             schema: {
-              type: "integer",
-              minimum: 1,
-              default: 12,
+              type: "array",
+              items: ref("ProjectStatus"),
             },
           },
         ],
-
         responses: {
-          200: {
-            description: "Paginated list of projects",
-            content: {
-              "application/json": {
-                schema: {
-                  type: "object",
-                  properties: {
-                    page: { type: "integer", example: 1 },
-                    limit: { type: "integer", example: 12 },
-                    total: { type: "integer", example: 37 },
-                    totalPages: { type: "integer", example: 4 },
-                    projects: {
-                      type: "array",
-                      items: {
-                        type: "object",
-                        properties: {
-                          id: { type: "string", format: "uuid" },
-                          name: { type: "string" },
-                          description: { type: "string", nullable: true },
-                          status: { type: "string" },
-                          createdAt: { type: "string", format: "date-time" },
-                          tasksCount: { type: "integer", example: 10000 },
-                          completionPercent: { type: "integer", example: 63 },
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
+          200: jsonResponse("Paginated projects", ref("ProjectsPage")),
+          401: responseRef("Unauthorized"),
+          403: responseRef("Forbidden"),
         },
       },
 
       post: {
-        summary: "Create a project",
-
-        requestBody: {
-          required: true,
-
-          content: {
-            "application/json": {
-              schema: {
-                type: "object",
-
-                required: ["name"],
-
-                properties: {
-                  name: {
-                    type: "string",
-
-                    maxLength: 150,
-
-                    example: "Workly SaaS",
-                  },
-
-                  description: {
-                    type: "string",
-
-                    maxLength: 1000,
-
-                    example: "Project management platform",
-                  },
-
-                  status: {
-                    type: "string",
-
-                    maxLength: 50,
-
-                    example: "active",
-                  },
-                },
-              },
-            },
-          },
-        },
-
+        tags: ["Projects"],
+        operationId: "createProject",
+        summary: "Create project",
+        description:
+          "Allowed for superadmin, admin and manager. The creator is automatically added to project_members.",
+        security: cookieSecurity,
+        requestBody: jsonRequest(ref("CreateProjectRequest")),
         responses: {
-          200: {
-            description: "Created project",
-          },
+          200: jsonResponse("Created project", ref("Project")),
+          400: responseRef("ValidationError"),
+          401: responseRef("Unauthorized"),
+          403: responseRef("Forbidden"),
+          500: responseRef("ServerError"),
         },
       },
     },
 
     "/projects/{id}": {
+      parameters: [
+        {
+          name: "id",
+          in: "path",
+          required: true,
+          description: "Project ID",
+          schema: { type: "string", format: "uuid" },
+        },
+      ],
+
       get: {
+        tags: ["Projects"],
+        operationId: "getProjectById",
         summary: "Get project by ID",
-
-        parameters: [
-          {
-            name: "id",
-
-            in: "path",
-
-            required: true,
-
-            schema: {
-              type: "string",
-
-              format: "uuid",
-            },
-          },
-        ],
-
         responses: {
-          200: {
-            description: "Project",
-          },
+          200: jsonResponse("Project with task statistics", ref("ProjectWithStats")),
+          404: responseRef("NotFound"),
         },
       },
 
       patch: {
+        tags: ["Projects"],
+        operationId: "updateProject",
         summary: "Update project",
-
-        parameters: [
-          {
-            name: "id",
-
-            in: "path",
-
-            required: true,
-
-            schema: {
-              type: "string",
-
-              format: "uuid",
-            },
-          },
-        ],
-
-        requestBody: {
-          required: true,
-
-          content: {
-            "application/json": {
-              schema: {
-                type: "object",
-
-                properties: {
-                  name: {
-                    type: "string",
-
-                    maxLength: 150,
-
-                    example: "Workly SaaS",
-                  },
-
-                  description: {
-                    type: "string",
-
-                    maxLength: 1000,
-
-                    example: "Project management platform",
-                  },
-
-                  status: {
-                    type: "string",
-
-                    maxLength: 50,
-
-                    example: "active",
-                  },
-                },
-              },
-            },
-          },
-        },
-
+        description:
+          "Allowed for superadmin, admin and manager. Replacing/removing image also removes the previous Storage object.",
+        security: cookieSecurity,
+        requestBody: jsonRequest(ref("UpdateProjectRequest")),
         responses: {
-          200: {
-            description: "Updated project",
-          },
+          200: jsonResponse("Updated project", ref("Project")),
+          400: responseRef("ValidationError"),
+          401: responseRef("Unauthorized"),
+          403: responseRef("Forbidden"),
+          404: responseRef("NotFound"),
         },
       },
 
       delete: {
+        tags: ["Projects"],
+        operationId: "deleteProject",
         summary: "Delete project",
-
-        parameters: [
-          {
-            name: "id",
-
-            in: "path",
-
-            required: true,
-
-            schema: {
-              type: "string",
-
-              format: "uuid",
-            },
-          },
-        ],
-
+        description:
+          "Allowed for superadmin, admin and manager. Database cascades delete project_members, tasks and task_assignees. Project image is also removed from Storage.",
+        security: cookieSecurity,
         responses: {
-          200: {
-            description: "Deleted project",
-          },
-        },
-      },
-    }, // =========================
-
-    // PROJECT MEMBERS
-
-    // =========================
-
-    "/project-members": {
-      get: {
-        summary: "Get all project memberships",
-
-        responses: {
-          200: {
-            description: "List of project memberships",
-          },
-        },
-      },
-
-      post: {
-        summary: "Add a user to a project",
-
-        requestBody: {
-          required: true,
-
-          content: {
-            "application/json": {
-              schema: {
-                type: "object",
-
-                required: ["userId", "projectId", "role"],
-
-                properties: {
-                  userId: {
-                    type: "string",
-
-                    format: "uuid",
-
-                    example: "9e47eb80-a52c-4278-9da2-9fe0ddc90883",
-                  },
-
-                  projectId: {
-                    type: "string",
-
-                    format: "uuid",
-
-                    example: "448f98a7-0bb2-4025-9eb2-1790384c0c61",
-                  },
-
-                  role: {
-                    type: "string",
-
-                    maxLength: 50,
-
-                    example: "developer",
-                  },
-                },
-              },
-            },
-          },
-        },
-
-        responses: {
-          200: {
-            description: "Created project membership",
-          },
+          200: jsonResponse("Deleted project", ref("Project")),
+          401: responseRef("Unauthorized"),
+          403: responseRef("Forbidden"),
+          404: responseRef("NotFound"),
         },
       },
     },
 
-    "/projects/{projectId}/members": {
+    "/projects/{id}/members": {
       get: {
+        tags: ["Projects"],
+        operationId: "getProjectMembersByProjectId",
         summary: "Get project members",
-
+        description:
+          "Admin/superadmin can read any project members. Manager/worker must be a member of the project.",
+        security: cookieSecurity,
         parameters: [
           {
-            name: "projectId",
-
+            name: "id",
             in: "path",
-
             required: true,
-
-            schema: {
-              type: "string",
-
-              format: "uuid",
-            },
+            description: "Project ID",
+            schema: { type: "string", format: "uuid" },
           },
         ],
-
         responses: {
-          200: {
-            description: "List of project members",
-          },
+          200: jsonResponse("Project members", {
+            type: "array",
+            items: ref("ProjectMemberWithUser"),
+          }),
+          401: responseRef("Unauthorized"),
+          403: responseRef("Forbidden"),
+          404: responseRef("NotFound"),
         },
       },
-    }, // =========================
+    },
 
-    // TASKS
-
-    // =========================
-
-    "/tasks": {
+    "/projects/{id}/tasks": {
       get: {
-        summary: "Get all tasks",
-
+        tags: ["Projects", "Tasks"],
+        operationId: "getProjectTasks",
+        summary: "Get tasks for project",
+        description:
+          "Admin/superadmin see all project tasks. Manager sees tasks for projects they belong to. Worker sees assigned tasks only.",
+        security: cookieSecurity,
         parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            description: "Project ID",
+            schema: { type: "string", format: "uuid" },
+          },
           {
             name: "page",
             in: "query",
-            required: false,
-            schema: {
-              type: "integer",
-              minimum: 1,
-              default: 1,
-            },
+            schema: { type: "integer", minimum: 1, default: 1 },
           },
           {
             name: "limit",
             in: "query",
-            required: false,
-            schema: {
-              type: "integer",
-              minimum: 1,
-              default: 20,
-            },
+            schema: { type: "integer", minimum: 1, default: 20 },
           },
         ],
-
         responses: {
-          200: {
-            description: "Paginated list of tasks with assignees",
-            content: {
-              "application/json": {
-                schema: {
-                  type: "object",
-                  properties: {
-                    page: { type: "integer", example: 1 },
-                    limit: { type: "integer", example: 20 },
-                    total: { type: "integer", example: 137 },
-                    totalPages: { type: "integer", example: 7 },
-                    tasks: {
-                      type: "array",
-                      items: {
-                        type: "object",
-                        properties: {
-                          id: { type: "string", format: "uuid" },
-                          projectId: { type: "string", format: "uuid" },
-                          title: { type: "string" },
-                          description: { type: "string", nullable: true },
-                          status: { type: "string" },
-                          startDate: {
-                            type: "string",
-                            format: "date-time",
-                            nullable: true,
-                          },
-                          endDate: {
-                            type: "string",
-                            format: "date-time",
-                            nullable: true,
-                          },
-                          createdAt: { type: "string", format: "date-time" },
-                          assignees: {
-                            type: "array",
-                            items: {
-                              type: "object",
-                              properties: {
-                                id: { type: "string", format: "uuid" },
-                                name: { type: "string" },
-                                avatar: { type: "string", nullable: true },
-                              },
-                            },
-                          },
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
+          200: jsonResponse("Paginated project tasks", ref("TasksPage")),
+          401: responseRef("Unauthorized"),
+          403: responseRef("Forbidden"),
+        },
+      },
+    },
+
+    "/project-members": {
+      get: {
+        tags: ["Project members"],
+        operationId: "getProjectMemberships",
+        summary: "Get all project membership records",
+        responses: {
+          200: jsonResponse("Project membership records", {
+            type: "array",
+            items: ref("ProjectMember"),
+          }),
         },
       },
 
       post: {
-        summary: "Create a task",
-
-        requestBody: {
-          required: true,
-
-          content: {
-            "application/json": {
-              schema: {
-                type: "object",
-
-                required: ["projectId", "title"],
-
-                properties: {
-                  projectId: {
-                    type: "string",
-
-                    format: "uuid",
-
-                    example: "448f98a7-0bb2-4025-9eb2-1790384c0c61",
-                  },
-
-                  assigneeIds: {
-                    type: "array",
-
-                    items: {
-                      type: "string",
-
-                      format: "uuid",
-                    },
-
-                    example: ["9e47eb80-a52c-4278-9da2-9fe0ddc90883"],
-                  },
-
-                  title: {
-                    type: "string",
-
-                    maxLength: 150,
-
-                    example: "Implement authentication",
-                  },
-
-                  description: {
-                    type: "string",
-
-                    maxLength: 1000,
-
-                    example: "Add login and registration",
-                  },
-
-                  status: {
-                    type: "string",
-
-                    maxLength: 50,
-
-                    default: "pending",
-
-                    example: "pending",
-                  },
-                },
-              },
-            },
-          },
-        },
-
+        tags: ["Project members"],
+        operationId: "createProjectMember",
+        summary: "Add user to project",
+        description: "Allowed for superadmin, admin and manager.",
+        security: cookieSecurity,
+        requestBody: jsonRequest(ref("CreateProjectMemberRequest")),
         responses: {
-          200: {
-            description: "Created task",
+          200: jsonResponse("Created project membership", ref("ProjectMember")),
+          400: responseRef("ValidationError"),
+          401: responseRef("Unauthorized"),
+          403: responseRef("Forbidden"),
+          404: responseRef("NotFound"),
+          409: responseRef("Conflict"),
+        },
+      },
+    },
+
+    "/tasks": {
+      get: {
+        tags: ["Tasks"],
+        operationId: "getTasks",
+        summary: "Get tasks",
+        description:
+          "Admin/superadmin see all tasks. Manager sees tasks from their projects. Worker sees tasks assigned to them.",
+        security: cookieSecurity,
+        parameters: [
+          {
+            name: "page",
+            in: "query",
+            schema: { type: "integer", minimum: 1, default: 1 },
           },
+          {
+            name: "limit",
+            in: "query",
+            schema: { type: "integer", minimum: 1, default: 20 },
+          },
+        ],
+        responses: {
+          200: jsonResponse("Paginated tasks", ref("TasksPage")),
+          401: responseRef("Unauthorized"),
+          403: responseRef("Forbidden"),
+        },
+      },
+
+      post: {
+        tags: ["Tasks"],
+        operationId: "createTask",
+        summary: "Create task",
+        description:
+          "Allowed for superadmin, admin and manager. assigneeIds must contain project members. Assignees are stored in task_assignees.",
+        security: cookieSecurity,
+        requestBody: jsonRequest(ref("CreateTaskRequest")),
+        responses: {
+          200: jsonResponse("Created task with assignees", ref("Task")),
+          400: responseRef("ValidationError"),
+          401: responseRef("Unauthorized"),
+          403: responseRef("Forbidden"),
+          404: responseRef("NotFound"),
+          500: responseRef("ServerError"),
         },
       },
     },
 
     "/tasks/{id}": {
+      parameters: [
+        {
+          name: "id",
+          in: "path",
+          required: true,
+          description: "Task ID",
+          schema: { type: "string", format: "uuid" },
+        },
+      ],
+
       get: {
+        tags: ["Tasks"],
+        operationId: "getTaskById",
         summary: "Get task by ID",
-
-        parameters: [
-          {
-            name: "id",
-
-            in: "path",
-
-            required: true,
-
-            schema: {
-              type: "string",
-
-              format: "uuid",
-            },
-          },
-        ],
-
         responses: {
-          200: {
-            description: "Task with assignees",
-          },
+          200: jsonResponse("Task with assignees", ref("Task")),
+          404: responseRef("NotFound"),
         },
       },
 
       patch: {
+        tags: ["Tasks"],
+        operationId: "updateTask",
         summary: "Update task",
-
-        parameters: [
-          {
-            name: "id",
-
-            in: "path",
-
-            required: true,
-
-            schema: {
-              type: "string",
-
-              format: "uuid",
-            },
-          },
-        ],
-
-        requestBody: {
-          required: true,
-
-          content: {
-            "application/json": {
-              schema: {
-                type: "object",
-
-                properties: {
-                  projectId: {
-                    type: "string",
-
-                    format: "uuid",
-                  },
-
-                  assigneeIds: {
-                    type: "array",
-
-                    items: {
-                      type: "string",
-
-                      format: "uuid",
-                    },
-                  },
-
-                  title: {
-                    type: "string",
-
-                    maxLength: 150,
-                  },
-
-                  description: {
-                    type: "string",
-
-                    maxLength: 1000,
-                  },
-
-                  status: {
-                    type: "string",
-
-                    maxLength: 50,
-                  },
-                },
-              },
-            },
-          },
-        },
-
+        description:
+          "Allowed for superadmin, admin and manager. If assigneeIds is omitted, assignees stay unchanged. If assigneeIds is [], all assignees are removed. Otherwise the array fully replaces the current assignee list.",
+        security: cookieSecurity,
+        requestBody: jsonRequest(ref("UpdateTaskRequest")),
         responses: {
-          200: {
-            description: "Updated task",
-          },
+          200: jsonResponse("Updated task with assignees", ref("Task")),
+          400: responseRef("ValidationError"),
+          401: responseRef("Unauthorized"),
+          403: responseRef("Forbidden"),
+          404: responseRef("NotFound"),
         },
       },
 
       delete: {
+        tags: ["Tasks"],
+        operationId: "deleteTask",
         summary: "Delete task",
-
-        parameters: [
-          {
-            name: "id",
-
-            in: "path",
-
-            required: true,
-
-            schema: {
-              type: "string",
-
-              format: "uuid",
-            },
-          },
-        ],
-
+        description:
+          "Allowed for superadmin, admin and manager. task_assignees rows are deleted by database cascade.",
+        security: cookieSecurity,
         responses: {
-          200: {
-            description: "Deleted task",
-          },
+          200: jsonResponse("Deleted task", ref("TaskRecord")),
+          401: responseRef("Unauthorized"),
+          403: responseRef("Forbidden"),
+          404: responseRef("NotFound"),
         },
       },
     },
 
-    "/tasks/{id}/assignees": {
+    "/tasks/{taskId}/assignees": {
+      parameters: [
+        {
+          name: "taskId",
+          in: "path",
+          required: true,
+          description: "Task ID",
+          schema: { type: "string", format: "uuid" },
+        },
+      ],
+
       get: {
+        tags: ["Tasks"],
+        operationId: "getTaskAssignees",
         summary: "Get task assignees",
-
-        parameters: [
-          {
-            name: "id",
-
-            in: "path",
-
-            required: true,
-
-            schema: {
-              type: "string",
-
-              format: "uuid",
-            },
-          },
-        ],
-
         responses: {
-          200: {
-            description: "List of task assignees",
-          },
+          200: jsonResponse("Task assignees", {
+            type: "array",
+            items: ref("TaskAssignee"),
+          }),
         },
       },
 
       post: {
-        summary: "Add task assignee",
-
-        parameters: [
-          {
-            name: "id",
-
-            in: "path",
-
-            required: true,
-
-            schema: {
-              type: "string",
-
-              format: "uuid",
-            },
-          },
-        ],
-
-        requestBody: {
-          required: true,
-
-          content: {
-            "application/json": {
-              schema: {
-                type: "object",
-
-                required: ["userId"],
-
-                properties: {
-                  userId: {
-                    type: "string",
-
-                    format: "uuid",
-
-                    example: "9e47eb80-a52c-4278-9da2-9fe0ddc90883",
-                  },
-                },
-              },
-            },
-          },
-        },
-
+        tags: ["Tasks"],
+        operationId: "addTaskAssignee",
+        summary: "Add one task assignee",
+        description:
+          "Legacy granular assignee endpoint kept alongside PATCH /tasks/{id}. Allowed for superadmin, admin and manager.",
+        security: cookieSecurity,
+        requestBody: jsonRequest(ref("AddTaskAssigneeRequest")),
         responses: {
-          200: {
-            description: "Task assignee added",
-          },
+          200: jsonResponse("Created task-assignee relation", ref("TaskAssigneeLink")),
+          400: responseRef("ValidationError"),
+          401: responseRef("Unauthorized"),
+          403: responseRef("Forbidden"),
+          409: responseRef("Conflict"),
         },
       },
     },
 
-    "/tasks/{id}/assignees/{userId}": {
+    "/tasks/{taskId}/assignees/{userId}": {
       delete: {
-        summary: "Remove task assignee",
-
+        tags: ["Tasks"],
+        operationId: "removeTaskAssignee",
+        summary: "Remove one task assignee",
+        description:
+          "Legacy granular assignee endpoint kept alongside PATCH /tasks/{id}. Allowed for superadmin, admin and manager.",
+        security: cookieSecurity,
         parameters: [
           {
-            name: "id",
-
+            name: "taskId",
             in: "path",
-
             required: true,
-
-            schema: {
-              type: "string",
-
-              format: "uuid",
-            },
+            description: "Task ID",
+            schema: { type: "string", format: "uuid" },
           },
-
           {
             name: "userId",
-
-            in: "path",
-
-            required: true,
-
-            schema: {
-              type: "string",
-
-              format: "uuid",
-            },
-          },
-        ],
-
-        responses: {
-          200: {
-            description: "Task assignee removed",
-          },
-        },
-      },
-    },
-
-    "/projects/{projectId}/tasks": {
-      get: {
-        summary: "Get project tasks",
-
-        parameters: [
-          {
-            name: "projectId",
             in: "path",
             required: true,
-            schema: {
-              type: "string",
-              format: "uuid",
-            },
-          },
-          {
-            name: "page",
-            in: "query",
-            required: false,
-            schema: {
-              type: "integer",
-              minimum: 1,
-              default: 1,
-            },
-          },
-          {
-            name: "limit",
-            in: "query",
-            required: false,
-            schema: {
-              type: "integer",
-              minimum: 1,
-              default: 20,
-            },
+            description: "User ID",
+            schema: { type: "string", format: "uuid" },
           },
         ],
-
         responses: {
           200: {
-            description: "Paginated list of project tasks with assignees",
+            description:
+              "Deleted task-assignee relation. If no matching relation exists, the current handler may return an empty response.",
             content: {
               "application/json": {
-                schema: {
-                  type: "object",
-                  properties: {
-                    page: { type: "integer", example: 1 },
-                    limit: { type: "integer", example: 20 },
-                    total: { type: "integer", example: 137 },
-                    totalPages: { type: "integer", example: 7 },
-                    tasks: {
-                      type: "array",
-                      items: {
-                        type: "object",
-                        properties: {
-                          id: { type: "string", format: "uuid" },
-                          projectId: { type: "string", format: "uuid" },
-                          title: { type: "string" },
-                          description: { type: "string", nullable: true },
-                          status: { type: "string" },
-                          startDate: {
-                            type: "string",
-                            format: "date-time",
-                            nullable: true,
-                          },
-                          endDate: {
-                            type: "string",
-                            format: "date-time",
-                            nullable: true,
-                          },
-                          createdAt: { type: "string", format: "date-time" },
-                          assignees: {
-                            type: "array",
-                            items: {
-                              type: "object",
-                              properties: {
-                                id: { type: "string", format: "uuid" },
-                                name: { type: "string" },
-                                avatar: { type: "string", nullable: true },
-                              },
-                            },
-                          },
-                        },
-                      },
-                    },
-                  },
-                },
+                schema: ref("TaskAssigneeLink"),
               },
             },
           },
+          401: responseRef("Unauthorized"),
+          403: responseRef("Forbidden"),
         },
       },
     },
-    // =========================
 
-    // FILES
-
-    // =========================
     "/uploads/image": {
       post: {
+        tags: ["Uploads"],
+        operationId: "uploadImage",
         summary: "Upload image",
-
-        security: [
-          {
-            cookieAuth: [],
-          },
-        ],
-
+        description:
+          "Accepts JPEG, PNG or WebP up to 5 MB and stores it in the configured Supabase Storage bucket.",
+        security: cookieSecurity,
         requestBody: {
           required: true,
           content: {
@@ -1365,102 +672,27 @@ export const openapi = {
             },
           },
         },
-
         responses: {
-          200: {
-            description: "Image uploaded successfully",
-            content: {
-              "application/json": {
-                schema: {
-                  type: "object",
-                  properties: {
-                    url: {
-                      type: "string",
-                      format: "uri",
-                      example:
-                        "https://example.supabase.co/storage/v1/object/public/workly-images/image.jpg",
-                    },
-
-                    path: {
-                      type: "string",
-                      example: "08e18f96-a9ab-45c8-8b9f-731d8272e573.jpg",
-                    },
-                  },
-                },
-              },
-            },
-          },
-
-          400: {
-            description: "Invalid file",
-          },
-
-          401: {
-            description: "Unauthorized",
-          },
-
-          500: {
-            description: "Image upload failed",
-          },
+          200: jsonResponse("Uploaded image", ref("UploadImageResponse")),
+          400: responseRef("ValidationError"),
+          401: responseRef("Unauthorized"),
+          403: responseRef("Forbidden"),
+          500: responseRef("ServerError"),
         },
       },
 
       delete: {
+        tags: ["Uploads"],
+        operationId: "deleteImage",
         summary: "Delete image",
-
-        security: [
-          {
-            cookieAuth: [],
-          },
-        ],
-
-        requestBody: {
-          required: true,
-          content: {
-            "application/json": {
-              schema: {
-                type: "object",
-                required: ["path"],
-                properties: {
-                  path: {
-                    type: "string",
-                    example: "08e18f96-a9ab-45c8-8b9f-731d8272e573.jpg",
-                  },
-                },
-              },
-            },
-          },
-        },
-
+        security: cookieSecurity,
+        requestBody: jsonRequest(ref("DeleteImageRequest")),
         responses: {
-          200: {
-            description: "Image deleted successfully",
-            content: {
-              "application/json": {
-                schema: {
-                  type: "object",
-                  properties: {
-                    success: {
-                      type: "boolean",
-                      example: true,
-                    },
-                  },
-                },
-              },
-            },
-          },
-
-          400: {
-            description: "Image path is required",
-          },
-
-          401: {
-            description: "Unauthorized",
-          },
-
-          500: {
-            description: "Image deletion failed",
-          },
+          200: jsonResponse("Image deleted", ref("SuccessResponse")),
+          400: responseRef("ValidationError"),
+          401: responseRef("Unauthorized"),
+          403: responseRef("Forbidden"),
+          500: responseRef("ServerError"),
         },
       },
     },
@@ -1470,10 +702,468 @@ export const openapi = {
     securitySchemes: {
       cookieAuth: {
         type: "apiKey",
-
         in: "cookie",
-
         name: "auth_token",
+        description: "JWT stored in the auth_token HttpOnly cookie.",
+      },
+    },
+
+    responses: {
+      ValidationError: {
+        description: "Invalid request data",
+        content: {
+          "application/json": {
+            schema: ref("ApiError"),
+          },
+        },
+      },
+      Unauthorized: {
+        description: "Unauthorized",
+        content: {
+          "application/json": {
+            schema: ref("ApiError"),
+          },
+        },
+      },
+      Forbidden: {
+        description: "Forbidden",
+        content: {
+          "application/json": {
+            schema: ref("ApiError"),
+          },
+        },
+      },
+      NotFound: {
+        description: "Resource not found",
+        content: {
+          "application/json": {
+            schema: ref("ApiError"),
+          },
+        },
+      },
+      Conflict: {
+        description: "Resource conflict",
+        content: {
+          "application/json": {
+            schema: ref("ApiError"),
+          },
+        },
+      },
+      ServerError: {
+        description: "Internal server error",
+        content: {
+          "application/json": {
+            schema: ref("ApiError"),
+          },
+        },
+      },
+    },
+
+    schemas: {
+      Role: {
+        type: "string",
+        enum: ["superadmin", "admin", "manager", "worker"],
+      },
+
+      AssignableRole: {
+        type: "string",
+        enum: ["admin", "manager", "worker"],
+      },
+
+      ProjectStatus: {
+        type: "string",
+        enum: ["active", "on_hold", "completed", "cancelled"],
+      },
+
+      TaskStatus: {
+        type: "string",
+        enum: ["pending", "in_progress", "completed", "cancelled"],
+      },
+
+      ApiError: {
+        type: "object",
+        properties: {
+          statusCode: { type: "integer", example: 400 },
+          statusMessage: { type: "string", example: "Invalid request" },
+          message: { type: "string", example: "Invalid request" },
+        },
+      },
+
+      SuccessResponse: {
+        type: "object",
+        required: ["success"],
+        properties: {
+          success: { type: "boolean", example: true },
+        },
+      },
+
+      RegisterRequest: {
+        type: "object",
+        required: ["name", "email", "password"],
+        properties: {
+          name: {
+            type: "string",
+            minLength: 2,
+            maxLength: 100,
+            example: "Timur Developer",
+          },
+          email: {
+            type: "string",
+            format: "email",
+            example: "timur@example.com",
+          },
+          password: {
+            type: "string",
+            minLength: 6,
+            example: "password123",
+          },
+        },
+      },
+
+      LoginRequest: {
+        type: "object",
+        required: ["email", "password"],
+        properties: {
+          email: {
+            type: "string",
+            format: "email",
+            example: "timur@example.com",
+          },
+          password: {
+            type: "string",
+            minLength: 6,
+            example: "password123",
+          },
+        },
+      },
+
+      User: {
+        type: "object",
+        required: ["id", "name", "email", "role", "createdAt"],
+        properties: {
+          id: { type: "string", format: "uuid" },
+          name: { type: "string", maxLength: 100 },
+          email: { type: "string", format: "email" },
+          role: ref("Role"),
+          position: { type: "string", maxLength: 100, nullable: true },
+          avatar: { type: "string", format: "uri", nullable: true },
+          createdAt: { type: "string", format: "date-time" },
+        },
+      },
+
+      UserRecord: {
+        type: "object",
+        description:
+          "Raw users table record currently returned by some endpoints. passwordHash should not be exposed by public API responses.",
+        required: ["id", "name", "email", "role", "createdAt"],
+        properties: {
+          id: { type: "string", format: "uuid" },
+          name: { type: "string", maxLength: 100 },
+          email: { type: "string", format: "email" },
+          passwordHash: {
+            type: "string",
+            nullable: true,
+            description: "Current raw DB response field; should be removed from public API responses.",
+          },
+          role: ref("Role"),
+          position: { type: "string", maxLength: 100, nullable: true },
+          avatar: { type: "string", format: "uri", nullable: true },
+          createdAt: { type: "string", format: "date-time" },
+        },
+      },
+
+      CreateUserRequest: {
+        type: "object",
+        required: ["name", "email"],
+        properties: {
+          name: { type: "string", minLength: 1, maxLength: 100 },
+          email: { type: "string", format: "email" },
+          position: { type: "string", maxLength: 100 },
+          avatar: { type: "string", format: "uri", maxLength: 500 },
+        },
+      },
+
+      UpdateUserRequest: {
+        type: "object",
+        properties: {
+          name: { type: "string", minLength: 1, maxLength: 100 },
+          email: { type: "string", format: "email" },
+          position: { type: "string", maxLength: 100 },
+          avatar: { type: "string", format: "uri", maxLength: 500 },
+        },
+      },
+
+      UpdateUserRoleRequest: {
+        type: "object",
+        required: ["role"],
+        properties: {
+          role: ref("AssignableRole"),
+        },
+      },
+
+      RolesResponse: {
+        type: "object",
+        required: ["SUPERADMIN", "ADMIN", "MANAGER", "WORKER"],
+        properties: {
+          SUPERADMIN: { type: "string", enum: ["superadmin"] },
+          ADMIN: { type: "string", enum: ["admin"] },
+          MANAGER: { type: "string", enum: ["manager"] },
+          WORKER: { type: "string", enum: ["worker"] },
+        },
+        example: {
+          SUPERADMIN: "superadmin",
+          ADMIN: "admin",
+          MANAGER: "manager",
+          WORKER: "worker",
+        },
+      },
+
+      DashboardStats: {
+        type: "object",
+        required: ["totalTasks", "completedTasks", "totalProjects", "totalUsers"],
+        properties: {
+          totalTasks: { type: "integer", minimum: 0, example: 42 },
+          completedTasks: { type: "integer", minimum: 0, example: 17 },
+          totalProjects: { type: "integer", minimum: 0, example: 8 },
+          totalUsers: { type: "integer", minimum: 0, example: 24 },
+        },
+      },
+
+      Project: {
+        type: "object",
+        required: ["id", "name", "status", "createdAt", "updatedAt"],
+        properties: {
+          id: { type: "string", format: "uuid" },
+          name: { type: "string", maxLength: 150 },
+          description: { type: "string", maxLength: 1000, nullable: true },
+          status: ref("ProjectStatus"),
+          image: { type: "string", format: "uri", nullable: true },
+          createdAt: { type: "string", format: "date-time" },
+          updatedAt: { type: "string", format: "date-time" },
+        },
+      },
+
+      ProjectWithStats: {
+        allOf: [
+          ref("Project"),
+          {
+            type: "object",
+            required: ["tasksCount", "completionPercent"],
+            properties: {
+              tasksCount: { type: "integer", minimum: 0, example: 12 },
+              completionPercent: {
+                type: "integer",
+                minimum: 0,
+                maximum: 100,
+                example: 67,
+              },
+            },
+          },
+        ],
+      },
+
+      ProjectsPage: {
+        type: "object",
+        required: ["page", "limit", "total", "totalPages", "projects"],
+        properties: {
+          page: { type: "integer", minimum: 1, example: 1 },
+          limit: { type: "integer", minimum: 1, example: 12 },
+          total: { type: "integer", minimum: 0, example: 30 },
+          totalPages: { type: "integer", minimum: 0, example: 3 },
+          projects: {
+            type: "array",
+            items: ref("ProjectWithStats"),
+          },
+        },
+      },
+
+      CreateProjectRequest: {
+        type: "object",
+        required: ["name"],
+        properties: {
+          name: { type: "string", minLength: 1, maxLength: 150 },
+          description: { type: "string", maxLength: 1000 },
+          status: ref("ProjectStatus"),
+          image: { type: "string", format: "uri", nullable: true },
+        },
+      },
+
+      UpdateProjectRequest: {
+        type: "object",
+        properties: {
+          name: { type: "string", minLength: 1, maxLength: 150 },
+          description: { type: "string", maxLength: 1000 },
+          status: ref("ProjectStatus"),
+          image: { type: "string", format: "uri", nullable: true },
+        },
+      },
+
+      ProjectMember: {
+        type: "object",
+        required: ["id", "userId", "projectId", "role", "createdAt"],
+        properties: {
+          id: { type: "string", format: "uuid" },
+          userId: { type: "string", format: "uuid" },
+          projectId: { type: "string", format: "uuid" },
+          role: { type: "string", minLength: 1, maxLength: 50 },
+          createdAt: { type: "string", format: "date-time" },
+        },
+      },
+
+      ProjectMemberWithUser: {
+        type: "object",
+        required: ["role", "user", "projectId"],
+        properties: {
+          role: { type: "string", maxLength: 50 },
+          user: ref("UserRecord"),
+          projectId: { type: "string", format: "uuid" },
+        },
+      },
+
+      CreateProjectMemberRequest: {
+        type: "object",
+        required: ["userId", "projectId", "role"],
+        properties: {
+          userId: { type: "string", format: "uuid" },
+          projectId: { type: "string", format: "uuid" },
+          role: { type: "string", minLength: 1, maxLength: 50 },
+        },
+      },
+
+      TaskAssignee: {
+        type: "object",
+        required: ["id", "name"],
+        properties: {
+          id: { type: "string", format: "uuid" },
+          name: { type: "string" },
+          avatar: { type: "string", format: "uri", nullable: true },
+        },
+      },
+
+      TaskAssigneeLink: {
+        type: "object",
+        required: ["id", "taskId", "userId", "createdAt"],
+        properties: {
+          id: { type: "string", format: "uuid" },
+          taskId: { type: "string", format: "uuid" },
+          userId: { type: "string", format: "uuid" },
+          createdAt: { type: "string", format: "date-time" },
+        },
+      },
+
+      TaskRecord: {
+        type: "object",
+        required: ["id", "projectId", "title", "status", "createdAt", "updatedAt"],
+        properties: {
+          id: { type: "string", format: "uuid" },
+          projectId: { type: "string", format: "uuid" },
+          title: { type: "string", maxLength: 150 },
+          description: { type: "string", maxLength: 1000, nullable: true },
+          status: ref("TaskStatus"),
+          startDate: { type: "string", format: "date-time", nullable: true },
+          endDate: { type: "string", format: "date-time", nullable: true },
+          createdAt: { type: "string", format: "date-time" },
+          updatedAt: { type: "string", format: "date-time" },
+        },
+      },
+
+      Task: {
+        allOf: [
+          ref("TaskRecord"),
+          {
+            type: "object",
+            required: ["assignees"],
+            properties: {
+              assignees: {
+                type: "array",
+                items: ref("TaskAssignee"),
+              },
+            },
+          },
+        ],
+      },
+
+      TasksPage: {
+        type: "object",
+        required: ["page", "limit", "total", "totalPages", "tasks"],
+        properties: {
+          page: { type: "integer", minimum: 1, example: 1 },
+          limit: { type: "integer", minimum: 1, example: 20 },
+          total: { type: "integer", minimum: 0, example: 137 },
+          totalPages: { type: "integer", minimum: 0, example: 7 },
+          tasks: {
+            type: "array",
+            items: ref("Task"),
+          },
+        },
+      },
+
+      CreateTaskRequest: {
+        type: "object",
+        required: ["projectId", "title"],
+        properties: {
+          projectId: { type: "string", format: "uuid" },
+          assigneeIds: {
+            type: "array",
+            items: { type: "string", format: "uuid" },
+            example: ["3fa85f64-5717-4562-b3fc-2c963f66afa6"],
+          },
+          title: { type: "string", minLength: 1, maxLength: 150 },
+          description: { type: "string", maxLength: 1000 },
+          status: ref("TaskStatus"),
+          startDate: { type: "string", format: "date-time" },
+          endDate: { type: "string", format: "date-time" },
+        },
+      },
+
+      UpdateTaskRequest: {
+        type: "object",
+        properties: {
+          projectId: { type: "string", format: "uuid" },
+          assigneeIds: {
+            type: "array",
+            description:
+              "Full assignee list. Omit to keep current assignees. Send [] to remove all assignees.",
+            items: { type: "string", format: "uuid" },
+            example: [],
+          },
+          title: { type: "string", minLength: 1, maxLength: 150 },
+          description: { type: "string", maxLength: 1000 },
+          status: ref("TaskStatus"),
+          startDate: { type: "string", format: "date-time" },
+          endDate: { type: "string", format: "date-time" },
+        },
+      },
+
+      AddTaskAssigneeRequest: {
+        type: "object",
+        required: ["userId"],
+        properties: {
+          userId: { type: "string", format: "uuid" },
+        },
+      },
+
+      UploadImageResponse: {
+        type: "object",
+        required: ["url", "path"],
+        properties: {
+          url: { type: "string", format: "uri" },
+          path: {
+            type: "string",
+            example: "08e18f96-a9ab-45c8-8b9f-731d8272e573.webp",
+          },
+        },
+      },
+
+      DeleteImageRequest: {
+        type: "object",
+        required: ["path"],
+        properties: {
+          path: {
+            type: "string",
+            example: "08e18f96-a9ab-45c8-8b9f-731d8272e573.webp",
+          },
+        },
       },
     },
   },
