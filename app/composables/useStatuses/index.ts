@@ -1,4 +1,5 @@
 import { PROJECT_STATUSES } from "~/constants/projectStatuses";
+import { TASK_STATUSES } from "~/constants/taskStatuses";
 import { useI18n } from "#imports";
 export function useStatuses() {
   const { t } = useI18n();
@@ -36,7 +37,36 @@ export function useStatuses() {
   };
 
   const getProjectStatusLabel = (status: string) => {
-    return getProjectStatuses.value.find((s) => s.value === status)?.label || "";
-  }
-  return { getProjectStatuses, getProjectStatusColor, getProjectStatusLabel };
+    return (
+      getProjectStatuses.value.find((s) => s.value === status)?.label || ""
+    );
+  };
+  
+  const getTaskStatuses = computed(() => {
+    return [
+      {
+        label: "Canceled",
+        value: TASK_STATUSES.CANCELLED,
+      },
+      {
+        label: "Completed",
+        value: TASK_STATUSES.COMPLETED,
+      },
+      {
+        label: "In Progress",
+        value: TASK_STATUSES.IN_PROGRESS,
+      },
+      {
+        label: "Pending",
+        value: TASK_STATUSES.PENDING,
+      },
+    ];
+  });
+
+  return {
+    getProjectStatuses,
+    getProjectStatusColor,
+    getProjectStatusLabel,
+    getTaskStatuses,
+  };
 }

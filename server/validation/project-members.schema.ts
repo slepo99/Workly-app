@@ -1,7 +1,24 @@
-import { z } from 'zod'
+import { z } from "zod";
 
 export const createProjectMemberSchema = z.object({
-  userId: z.uuid(),
   projectId: z.uuid(),
-  role: z.string().min(1).max(50),
-})
+
+  members: z
+    .array(
+      z.object({
+        userId: z.uuid(),
+        role: z.string().min(1).max(50),
+      }),
+    )
+    .min(1)
+    .refine(
+      (members) => {
+        const userIds = members.map((member) => member.userId);
+
+        return new Set(userIds).size === userIds.length;
+      },
+      {
+        message: "Duplicate users are not allowed",
+      },
+    ),
+});

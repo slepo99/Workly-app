@@ -4,3 +4,6 @@ export const TASK_STATUSES = {
   COMPLETED: "completed",
   CANCELLED: "cancelled",
 } as const
+
+export type TaskStatus =
+  (typeof TASK_STATUSES)[keyof typeof TASK_STATUSES];

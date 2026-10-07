@@ -1,35 +1,63 @@
 import { db } from "~~/server/db";
-import { projectMembers, projects, users } from "~~/server/db/schema";
-import { eq } from "drizzle-orm";
-export async function createProjectMember(data: {
-  userId: string;
+import {
+  projectMembers,
+  projects,
+  users,
+} from "~~/server/db/schema";
+import { eq, inArray } from "drizzle-orm";
+
+export async function createProjectMembers(data: {
   projectId: string;
-  role: string;
+  members: {
+    userId: string;
+    role: string;
+  }[];
 }) {
-  const project = await db
+  const [project] = await db
     .select()
     .from(projects)
     .where(eq(projects.id, data.projectId));
 
-  if (!project[0]) {
-   throw  createError({
+  if (!project) {
+    throw createError({
       statusCode: 404,
       statusMessage: "Project not found",
     });
   }
 
-  const user = await db.select().from(users).where(eq(users.id, data.userId));
+  const userIds = data.members.map((member) => member.userId);
 
-  if (!user[0]) {
-   throw  createError({
+  const existingUsers = await db
+    .select({
+      id: users.id,
+    })
+    .from(users)
+    .where(inArray(users.id, userIds));
+
+  if (existingUsers.length !== userIds.length) {
+    throw createError({
       statusCode: 404,
-      statusMessage: "User not found",
+      statusMessage: "One or more users not found",
     });
   }
-  const result = await db.insert(projectMembers).values(data).returning();
 
-  return result[0];
+  const membersToInsert = data.members.map((member) => ({
+    projectId: data.projectId,
+    userId: member.userId,
+    role: member.role,
+  }));
+
+  const createdMembers = await db
+    .insert(projectMembers)
+    .values(membersToInsert)
+    .onConflictDoNothing()
+    .returning();
+
+  return createdMembers;
 }
+
 export async function getProjectMembers() {
-  return await db.select().from(projectMembers);
+  return await db
+    .select()
+    .from(projectMembers);
 }

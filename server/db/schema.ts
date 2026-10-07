@@ -29,7 +29,7 @@ export const users = pgTable("users", {
   name: varchar("name", { length: 100 }).notNull(),
   email: varchar("email", { length: 255 }).notNull().unique(),
   passwordHash: varchar("password_hash", { length: 255 }),
-  role: userRoleEnum("role").notNull().default(ROLES.MANAGER),
+  role: userRoleEnum("role").notNull().default(ROLES.WORKER),
   position: varchar("position", { length: 100 }),
   avatar: varchar("avatar", { length: 500 }),
   createdAt: timestamp("created_at").defaultNow().notNull(),

@@ -54,12 +54,8 @@
           class="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-wrap xl:shrink-0"
         >
           <ProjectEdit :project="props.project" />
-          <UButton
-            label="Add task"
-            icon="i-lucide-plus"
-            color="secondary"
-            class="min-w-0 cursor-pointer justify-center"
-          />
+ 
+          <ProjectCreateTask :project-members="props.members" :project="props.project"/>
         </div>
       </div>
     </div>

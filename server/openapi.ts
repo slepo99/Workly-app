@@ -11,10 +11,7 @@ const jsonRequest = (schema: OpenApiSchema) => ({
   },
 });
 
-const jsonResponse = (
-  description: string,
-  schema: OpenApiSchema,
-) => ({
+const jsonResponse = (description: string, schema: OpenApiSchema) => ({
   description,
   content: {
     "application/json": {
@@ -53,7 +50,10 @@ export const openapi = {
     { name: "Dashboard", description: "Dashboard statistics" },
     { name: "Roles", description: "Application roles" },
     { name: "Users", description: "Users and role management" },
-    { name: "Projects", description: "Projects, project members and project tasks" },
+    {
+      name: "Projects",
+      description: "Projects, project members and project tasks",
+    },
     { name: "Project members", description: "Project membership records" },
     { name: "Tasks", description: "Tasks and task assignees" },
     { name: "Uploads", description: "Image upload and deletion" },
@@ -137,8 +137,11 @@ export const openapi = {
         tags: ["Roles"],
         operationId: "getRoles",
         summary: "Get application roles",
+        security: cookieSecurity,
         responses: {
           200: jsonResponse("Role constants", ref("RolesResponse")),
+          401: responseRef("Unauthorized"),
+          403: responseRef("Forbidden"),
         },
       },
     },
@@ -148,11 +151,14 @@ export const openapi = {
         tags: ["Users"],
         operationId: "getUsers",
         summary: "Get all users",
+        security: cookieSecurity,
         responses: {
           200: jsonResponse("Users", {
             type: "array",
             items: ref("User"),
           }),
+          401: responseRef("Unauthorized"),
+          403: responseRef("Forbidden"),
         },
       },
 
@@ -164,7 +170,7 @@ export const openapi = {
         security: cookieSecurity,
         requestBody: jsonRequest(ref("CreateUserRequest")),
         responses: {
-          200: jsonResponse("Created user record", ref("UserRecord")),
+          200: jsonResponse("Created user", ref("User")),
           400: responseRef("ValidationError"),
           401: responseRef("Unauthorized"),
           403: responseRef("Forbidden"),
@@ -188,8 +194,11 @@ export const openapi = {
         tags: ["Users"],
         operationId: "getUserById",
         summary: "Get user by ID",
+        security: cookieSecurity,
         responses: {
           200: jsonResponse("User", ref("User")),
+          401: responseRef("Unauthorized"),
+          403: responseRef("Forbidden"),
           404: responseRef("NotFound"),
         },
       },
@@ -218,7 +227,7 @@ export const openapi = {
         description: "Allowed for superadmin, admin and manager.",
         security: cookieSecurity,
         responses: {
-          200: jsonResponse("Deleted user record", ref("UserRecord")),
+          200: jsonResponse("Deleted user", ref("User")),
           401: responseRef("Unauthorized"),
           403: responseRef("Forbidden"),
           404: responseRef("NotFound"),
@@ -332,8 +341,16 @@ export const openapi = {
         tags: ["Projects"],
         operationId: "getProjectById",
         summary: "Get project by ID",
+        description:
+          "Admin/superadmin can read any project. Manager/worker can read only projects where they are members.",
+        security: cookieSecurity,
         responses: {
-          200: jsonResponse("Project with task statistics", ref("ProjectWithStats")),
+          200: jsonResponse(
+            "Project with task statistics",
+            ref("ProjectWithStats"),
+          ),
+          401: responseRef("Unauthorized"),
+          403: responseRef("Forbidden"),
           404: responseRef("NotFound"),
         },
       },
@@ -428,7 +445,7 @@ export const openapi = {
           },
         ],
         responses: {
-          200: jsonResponse("Paginated project tasks", ref("TasksPage")),
+          200: jsonResponse("Paginated project tasks", ref("ProjectTasksPage")),
           401: responseRef("Unauthorized"),
           403: responseRef("Forbidden"),
         },
@@ -440,28 +457,35 @@ export const openapi = {
         tags: ["Project members"],
         operationId: "getProjectMemberships",
         summary: "Get all project membership records",
+        description: "Allowed only for superadmin and admin.",
+        security: cookieSecurity,
         responses: {
           200: jsonResponse("Project membership records", {
             type: "array",
             items: ref("ProjectMember"),
           }),
+          401: responseRef("Unauthorized"),
+          403: responseRef("Forbidden"),
         },
       },
 
       post: {
         tags: ["Project members"],
-        operationId: "createProjectMember",
-        summary: "Add user to project",
-        description: "Allowed for superadmin, admin and manager.",
+        operationId: "createProjectMembers",
+        summary: "Add users to project",
+        description:
+          "Adds one or more users to a project. Existing memberships are skipped.",
         security: cookieSecurity,
-        requestBody: jsonRequest(ref("CreateProjectMemberRequest")),
+        requestBody: jsonRequest(ref("CreateProjectMembersRequest")),
         responses: {
-          200: jsonResponse("Created project membership", ref("ProjectMember")),
+          200: jsonResponse("Created project memberships", {
+            type: "array",
+            items: ref("ProjectMemberRecord"),
+          }),
           400: responseRef("ValidationError"),
           401: responseRef("Unauthorized"),
           403: responseRef("Forbidden"),
           404: responseRef("NotFound"),
-          409: responseRef("Conflict"),
         },
       },
     },
@@ -527,8 +551,13 @@ export const openapi = {
         tags: ["Tasks"],
         operationId: "getTaskById",
         summary: "Get task by ID",
+        description:
+          "Admin/superadmin can read any task. Manager can read tasks from projects they belong to. Worker can read only tasks assigned to them.",
+        security: cookieSecurity,
         responses: {
           200: jsonResponse("Task with assignees", ref("Task")),
+          401: responseRef("Unauthorized"),
+          403: responseRef("Forbidden"),
           404: responseRef("NotFound"),
         },
       },
@@ -581,11 +610,17 @@ export const openapi = {
         tags: ["Tasks"],
         operationId: "getTaskAssignees",
         summary: "Get task assignees",
+        description:
+          "Uses the same resource-level access rules as GET /tasks/{id}.",
+        security: cookieSecurity,
         responses: {
           200: jsonResponse("Task assignees", {
             type: "array",
             items: ref("TaskAssignee"),
           }),
+          401: responseRef("Unauthorized"),
+          403: responseRef("Forbidden"),
+          404: responseRef("NotFound"),
         },
       },
 
@@ -594,15 +629,18 @@ export const openapi = {
         operationId: "addTaskAssignee",
         summary: "Add one task assignee",
         description:
-          "Legacy granular assignee endpoint kept alongside PATCH /tasks/{id}. Allowed for superadmin, admin and manager.",
+          "Legacy granular assignee endpoint kept alongside PATCH /tasks/{id}. Allowed for superadmin, admin and manager. The caller must have access to the task and the added user must be a member of the task project.",
         security: cookieSecurity,
         requestBody: jsonRequest(ref("AddTaskAssigneeRequest")),
         responses: {
-          200: jsonResponse("Created task-assignee relation", ref("TaskAssigneeLink")),
+          200: jsonResponse(
+            "Created task-assignee relation",
+            ref("TaskAssigneeLink"),
+          ),
           400: responseRef("ValidationError"),
           401: responseRef("Unauthorized"),
           403: responseRef("Forbidden"),
-          409: responseRef("Conflict"),
+          404: responseRef("NotFound"),
         },
       },
     },
@@ -613,7 +651,7 @@ export const openapi = {
         operationId: "removeTaskAssignee",
         summary: "Remove one task assignee",
         description:
-          "Legacy granular assignee endpoint kept alongside PATCH /tasks/{id}. Allowed for superadmin, admin and manager.",
+          "Legacy granular assignee endpoint kept alongside PATCH /tasks/{id}. Allowed for superadmin, admin and manager. The caller must have access to the task and the added user must be a member of the task project.",
         security: cookieSecurity,
         parameters: [
           {
@@ -851,27 +889,6 @@ export const openapi = {
         },
       },
 
-      UserRecord: {
-        type: "object",
-        description:
-          "Raw users table record currently returned by some endpoints. passwordHash should not be exposed by public API responses.",
-        required: ["id", "name", "email", "role", "createdAt"],
-        properties: {
-          id: { type: "string", format: "uuid" },
-          name: { type: "string", maxLength: 100 },
-          email: { type: "string", format: "email" },
-          passwordHash: {
-            type: "string",
-            nullable: true,
-            description: "Current raw DB response field; should be removed from public API responses.",
-          },
-          role: ref("Role"),
-          position: { type: "string", maxLength: 100, nullable: true },
-          avatar: { type: "string", format: "uri", nullable: true },
-          createdAt: { type: "string", format: "date-time" },
-        },
-      },
-
       CreateUserRequest: {
         type: "object",
         required: ["name", "email"],
@@ -920,7 +937,12 @@ export const openapi = {
 
       DashboardStats: {
         type: "object",
-        required: ["totalTasks", "completedTasks", "totalProjects", "totalUsers"],
+        required: [
+          "totalTasks",
+          "completedTasks",
+          "totalProjects",
+          "totalUsers",
+        ],
         properties: {
           totalTasks: { type: "integer", minimum: 0, example: 42 },
           completedTasks: { type: "integer", minimum: 0, example: 17 },
@@ -1015,18 +1037,48 @@ export const openapi = {
         required: ["role", "user", "projectId"],
         properties: {
           role: { type: "string", maxLength: 50 },
-          user: ref("UserRecord"),
+          user: ref("User"),
           projectId: { type: "string", format: "uuid" },
         },
       },
 
-      CreateProjectMemberRequest: {
+      CreateProjectMembersRequest: {
         type: "object",
-        required: ["userId", "projectId", "role"],
+        required: ["projectId", "members"],
         properties: {
-          userId: { type: "string", format: "uuid" },
-          projectId: { type: "string", format: "uuid" },
-          role: { type: "string", minLength: 1, maxLength: 50 },
+          projectId: {
+            type: "string",
+            format: "uuid",
+          },
+          members: {
+            type: "array",
+            minItems: 1,
+            items: {
+              type: "object",
+              required: ["userId", "role"],
+              properties: {
+                userId: {
+                  type: "string",
+                  format: "uuid",
+                },
+                role: {
+                  type: "string",
+                  minLength: 1,
+                  maxLength: 50,
+                },
+              },
+            },
+            example: [
+              {
+                userId: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                role: "developer",
+              },
+              {
+                userId: "8fa85f64-5717-4562-b3fc-2c963f66afa7",
+                role: "manager",
+              },
+            ],
+          },
         },
       },
 
@@ -1053,7 +1105,14 @@ export const openapi = {
 
       TaskRecord: {
         type: "object",
-        required: ["id", "projectId", "title", "status", "createdAt", "updatedAt"],
+        required: [
+          "id",
+          "projectId",
+          "title",
+          "status",
+          "createdAt",
+          "updatedAt",
+        ],
         properties: {
           id: { type: "string", format: "uuid" },
           projectId: { type: "string", format: "uuid" },
@@ -1094,6 +1153,55 @@ export const openapi = {
           tasks: {
             type: "array",
             items: ref("Task"),
+          },
+        },
+      },
+
+      ProjectTaskRecord: {
+        type: "object",
+        required: ["id", "projectId", "title", "status", "createdAt"],
+        description:
+          "Task shape returned by GET /projects/{id}/tasks. updatedAt is present for admin/superadmin responses but is currently omitted by manager/worker selects.",
+        properties: {
+          id: { type: "string", format: "uuid" },
+          projectId: { type: "string", format: "uuid" },
+          title: { type: "string", maxLength: 150 },
+          description: { type: "string", maxLength: 1000, nullable: true },
+          status: ref("TaskStatus"),
+          startDate: { type: "string", format: "date-time", nullable: true },
+          endDate: { type: "string", format: "date-time", nullable: true },
+          createdAt: { type: "string", format: "date-time" },
+          updatedAt: { type: "string", format: "date-time" },
+        },
+      },
+
+      ProjectTask: {
+        allOf: [
+          ref("ProjectTaskRecord"),
+          {
+            type: "object",
+            required: ["assignees"],
+            properties: {
+              assignees: {
+                type: "array",
+                items: ref("TaskAssignee"),
+              },
+            },
+          },
+        ],
+      },
+
+      ProjectTasksPage: {
+        type: "object",
+        required: ["page", "limit", "total", "totalPages", "tasks"],
+        properties: {
+          page: { type: "integer", minimum: 1, example: 1 },
+          limit: { type: "integer", minimum: 1, example: 20 },
+          total: { type: "integer", minimum: 0, example: 42 },
+          totalPages: { type: "integer", minimum: 0, example: 3 },
+          tasks: {
+            type: "array",
+            items: ref("ProjectTask"),
           },
         },
       },
