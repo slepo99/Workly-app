@@ -106,5 +106,13 @@
         }
       }
     }
+  },
+  "projects" : {
+    "statuses": {
+      "active": "Active",
+      "completed": "Completed",
+      "onHold": "On hold",
+      "cancelled": "Cancelled"
+    }
   }
 }

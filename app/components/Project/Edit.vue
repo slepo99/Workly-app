@@ -35,7 +35,7 @@
         <UFormField label="Status" name="status" required>
           <USelect
             v-model="form.status"
-            :items="statusItems"
+            :items="projectStatuses"
             value-key="value"
             label-key="label"
             class="w-full"
@@ -108,30 +108,17 @@ import {
   type ProjectStatus,
 } from "~/constants/projectStatuses";
 import { useProjectStore } from "~/stores/project";
-
+import { useStatuses } from "~/composables/useStatuses";
 const props = defineProps<{
   project: ProjectModel;
 }>();
 
 const projectStore = useProjectStore();
-
+const { projectStatuses } = useStatuses()
 const isOpen = ref(false);
 const isSaving = ref(false);
 const isImageRemoved = ref(false);
-const statusItems = [
-  {
-    label: "Active",
-    value: PROJECT_STATUSES.ACTIVE,
-  },
-  {
-    label: "On hold",
-    value: PROJECT_STATUSES.ON_HOLD,
-  },
-  {
-    label: "Completed",
-    value: PROJECT_STATUSES.COMPLETED,
-  },
-];
+
 
 const form = reactive<{
   name: string;

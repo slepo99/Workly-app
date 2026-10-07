@@ -37,7 +37,11 @@
               size="lg"
               class="shrink-0"
             >
-              {{ project.status }}
+              {{
+                projectStatuses.find(
+                  (status) => status.value === project.status,
+                )?.label
+              }}
             </UBadge>
           </div>
 
@@ -51,15 +55,7 @@
         <div
           class="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-wrap xl:shrink-0"
         >
-          <!-- <UButton
-            class="min-w-0 justify-center !bg-transparent !text-primary hover:!bg-primary/10"
-            variant="outline"
-            icon="i-lucide-edit-2"
-            @click="editProject"
-          >
-            Edit Project
-          </UButton> -->
-          <ProjectEdit :project="props.project"/>
+          <ProjectEdit :project="props.project" />
           <UButton
             label="Add task"
             icon="i-lucide-plus"
@@ -134,17 +130,15 @@
 
 <script setup lang="ts">
 import type { ProjectModel } from "~/composables/api/useProjectsApi/types";
-import { PROJECT_STATUSES } from "~/constants/projectStatuses";
 import type { ProjectMemberModel } from "~/composables/api/useProjectMembersApi/types";
+import { useStatuses } from "~/composables/useStatuses";
+
 const props = defineProps<{
   project: ProjectModel;
   members: ProjectMemberModel[];
 }>();
-const emits = defineEmits(["editProject"]);
 
-function editProject() {
-  emits("editProject");
-}
+const { projectStatuses, getProjectStatusColor } = useStatuses();
 </script>
 
 <style scoped></style>

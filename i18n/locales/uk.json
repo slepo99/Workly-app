@@ -105,5 +105,13 @@
         }
       }
     }
+  },
+  "projects" : {
+    "statuses": {
+      "active": "Активний",
+      "completed": "Завершений",
+      "onHold": "На паузі",
+      "cancelled": "Скасований"
+    }
   }
 }
