@@ -8,7 +8,7 @@
     />
 
     <template #body>
-      <UForm :state="form" class="flex flex-col gap-4" @submit="createTask">
+      <UForm :state="form" :schema="schema" class="flex flex-col gap-4" @submit="createTask">
         <UFormField label="Task title" name="title" required>
           <UInput v-model="form.title" placeholder="Task name" class="w-full" />
         </UFormField>
@@ -43,6 +43,9 @@
             class="w-full"
           />
         </UFormField>
+        <UFormField label="Date range" name="dateRange">
+          <UIRangeDatePicker v-model="taskDates" />
+        </UFormField>
 
         <div class="flex flex-col gap-2 pt-2 sm:flex-row sm:justify-end">
           <UButton
@@ -74,6 +77,7 @@ import { useStatuses } from "~/composables/useStatuses";
 import { useProjectCreateTask } from "~/composables/components/project/useProjectCreateTask";
 import type { ProjectMemberModel } from "~/composables/api/useProjectMembersApi/types";
 import type { ProjectModel } from "~/composables/api/useProjectsApi/types";
+
 const props = defineProps<{
   projectMembers: ProjectMemberModel[];
   project: ProjectModel;
@@ -81,8 +85,14 @@ const props = defineProps<{
 
 const { getTaskStatuses } = useStatuses();
 
-const { memberItems, form, isOpen, isSaving, resetForm, createTask } = useProjectCreateTask(
-  props.projectMembers,
-  props.project,
-);
+const {
+  memberItems,
+  form,
+  isOpen,
+  isSaving,
+  resetForm,
+  createTask,
+  taskDates,
+  schema,
+} = useProjectCreateTask(props.projectMembers, props.project);
 </script>

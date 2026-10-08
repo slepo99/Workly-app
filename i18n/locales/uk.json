@@ -113,5 +113,12 @@
       "onHold": "На паузі",
       "cancelled": "Скасований"
     }
+  },
+  "UI": {
+    "datePicker": {
+      "placeholder": "Виберіть дату",
+      "startDate": "Дата початку",
+      "endDate": "Дата завершення"
+    }
   }
 }

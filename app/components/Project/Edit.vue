@@ -14,7 +14,7 @@
     </UButton>
 
     <template #body>
-      <UForm :state="form" class="flex flex-col gap-4" @submit="saveProject">
+      <UForm :state="form" :schema="schema" class="flex flex-col gap-4" @submit="saveProject">
         <UFormField label="Project name" name="name" required>
           <UInput
             v-model="form.name"
@@ -107,9 +107,9 @@ import { useProjectEdit } from "~/composables/components/project/useProjectEdit"
 const props = defineProps<{
   project: ProjectModel;
 }>();
-
+const project = toRef(props, "project");
 const { getProjectStatuses } = useStatuses();
 
-const { isOpen, isSaving, isImageRemoved, form, resetForm, saveProject } =
-  useProjectEdit(props.project);
+const { isOpen, isSaving, isImageRemoved, form, resetForm, saveProject, schema } =
+  useProjectEdit(project);
 </script>

@@ -1,8 +1,12 @@
 import type { ProjectModel } from "~/composables/api/useProjectsApi/types";
-import { type ProjectStatus } from "~/constants/projectStatuses";
+import {
+  type ProjectStatus,
+  PROJECT_STATUSES,
+} from "~/constants/projectStatuses";
 import { useProjectStore } from "~/stores/project";
+import { z } from "zod";
 
-export function useProjectEdit(project: ProjectModel) {
+export function useProjectEdit(project: Ref<ProjectModel>) {
   const projectStore = useProjectStore();
 
   const isOpen = ref(false);
@@ -15,16 +19,16 @@ export function useProjectEdit(project: ProjectModel) {
     status: ProjectStatus;
     image: File | null;
   }>({
-    name: project.name,
-    description: project.description,
-    status: project.status as ProjectStatus,
+    name: project.value.name,
+    description: project.value.description,
+    status: project.value.status as ProjectStatus,
     image: null,
   });
 
   function resetForm() {
-    form.name = project.name;
-    form.description = project.description;
-    form.status = project.status as ProjectStatus;
+    form.name = project.value.name;
+    form.description = project.value.description;
+    form.status = project.value.status as ProjectStatus;
     form.image = null;
     isImageRemoved.value = false;
   }
@@ -38,7 +42,7 @@ export function useProjectEdit(project: ProjectModel) {
     try {
       isSaving.value = true;
 
-      let imageUrl: string | null = project.image;
+      let imageUrl: string | null = project.value.image;
 
       if (form.image) {
         const uploadedImage = await uploadFile(form.image);
@@ -49,21 +53,20 @@ export function useProjectEdit(project: ProjectModel) {
         imageUrl = null;
       }
 
-      await updateProject(project.id, {
+      await updateProject(project.value.id, {
         name: form.name,
         description: form.description,
         status: form.status,
         image: imageUrl,
       });
 
-      await projectStore.loadProjectById(project.id);
+      await projectStore.loadProjectById(project.value.id);
 
       toast.add({
         title: "Project updated",
         description: "Project has been successfully updated.",
         color: "success",
       });
-
       isOpen.value = false;
     } catch (error) {
       if (uploadedImagePath) {
@@ -85,7 +88,28 @@ export function useProjectEdit(project: ProjectModel) {
       isSaving.value = false;
     }
   }
+  const projectStatusSchema = z.enum(
+    Object.values(PROJECT_STATUSES) as [ProjectStatus, ...ProjectStatus[]],
+  );
+  const schema = z.object({
+    name: z
+      .string()
+      .min(1, "Project name is required")
+      .max(150, "Project name is too long"),
 
+    description: z.string().max(1000, "Description is too long"),
+
+    status: projectStatusSchema,
+
+    image: z.custom<File | null>(
+      (value) =>
+        value === null ||
+        (typeof File !== "undefined" && value instanceof File),
+      {
+        message: "Invalid image file",
+      },
+    ),
+  });
   return {
     isOpen,
     isSaving,
@@ -93,5 +117,6 @@ export function useProjectEdit(project: ProjectModel) {
     form,
     resetForm,
     saveProject,
+    schema,
   };
 }

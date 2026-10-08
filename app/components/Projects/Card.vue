@@ -46,7 +46,7 @@
         >
       </div>
       <UProgress
-        :model-value="project.completionPercent + 1"
+        :model-value="project.completionPercent"
         :max="100"
         :color="getProgressColor(project.completionPercent)"
         class="mt-4"

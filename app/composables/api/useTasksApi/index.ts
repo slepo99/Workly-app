@@ -20,7 +20,7 @@ export function useTasksApi() {
     });
   };
   const postTask = (body: TaskCreateModel) => {
-    return $api<TasksModel>(`${API.GET_TASKS}}`, {
+    return $api<TasksModel>(API.GET_TASKS, {
       method: "POST",
       body,
     });

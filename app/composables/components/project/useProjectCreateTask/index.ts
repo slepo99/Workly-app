@@ -1,11 +1,13 @@
-
 import type { ProjectModel } from "~/composables/api/useProjectsApi/types";
 import type { ProjectMemberModel } from "~/composables/api/useProjectMembersApi/types";
 import type { TaskCreateModel } from "~/composables/api/useTasksApi/types";
+import { z } from "zod";
+import { useProjectStore } from "~/stores/project";
 export function useProjectCreateTask(
   projectMembers: ProjectMemberModel[],
   project: ProjectModel,
 ) {
+  const projectStore = useProjectStore();
   const isOpen = ref(false);
   const isSaving = ref(false);
   const form = reactive<TaskCreateModel>({
@@ -33,16 +35,47 @@ export function useProjectCreateTask(
   function resetForm() {
     form.title = "";
     form.description = "";
-
     form.status = "in_progress";
     form.assigneeIds = [];
     form.endDate = "";
     form.startDate = "";
   }
   async function createTask() {
-
-    // soon will be added
+    const { postTask } = useTasksApi();
+    try {
+      isSaving.value = true;
+      await postTask(form);
+      resetForm();
+      isOpen.value = false;
+      await projectStore.loadProjectTasks(project.id);
+    } catch (error) {
+      console.error("Error creating task:", error);
+    } finally {
+      isSaving.value = false;
+    }
   }
+  const taskDates = computed({
+    get() {
+      return {
+        start: form.startDate,
+        end: form.endDate,
+      };
+    },
+
+    set(value) {
+      form.startDate = value.start;
+      form.endDate = value.end;
+    },
+  });
+  const schema = z.object({
+    title: z.string().min(1, "Task title is required"),
+    description: z.string().optional(),
+    status: z.string().min(1, "Status is required"),
+    assigneeIds: z.array(z.string()),
+    startDate: z.string().optional(),
+    endDate: z.string().optional(),
+    projectId: z.string(),
+  });
   return {
     memberItems,
     form,
@@ -50,5 +83,7 @@ export function useProjectCreateTask(
     isSaving,
     resetForm,
     createTask,
+    taskDates,
+    schema,
   };
 }

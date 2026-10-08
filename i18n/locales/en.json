@@ -114,5 +114,12 @@
       "onHold": "On hold",
       "cancelled": "Cancelled"
     }
+  },
+  "UI": {
+    "datePicker": {
+      "placeholder": "Select date",
+      "startDate": "Start date",
+      "endDate": "End date"
+    }
   }
 }
