@@ -19,7 +19,7 @@ export async function createProject(
     name: string;
     description?: string;
     status?: string;
-    image?: string;
+    image?: string | null;
   },
 ) {
   return await db.transaction(async (tx) => {
@@ -447,7 +447,7 @@ export async function getAvailableUsersByProjectId(projectId: string) {
     .from(projects)
     .where(eq(projects.id, projectId));
 
-  if(!currentProject) {
+  if (!currentProject) {
     throw createError({
       statusCode: 404,
       statusMessage: "Project not found",

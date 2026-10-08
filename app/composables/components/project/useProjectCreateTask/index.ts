@@ -8,6 +8,8 @@ export function useProjectCreateTask(
   project: ProjectModel,
 ) {
   const projectStore = useProjectStore();
+  const toast = useToast();
+
   const isOpen = ref(false);
   const isSaving = ref(false);
   const form = reactive<TaskCreateModel>({
@@ -48,7 +50,17 @@ export function useProjectCreateTask(
       resetForm();
       isOpen.value = false;
       await projectStore.loadProjectTasks(project.id);
+      toast.add({
+        title: "Task created",
+        description: "Task has been created successfully",
+        color: "success",
+      });
     } catch (error) {
+      toast.add({
+        title: "Error creating task",
+        description: "Failed to create task",
+        color: "error",
+      });
       console.error("Error creating task:", error);
     } finally {
       isSaving.value = false;

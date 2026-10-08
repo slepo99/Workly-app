@@ -2,8 +2,10 @@ import type {
   CreateProjectInput,
   UpdateProjectInput,
   ProjectsResponseModel,
-  ProjectModel
+  ProjectModel,
 } from "./types";
+
+import type { UserModel } from "../useProjectMembersApi/types";
 import { PROJECTS_PAGINATION } from "~/constants/api";
 import type { ProjectStatus } from "~/constants/projectStatuses";
 
@@ -59,12 +61,18 @@ export function useProjectsApi() {
   const getProjectById = (id: string) => {
     return $api<ProjectModel>(`${API.GET_PROJECTS}/${id}`);
   };
+  const getAvailableUsersForProject = (projectId: string) => {
+    return $api<UserModel[]>(
+      `${API.GET_PROJECTS}/${projectId}/available-users`,
+    );
+  };
 
   return {
     getProjects,
     createProject,
     updateProject,
     deleteProject,
-    getProjectById
+    getProjectById,
+    getAvailableUsersForProject
   };
 }

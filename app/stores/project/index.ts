@@ -1,12 +1,16 @@
 import { defineStore } from "pinia";
 import type { ProjectModel } from "~/composables/api/useProjectsApi/types";
-import type { ProjectMemberModel } from "~/composables/api/useProjectMembersApi/types";
+import type {
+  ProjectMemberModel,
+  UserModel,
+} from "~/composables/api/useProjectMembersApi/types";
 import type { TasksModel } from "~/composables/api/useTasksApi/types";
 interface ProjectStateModel {
   project: ProjectModel | null;
-  isLoading: boolean; // todo: create isLoading for each requests
+  isLoading: boolean; // todo: remove isLoading from store and replace to the composable
   projectMembers: ProjectMemberModel[];
   projectTasks: TasksModel[];
+  availableUsers: UserModel[];
 }
 
 export const useProjectStore = defineStore("project", {
@@ -16,6 +20,7 @@ export const useProjectStore = defineStore("project", {
       isLoading: false,
       projectMembers: [],
       projectTasks: [],
+      availableUsers: [],
     };
   },
 
@@ -50,6 +55,17 @@ export const useProjectStore = defineStore("project", {
       try {
         const tasks = await getProjectTasks(projectId);
         this.projectTasks = tasks.tasks;
+      } finally {
+        this.isLoading = false;
+      }
+    },
+    async loadAvailableUsersForProject(projectId: string) {
+      const { getAvailableUsersForProject } = useProjectsApi();
+      this.isLoading = true;
+
+      try {
+        const users = await getAvailableUsersForProject(projectId);
+        this.availableUsers = users;
       } finally {
         this.isLoading = false;
       }
