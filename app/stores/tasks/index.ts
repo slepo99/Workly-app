@@ -27,7 +27,7 @@ export const useTasksStore = defineStore("tasks", {
       this.isLoading = true;
       try {
         const tasks = await getTasks();
-        this.tasks = tasks;
+        this.tasks = tasks.tasks;
       } finally {
         this.isLoading = false;
       }

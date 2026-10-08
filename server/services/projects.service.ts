@@ -6,7 +6,7 @@ import {
   tasks,
   taskAssignees,
 } from "~~/server/db/schema";
-import { eq, and, count, desc, ilike, inArray } from "drizzle-orm";
+import { eq, and, count, desc, ilike, inArray, isNull } from "drizzle-orm";
 import { ROLES, type Role } from "~~/server/constants/roles";
 import { getTaskAssignees } from "./task-assignees.service";
 import { TASK_STATUSES } from "~~/server/constants/taskStatuses";
@@ -440,4 +440,38 @@ export async function getTasksByProjectId(
     totalPages: Math.ceil(total / limit),
     tasks: tasksWithAssignees,
   };
+}
+export async function getAvailableUsersByProjectId(projectId: string) {
+  const [currentProject] = await db
+    .select()
+    .from(projects)
+    .where(eq(projects.id, projectId));
+
+  if(!currentProject) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: "Project not found",
+    });
+  }
+  const availableUsers = await db
+    .select({
+      id: users.id,
+      name: users.name,
+      email: users.email,
+      role: users.role,
+      position: users.position,
+      avatar: users.avatar,
+      createdAt: users.createdAt,
+    })
+    .from(users)
+    .leftJoin(
+      projectMembers,
+      and(
+        eq(projectMembers.userId, users.id),
+        eq(projectMembers.projectId, projectId),
+      ),
+    )
+    .where(isNull(projectMembers.id));
+
+  return availableUsers;
 }

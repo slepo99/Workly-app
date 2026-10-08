@@ -489,6 +489,39 @@ export const openapi = {
         },
       },
     },
+    "/projects/{id}/available-users": {
+      get: {
+        tags: ["Projects"],
+        operationId: "getAvailableUsersByProjectId",
+        summary: "Get users available to add to project",
+        description:
+          "Returns users who are not currently members of the specified project.",
+        security: cookieSecurity,
+
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: {
+              type: "string",
+              format: "uuid",
+            },
+          },
+        ],
+
+        responses: {
+          200: jsonResponse("List of available users", {
+            type: "array",
+            items: ref("User"),
+          }),
+
+          401: responseRef("Unauthorized"),
+          403: responseRef("Forbidden"),
+          404: responseRef("NotFound"),
+        },
+      },
+    },
 
     "/tasks": {
       get: {

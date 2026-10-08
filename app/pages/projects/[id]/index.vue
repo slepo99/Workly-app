@@ -10,7 +10,9 @@
       />
       <ProjectMembersTable
         :members="projectStore.projectMembers"
+        :project-id="projectId"
         class="mt-4"
+        @add-member="console.log('Add member')"
       />
       <DashboardTasklistTable :tasks="projectStore.projectTasks" class="mt-4" />
     </div>

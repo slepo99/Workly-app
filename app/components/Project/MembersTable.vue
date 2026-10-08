@@ -1,7 +1,8 @@
 <template>
   <div class="min-w-0 overflow-hidden rounded-lg border border-default">
-    <div class="border-b border-default px-4 py-3">
+    <div class="border-b border-default px-4 py-3 flex items-center justify-between">
       <span class="text-lg font-semibold">Project members</span>
+          <ProjectAddMembers :project-id="projectId" />
     </div>
 
     <UTable
@@ -14,9 +15,7 @@
       }"
     >
       <template #empty>
-        <div class="py-6 text-center text-muted">
-          No project members
-        </div>
+        <div class="py-6 text-center text-muted">No project members</div>
       </template>
     </UTable>
   </div>
@@ -31,6 +30,7 @@ import type { ProjectMemberModel } from "~/composables/api/useProjectMembersApi/
 
 defineProps<{
   members: ProjectMemberModel[];
+  projectId: string;
 }>();
 
 const UAvatar = resolveComponent("UAvatar");
@@ -50,7 +50,8 @@ const columns: TableColumn<ProjectMemberModel>[] = [
 
       if (!member.user.avatar) {
         return h("div", {
-          class: "size-10 shrink-0 rounded-full bg-neutral-200 dark:bg-neutral-700",
+          class:
+            "size-10 shrink-0 rounded-full bg-neutral-200 dark:bg-neutral-700",
           role: "img",
           "aria-label": `No avatar for ${member.user.name}`,
         });
@@ -118,33 +119,30 @@ const columns: TableColumn<ProjectMemberModel>[] = [
     header: ({ column }) => getHeader(column, "Joined at"),
     cell: ({ row }) => formatDate(row.original.user.createdAt),
   },
-{
-  id: "id",
-  accessorFn: (row) => row.user.id,
-  header: ({ column }) => getHeader(column, "ID"),
-  cell: ({ row }) =>
-    h(
-      UTooltip,
-      { text: row.original.user.id },
-      {
-        default: () =>
-          h(
-            "div",
-            { class: "max-w-32 truncate text-muted" },
-            row.original.user.id,
-          ),
-      },
-    ),
-},
-{
-  id: "actions",
-  header: "Actions",
-  enableSorting: false,
-  cell: ({ row }) =>
-    h(
-      "div",
-      { class: "flex items-center gap-1" },
-      [
+  {
+    id: "id",
+    accessorFn: (row) => row.user.id,
+    header: ({ column }) => getHeader(column, "ID"),
+    cell: ({ row }) =>
+      h(
+        UTooltip,
+        { text: row.original.user.id },
+        {
+          default: () =>
+            h(
+              "div",
+              { class: "max-w-32 truncate text-muted" },
+              row.original.user.id,
+            ),
+        },
+      ),
+  },
+  {
+    id: "actions",
+    header: "Actions",
+    enableSorting: false,
+    cell: ({ row }) =>
+      h("div", { class: "flex items-center gap-1" }, [
         h(UButton, {
           icon: "i-lucide-eye",
           color: "neutral",
@@ -166,9 +164,8 @@ const columns: TableColumn<ProjectMemberModel>[] = [
             console.log("Remove member:", row.original.user.id);
           },
         }),
-      ],
-    ),
-},
+      ]),
+  },
 ];
 
 function getHeader(column: Column<ProjectMemberModel>, label: string) {
