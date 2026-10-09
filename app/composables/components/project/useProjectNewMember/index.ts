@@ -7,20 +7,7 @@ export function useProjectNewMember(projectId: Ref<string>) {
   const isOpen = ref(false);
   const isSaving = ref(false);
   const selectedUsers = ref<string[]>([]);
-  // const getUsersList = computed(() => {
-  //   return usersStore.users.map((user) => ({
-  //     label: user.name,
-  //     value: user.id,
-  //     email: user.email,
-  //     avatar: user.avatar
-  //       ? {
-  //           src: user.avatar,
-  //           loading: "lazy" as const,
-  //         }
-  //       : undefined,
-  //   }));
-  // });
-
+ 
   async function loadUsers() {
     isLoading.value = true;
     try {
@@ -36,6 +23,7 @@ export function useProjectNewMember(projectId: Ref<string>) {
       isLoading.value = false;
     }
   }
+
 
   const getUsersList = computed(() => {
     return projectStore.availableUsers.map((user) => ({

@@ -5,7 +5,7 @@ import type {
   ProjectModel,
 } from "./types";
 
-import type { UserModel } from "../useProjectMembersApi/types";
+import type { UserModel } from "~/composables/api/useUsersApi/types"
 import { PROJECTS_PAGINATION } from "~/constants/api";
 import type { ProjectStatus } from "~/constants/projectStatuses";
 

@@ -489,6 +489,32 @@ export const openapi = {
         },
       },
     },
+
+    "/project-members/role": {
+      patch: {
+        tags: ["Project members"],
+        operationId: "updateProjectMemberRole",
+        summary: "Update project member role",
+        description:
+          "Updates the role of an existing member within a specific project.",
+        security: cookieSecurity,
+
+        requestBody: jsonRequest(ref("UpdateProjectMemberRoleRequest")),
+
+        responses: {
+          200: jsonResponse(
+            "Updated project member",
+            ref("ProjectMemberRecord"),
+          ),
+
+          400: responseRef("ValidationError"),
+          401: responseRef("Unauthorized"),
+          403: responseRef("Forbidden"),
+          404: responseRef("NotFound"),
+        },
+      },
+    },
+
     "/projects/{id}/available-users": {
       get: {
         tags: ["Projects"],
@@ -1112,6 +1138,32 @@ export const openapi = {
               },
             ],
           },
+        },
+      },
+      UpdateProjectMemberRoleRequest: {
+        type: "object",
+        required: ["projectId", "userId", "role"],
+        properties: {
+          projectId: {
+            type: "string",
+            format: "uuid",
+          },
+
+          userId: {
+            type: "string",
+            format: "uuid",
+          },
+
+          role: {
+            type: "string",
+            minLength: 1,
+            maxLength: 50,
+          },
+        },
+        example: {
+          projectId: "448f98a7-0bb2-4025-9eb2-1790384c0c61",
+          userId: "9e47eb80-a52c-4278-9da2-9fe0ddc90883",
+          role: "worker",
         },
       },
 

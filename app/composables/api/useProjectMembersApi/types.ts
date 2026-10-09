@@ -1,12 +1,4 @@
-export interface UserModel {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  position: string | null;
-  avatar: string | null;
-  createdAt: string;
-}
+import type { UserModel } from "~/composables/api/useUsersApi/types";
 
 export interface ProjectMemberModel {
   role: string;
@@ -19,4 +11,11 @@ export interface ProjectMemberPostModel {
     userId: string;
     role: string;
   }[];
+}
+export interface AllProjectMembersResponseModel {
+    id: string;
+    userId: string;
+    projectId: string;
+    role: string;
+    createdAt: string;
 }

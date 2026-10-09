@@ -2,7 +2,7 @@ import { useProjectStore } from "~/stores/project";
 import type { BreadcrumbItem } from "@nuxt/ui";
 export function useProject() {
   const projectStore = useProjectStore();
-
+  const toast = useToast();
   async function onFirstLoadProject(projectId: string) {
     await callOnce(
       `project-${projectId}`,
@@ -13,7 +13,7 @@ export function useProject() {
     );
   }
   async function onLoadProjectMembers(projectId: string) {
-     await callOnce(
+    await callOnce(
       `project-members-${projectId}`,
       async () => {
         await projectStore.loadProjectMembers(projectId);
@@ -22,13 +22,32 @@ export function useProject() {
     );
   }
   async function onLoadProjectTasks(projectId: string) {
-     await callOnce(
+    await callOnce(
       `project-tasks-${projectId}`,
       async () => {
         await projectStore.loadProjectTasks(projectId);
       },
       { mode: "navigation" },
     );
+  }
+  async function onUpdateMemberRole(data: {
+    projectId: string;
+    userId: string;
+    role: string;
+  }) {
+    try {
+      await projectStore.updateProjectMemberRole(
+        data.projectId,
+        data.userId,
+        data.role,
+      );
+    } catch (error) {
+      console.error("Error updating member role:", error);
+      toast.add({
+        title: "Error updating member role",
+        color: "warning",
+      });
+    }
   }
   function getBreadcumbs(projectId: string): BreadcrumbItem[] {
     return [
@@ -48,6 +67,7 @@ export function useProject() {
     onFirstLoadProject,
     getBreadcumbs,
     onLoadProjectMembers,
-    onLoadProjectTasks
+    onLoadProjectTasks,
+    onUpdateMemberRole,
   };
 }

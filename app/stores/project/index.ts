@@ -2,8 +2,9 @@ import { defineStore } from "pinia";
 import type { ProjectModel } from "~/composables/api/useProjectsApi/types";
 import type {
   ProjectMemberModel,
-  UserModel,
+  AllProjectMembersResponseModel,
 } from "~/composables/api/useProjectMembersApi/types";
+import type { UserModel } from "~/composables/api/useUsersApi/types";
 import type { TasksModel } from "~/composables/api/useTasksApi/types";
 interface ProjectStateModel {
   project: ProjectModel | null;
@@ -27,6 +28,14 @@ export const useProjectStore = defineStore("project", {
   getters: {},
 
   actions: {
+    setProjectMemberNewRole(member: AllProjectMembersResponseModel) {
+      const index = this.projectMembers.findIndex(
+        (m) => m.user.id === member.userId,
+      );
+      if (index !== -1 && this.projectMembers[index]) {
+        this.projectMembers[index].role = member.role;
+      }
+    },
     async loadProjectById(id: string) {
       const { getProjectById } = useProjectsApi();
       this.isLoading = true;
@@ -70,5 +79,15 @@ export const useProjectStore = defineStore("project", {
         this.isLoading = false;
       }
     },
+    async updateProjectMemberRole(projectId: string, userId: string, role: string) {
+      const { updateMemberRole } = useProjectMembersApi();
+      this.isLoading = true;
+      try {
+        const member = await updateMemberRole(projectId, userId, role);
+        this.setProjectMemberNewRole(member);
+      } finally {
+        this.isLoading = false;
+      }
+    }
   },
 });

@@ -1,8 +1,10 @@
 <template>
   <div class="min-w-0 overflow-hidden rounded-lg border border-default">
-    <div class="border-b border-default px-4 py-3 flex items-center justify-between">
+    <div
+      class="border-b border-default px-4 py-3 flex items-center justify-between"
+    >
       <span class="text-lg font-semibold">Project members</span>
-          <ProjectAddMembers :project-id="projectId" />
+      <ProjectAddMembers :project-id="projectId" />
     </div>
 
     <UTable
@@ -27,18 +29,52 @@ import type { TableColumn } from "@nuxt/ui";
 import type { Column, SortingState } from "@tanstack/vue-table";
 import { formatDate } from "~/utils/date";
 import type { ProjectMemberModel } from "~/composables/api/useProjectMembersApi/types";
-
+import { PROJECT_ROLES } from "~/constants/projectRoles";
 defineProps<{
   members: ProjectMemberModel[];
   projectId: string;
 }>();
 
 const UAvatar = resolveComponent("UAvatar");
-const UBadge = resolveComponent("UBadge");
 const UButton = resolveComponent("UButton");
 const UTooltip = resolveComponent("UTooltip");
+const USelect = resolveComponent("USelect");
+
+const emit = defineEmits<{
+  "update-role": [
+    payload: {
+      projectId: string;
+      userId: string;
+      role: string;
+    },
+  ];
+  view: [memberId: string];
+  remove: [memberId: string];
+}>();
 
 const sorting = ref<SortingState>([]);
+const roleItems = [
+  {
+    label: "Analyst",
+    value: PROJECT_ROLES.ANALYST,
+  },
+  {
+    label: "Designer",
+    value: PROJECT_ROLES.DESIGNER,
+  },
+  {
+    label: "Developer",
+    value: PROJECT_ROLES.DEVELOPER,
+  },
+  {
+    label: "Manager",
+    value: PROJECT_ROLES.MANAGER,
+  },
+  {
+    label: "Tester",
+    value: PROJECT_ROLES.TESTER,
+  },
+];
 
 const columns: TableColumn<ProjectMemberModel>[] = [
   {
@@ -106,13 +142,33 @@ const columns: TableColumn<ProjectMemberModel>[] = [
   },
   {
     accessorKey: "role",
+
     header: ({ column }) => getHeader(column, "Role"),
-    cell: ({ row }) =>
-      h(UBadge, {
-        label: row.original.role,
-        color: "neutral",
-        variant: "subtle",
-      }),
+
+    cell: ({ row }) => {
+      const status = row.original.role;
+
+      return h(USelect, {
+        modelValue: status,
+        items: roleItems,
+        valueKey: "value",
+        labelKey: "label",
+        size: "sm",
+        class: "w-36",
+
+        ui: {
+          base: `rounded-full`,
+        },
+
+        "onUpdate:modelValue": (value: string) => {
+          emit("update-role", {
+            projectId: row.original.projectId,
+            userId: row.original.user.id,
+            role: value,
+          });
+        },
+      });
+    },
   },
   {
     accessorKey: "createdAt",

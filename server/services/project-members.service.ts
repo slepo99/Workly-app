@@ -1,10 +1,6 @@
 import { db } from "~~/server/db";
-import {
-  projectMembers,
-  projects,
-  users,
-} from "~~/server/db/schema";
-import { eq, inArray } from "drizzle-orm";
+import { projectMembers, projects, users } from "~~/server/db/schema";
+import { eq, inArray, and } from "drizzle-orm";
 
 export async function createProjectMembers(data: {
   projectId: string;
@@ -57,7 +53,31 @@ export async function createProjectMembers(data: {
 }
 
 export async function getProjectMembers() {
-  return await db
-    .select()
-    .from(projectMembers);
+  return await db.select().from(projectMembers);
+}
+
+export async function updateProjectMemberRole(
+  projectId: string,
+  userId: string,
+  role: string,
+) {
+  const [updatedMember] = await db
+    .update(projectMembers)
+    .set({ role })
+    .where(
+      and(
+        eq(projectMembers.projectId, projectId),
+        eq(projectMembers.userId, userId),
+      ),
+    )
+    .returning();
+
+  if (!updatedMember) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: "Project member not found",
+    });
+  }
+
+  return updatedMember;
 }

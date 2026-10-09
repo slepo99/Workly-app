@@ -12,7 +12,7 @@
         :members="projectStore.projectMembers"
         :project-id="projectId"
         class="mt-4"
-        @add-member="console.log('Add member')"
+        @update-role="onUpdateMemberRole"
       />
       <DashboardTasklistTable :tasks="projectStore.projectTasks" class="mt-4" />
     </div>
@@ -33,6 +33,7 @@ const {
   onLoadProjectMembers,
   onLoadProjectTasks,
   getBreadcumbs,
+  onUpdateMemberRole
 } = useProject();
 
 await onFirstLoadProject(projectId);

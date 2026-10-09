@@ -22,3 +22,8 @@ export const createProjectMemberSchema = z.object({
       },
     ),
 });
+export const updateProjectMemberRoleSchema = z.object({
+  projectId: z.uuid(),
+  userId: z.uuid(),
+  role: z.string().min(1).max(50),
+});
