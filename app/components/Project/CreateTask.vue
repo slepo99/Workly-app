@@ -84,7 +84,8 @@ const props = defineProps<{
 }>();
 
 const { getTaskStatuses } = useStatuses();
-
+const refProjectMembers = toRef(props, "projectMembers");
+const refProject = toRef(props, "project");
 const {
   memberItems,
   form,
@@ -94,5 +95,5 @@ const {
   createTask,
   taskDates,
   schema,
-} = useProjectCreateTask(props.projectMembers, props.project);
+} = useProjectCreateTask(refProjectMembers, refProject);
 </script>

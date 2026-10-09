@@ -4,8 +4,8 @@ import type { TaskCreateModel } from "~/composables/api/useTasksApi/types";
 import { z } from "zod";
 import { useProjectStore } from "~/stores/project";
 export function useProjectCreateTask(
-  projectMembers: ProjectMemberModel[],
-  project: ProjectModel,
+  projectMembers: Ref<ProjectMemberModel[]>,
+  project: Ref<ProjectModel>,
 ) {
   const projectStore = useProjectStore();
   const toast = useToast();
@@ -19,11 +19,11 @@ export function useProjectCreateTask(
     assigneeIds: [],
     endDate: "",
     startDate: "",
-    projectId: project.id,
+    projectId: project.value.id,
   });
 
   const memberItems = computed(() =>
-    projectMembers.map((member) => ({
+    projectMembers.value.map((member) => ({
       label: member.user.name,
       value: member.user.id,
       avatar: member.user.avatar
@@ -49,7 +49,7 @@ export function useProjectCreateTask(
       await postTask(form);
       resetForm();
       isOpen.value = false;
-      await projectStore.loadProjectTasks(project.id);
+      await projectStore.loadProjectTasks(project.value.id);
       toast.add({
         title: "Task created",
         description: "Task has been created successfully",

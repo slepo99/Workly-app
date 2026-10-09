@@ -217,7 +217,7 @@ const columns: TableColumn<ProjectMemberModel>[] = [
           size: "sm",
           "aria-label": "Remove member",
           onClick: () => {
-            console.log("Remove member:", row.original.user.id);
+            emit("remove", row.original.id);
           },
         }),
       ]),

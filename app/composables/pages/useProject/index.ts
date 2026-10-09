@@ -1,31 +1,33 @@
 import { useProjectStore } from "~/stores/project";
 import type { BreadcrumbItem } from "@nuxt/ui";
-export function useProject() {
+export function useProject(projectId: Ref<string>) {
   const projectStore = useProjectStore();
   const toast = useToast();
-  async function onFirstLoadProject(projectId: string) {
+  const isMmeberUpdating = ref(false);
+  const isMemberRemoving = ref(false);
+  async function onFirstLoadProject() {
     await callOnce(
       `project-${projectId}`,
       async () => {
-        await projectStore.loadProjectById(projectId);
+        await projectStore.loadProjectById(projectId.value);
       },
       { mode: "navigation" },
     );
   }
-  async function onLoadProjectMembers(projectId: string) {
+  async function onLoadProjectMembers() {
     await callOnce(
       `project-members-${projectId}`,
       async () => {
-        await projectStore.loadProjectMembers(projectId);
+        await projectStore.loadProjectMembers(projectId.value);
       },
       { mode: "navigation" },
     );
   }
-  async function onLoadProjectTasks(projectId: string) {
+  async function onLoadProjectTasks() {
     await callOnce(
       `project-tasks-${projectId}`,
       async () => {
-        await projectStore.loadProjectTasks(projectId);
+        await projectStore.loadProjectTasks(projectId.value);
       },
       { mode: "navigation" },
     );
@@ -35,20 +37,43 @@ export function useProject() {
     userId: string;
     role: string;
   }) {
+    isMmeberUpdating.value = true;
     try {
       await projectStore.updateProjectMemberRole(
         data.projectId,
         data.userId,
         data.role,
       );
+      await projectStore.loadProjectMembers(projectId.value);
     } catch (error) {
       console.error("Error updating member role:", error);
       toast.add({
         title: "Error updating member role",
         color: "warning",
       });
+    } finally {
+      isMmeberUpdating.value = false;
     }
   }
+
+  async function onRemoveProjectMember(id: string) {
+    const { deleteProjectMember } = useProjectMembersApi();
+    isMemberRemoving.value = true;
+    try {
+      await deleteProjectMember(id);
+      await projectStore.loadProjectMembers(projectId.value);
+    } catch (e: any) {
+      console.error("Error romoving member", e);
+      toast.add({
+        title: "Error romoving member",
+        description: e.statusMessage,
+        color: "warning",
+      });
+    } finally {
+      isMemberRemoving.value = false;
+    }
+  }
+
   function getBreadcumbs(projectId: string): BreadcrumbItem[] {
     return [
       {
@@ -69,5 +94,6 @@ export function useProject() {
     onLoadProjectMembers,
     onLoadProjectTasks,
     onUpdateMemberRole,
+    onRemoveProjectMember,
   };
 }

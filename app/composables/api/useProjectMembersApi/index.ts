@@ -29,9 +29,15 @@ export function useProjectMembersApi() {
       }
     });
   };
+  const deleteProjectMember = (id: string) => {
+    return $api(`${API.ADD_PROJECT_MEMBER}/${id}`, {
+      method: "DELETE"
+    })
+  }
   return {
     getProjectMembersById,
     addProjectMember,
-    updateMemberRole
+    updateMemberRole,
+    deleteProjectMember
   };
 }

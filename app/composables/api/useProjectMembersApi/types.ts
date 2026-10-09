@@ -4,6 +4,7 @@ export interface ProjectMemberModel {
   role: string;
   user: UserModel;
   projectId: string;
+  id: string;
 }
 export interface ProjectMemberPostModel {
   projectId: string;

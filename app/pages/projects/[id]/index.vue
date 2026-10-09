@@ -13,6 +13,7 @@
         :project-id="projectId"
         class="mt-4"
         @update-role="onUpdateMemberRole"
+        @remove="onRemoveProjectMember"
       />
       <DashboardTasklistTable :tasks="projectStore.projectTasks" class="mt-4" />
     </div>
@@ -26,19 +27,20 @@ import { useProject } from "~/composables/pages/useProject";
 const route = useRoute();
 const projectStore = useProjectStore();
 
-const projectId = route.params.id as string;
+const projectId = computed(() => route.params.id as string);
 
 const {
   onFirstLoadProject,
   onLoadProjectMembers,
   onLoadProjectTasks,
   getBreadcumbs,
-  onUpdateMemberRole
-} = useProject();
+  onUpdateMemberRole,
+  onRemoveProjectMember
+} = useProject(projectId);
 
-await onFirstLoadProject(projectId);
-await onLoadProjectMembers(projectId);
-await onLoadProjectTasks(projectId);
+await onFirstLoadProject();
+await onLoadProjectMembers();
+await onLoadProjectTasks();
 
 function editProject() {
   console.log('edit')

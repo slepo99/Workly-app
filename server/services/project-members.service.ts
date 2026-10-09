@@ -113,15 +113,22 @@ export async function deleteProjectMember(
     return deletedMember;
   }
   if (ROLES.MANAGER === currentUserRole) {
+    if (memberToDelete.userId === currentUserId) {
+      throw createError({
+        statusCode: 403,
+        statusMessage: "You can not remove yourself",
+      });
+    }
+
     const [managerMembership] = await db
-        .select()
-        .from(projectMembers)
-        .where(
-          and(
-            eq(projectMembers.projectId, memberToDelete.projectId),
-            eq(projectMembers.userId, currentUserId),
-          ),
-        );
+      .select()
+      .from(projectMembers)
+      .where(
+        and(
+          eq(projectMembers.projectId, memberToDelete.projectId),
+          eq(projectMembers.userId, currentUserId),
+        ),
+      );
 
     if (!managerMembership) {
       throw createError({
