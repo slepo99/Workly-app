@@ -514,7 +514,39 @@ export const openapi = {
         },
       },
     },
+    "/project-members/{id}": {
+      delete: {
+        tags: ["Project members"],
+        operationId: "deleteProjectMember",
+        summary: "Remove project member",
+        description:
+          "Removes an existing project membership by project member ID.",
+        security: cookieSecurity,
 
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: {
+              type: "string",
+              format: "uuid",
+            },
+          },
+        ],
+
+        responses: {
+          200: jsonResponse(
+            "Deleted project member",
+            ref("ProjectMemberRecord"),
+          ),
+
+          401: responseRef("Unauthorized"),
+          403: responseRef("Forbidden"),
+          404: responseRef("NotFound"),
+        },
+      },
+    },
     "/projects/{id}/available-users": {
       get: {
         tags: ["Projects"],

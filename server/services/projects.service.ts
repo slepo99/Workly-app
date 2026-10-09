@@ -12,6 +12,7 @@ import { getTaskAssignees } from "./task-assignees.service";
 import { TASK_STATUSES } from "~~/server/constants/taskStatuses";
 import { deleteImageByUrl } from "~~/server/services/uploads.service";
 import type { ProjectStatus } from "~~/server/constants/projectStatuses";
+
 export async function createProject(
   userId: string,
   role: Role,
@@ -162,6 +163,7 @@ export async function getProjects(
     projects: projectsWithStats,
   };
 }
+
 export async function getProjectById(id: string, userId: string, role: Role) {
   let project;
 
@@ -256,6 +258,7 @@ export async function updateProjectById(
 
   return updatedProject;
 }
+
 export async function deleteProjectById(id: string) {
   const [deletedProject] = await db
     .delete(projects)
@@ -272,6 +275,7 @@ export async function deleteProjectById(id: string) {
 
   return deletedProject;
 }
+
 export async function getMembersByProjectId(
   projectId: string,
   userId: string,
@@ -291,6 +295,7 @@ export async function getMembersByProjectId(
           createdAt: users.createdAt,
         },
         projectId: projectMembers.projectId,
+        id: projectMembers.id,
       })
       .from(projectMembers)
       .innerJoin(users, eq(users.id, projectMembers.userId))
@@ -325,6 +330,7 @@ export async function getMembersByProjectId(
           createdAt: users.createdAt,
         },
         projectId: projectMembers.projectId,
+        id: projectMembers.id,
       })
       .from(projectMembers)
       .innerJoin(users, eq(users.id, projectMembers.userId))
@@ -334,6 +340,7 @@ export async function getMembersByProjectId(
   }
   return null;
 }
+
 export async function getTasksByProjectId(
   projectId: string,
   userId: string,
@@ -441,6 +448,7 @@ export async function getTasksByProjectId(
     tasks: tasksWithAssignees,
   };
 }
+
 export async function getAvailableUsersByProjectId(projectId: string) {
   const [currentProject] = await db
     .select()
