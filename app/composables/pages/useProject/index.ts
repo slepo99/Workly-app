@@ -7,7 +7,7 @@ export function useProject(projectId: Ref<string>) {
   const isMemberRemoving = ref(false);
   async function onFirstLoadProject() {
     await callOnce(
-      `project-${projectId}`,
+      `project-${projectId.value}`,
       async () => {
         await projectStore.loadProjectById(projectId.value);
       },
@@ -16,7 +16,7 @@ export function useProject(projectId: Ref<string>) {
   }
   async function onLoadProjectMembers() {
     await callOnce(
-      `project-members-${projectId}`,
+      `project-members-${projectId.value}`,
       async () => {
         await projectStore.loadProjectMembers(projectId.value);
       },
@@ -25,7 +25,7 @@ export function useProject(projectId: Ref<string>) {
   }
   async function onLoadProjectTasks() {
     await callOnce(
-      `project-tasks-${projectId}`,
+      `project-tasks-${projectId.value}`,
       async () => {
         await projectStore.loadProjectTasks(projectId.value);
       },

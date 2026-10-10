@@ -173,7 +173,7 @@ const columns: TableColumn<ProjectMemberModel>[] = [
   {
     accessorKey: "createdAt",
     header: ({ column }) => getHeader(column, "Joined at"),
-    cell: ({ row }) => formatDate(row.original.user.createdAt),
+    cell: ({ row }) => formatDate(row.original.createdAt),
   },
   {
     id: "id",

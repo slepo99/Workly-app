@@ -5,6 +5,7 @@ export interface ProjectMemberModel {
   user: UserModel;
   projectId: string;
   id: string;
+  createdAt: string;
 }
 export interface ProjectMemberPostModel {
   projectId: string;

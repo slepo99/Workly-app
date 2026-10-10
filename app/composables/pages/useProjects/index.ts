@@ -1,7 +1,4 @@
-import {
-  PROJECT_STATUSES,
-  type ProjectStatus,
-} from "~/constants/projectStatuses";
+
 import { useProjectsStore } from "~/stores/projects";
 import { useDebounceFn } from "@vueuse/core";
 

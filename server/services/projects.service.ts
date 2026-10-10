@@ -296,6 +296,7 @@ export async function getMembersByProjectId(
         },
         projectId: projectMembers.projectId,
         id: projectMembers.id,
+        createdAt: projectMembers.createdAt
       })
       .from(projectMembers)
       .innerJoin(users, eq(users.id, projectMembers.userId))
@@ -331,6 +332,7 @@ export async function getMembersByProjectId(
         },
         projectId: projectMembers.projectId,
         id: projectMembers.id,
+        createdAt: projectMembers.createdAt
       })
       .from(projectMembers)
       .innerJoin(users, eq(users.id, projectMembers.userId))

@@ -45,7 +45,7 @@ export function useProjectNewMember(projectId: Ref<string>) {
       members: selectedUsers.value.map((userId) => {
         return {
           userId,
-          role: "worker",
+          role: "developer",
         };
       }),
     };

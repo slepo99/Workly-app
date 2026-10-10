@@ -6,7 +6,6 @@
         :project="projectStore.project"
         :members="projectStore.projectMembers"
         :tasks="projectStore.projectTasks"
-        @edit-project="editProject"
         class="mt-4"
       />
       <ProjectMembersTable
@@ -36,16 +35,14 @@ const {
   onLoadProjectTasks,
   getBreadcumbs,
   onUpdateMemberRole,
-  onRemoveProjectMember
+  onRemoveProjectMember,
 } = useProject(projectId);
 
-await onFirstLoadProject();
-await onLoadProjectMembers();
-await onLoadProjectTasks();
-
-function editProject() {
-  console.log('edit')
-}
+await Promise.all([
+  onFirstLoadProject(),
+  onLoadProjectMembers(),
+  onLoadProjectTasks(),
+]);
 </script>
 
 <style scoped></style>
