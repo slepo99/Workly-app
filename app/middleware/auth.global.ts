@@ -1,18 +1,19 @@
-import { useAuthStore } from "~/stores/auth"
+import { useAuthStore } from "~/stores/auth";
+
 export default defineNuxtRouteMiddleware(async (to) => {
-  const authStore = useAuthStore()
+  const authStore = useAuthStore();
 
   await callOnce("auth-user", async () => {
-    await authStore.fetchMe()
-  })
+    await authStore.fetchMe();
+  });
 
-  const isAuthPage = to.path === "/login" || to.path === "/register"
+  const isAuthPage = to.path === "/login" || to.path === "/register";
 
   if (!authStore.user && !isAuthPage) {
-    return navigateTo("/login")
+    return navigateTo("/login");
   }
 
   if (authStore.user && isAuthPage) {
-    return navigateTo("/")
+    return navigateTo("/");
   }
-})
+});

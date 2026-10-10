@@ -30,6 +30,7 @@ import type { Column, SortingState } from "@tanstack/vue-table";
 import { formatDate } from "~/utils/date";
 import type { ProjectMemberModel } from "~/composables/api/useProjectMembersApi/types";
 import { PROJECT_ROLES } from "~/constants/projectRoles";
+
 defineProps<{
   members: ProjectMemberModel[];
   projectId: string;
@@ -53,6 +54,7 @@ const emit = defineEmits<{
 }>();
 
 const sorting = ref<SortingState>([]);
+
 const roleItems = [
   {
     label: "Analyst",
@@ -81,6 +83,7 @@ const columns: TableColumn<ProjectMemberModel>[] = [
     accessorKey: "avatar",
     header: "Avatar",
     enableSorting: false,
+
     cell: ({ row }) => {
       const member = row.original;
 
@@ -102,7 +105,9 @@ const columns: TableColumn<ProjectMemberModel>[] = [
   },
   {
     accessorKey: "name",
+
     header: ({ column }) => getHeader(column, "Name"),
+
     cell: ({ row }) =>
       h(
         "div",
@@ -115,7 +120,9 @@ const columns: TableColumn<ProjectMemberModel>[] = [
   },
   {
     accessorKey: "email",
+
     header: ({ column }) => getHeader(column, "Email"),
+
     cell: ({ row }) =>
       h(
         "a",
@@ -129,7 +136,9 @@ const columns: TableColumn<ProjectMemberModel>[] = [
   },
   {
     accessorKey: "position",
+
     header: ({ column }) => getHeader(column, "Position"),
+
     cell: ({ row }) =>
       h(
         "div",
@@ -172,13 +181,18 @@ const columns: TableColumn<ProjectMemberModel>[] = [
   },
   {
     accessorKey: "createdAt",
+
     header: ({ column }) => getHeader(column, "Joined at"),
+
     cell: ({ row }) => formatDate(row.original.createdAt),
   },
   {
     id: "id",
+
     accessorFn: (row) => row.user.id,
+
     header: ({ column }) => getHeader(column, "ID"),
+
     cell: ({ row }) =>
       h(
         UTooltip,
@@ -197,6 +211,7 @@ const columns: TableColumn<ProjectMemberModel>[] = [
     id: "actions",
     header: "Actions",
     enableSorting: false,
+
     cell: ({ row }) =>
       h("div", { class: "flex items-center gap-1" }, [
         h(UButton, {
@@ -205,6 +220,7 @@ const columns: TableColumn<ProjectMemberModel>[] = [
           variant: "ghost",
           size: "sm",
           "aria-label": "View member",
+
           onClick: () => {
             window.open(`/users/${row.original.user.id}`, "_blank");
           },
@@ -216,6 +232,7 @@ const columns: TableColumn<ProjectMemberModel>[] = [
           variant: "ghost",
           size: "sm",
           "aria-label": "Remove member",
+
           onClick: () => {
             emit("remove", row.original.id);
           },
@@ -237,6 +254,7 @@ function getHeader(column: Column<ProjectMemberModel>, label: string) {
         : "i-lucide-arrow-down"
       : "i-lucide-arrow-up-down",
     class: "-mx-2.5",
+
     onClick: () => column.toggleSorting(isSorted === "asc"),
   });
 }

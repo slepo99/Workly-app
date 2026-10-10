@@ -1,25 +1,26 @@
-import { deleteProjectById } from '~~/server/services/projects.service'
-import { ROLE_GROUPS } from "~~/server/constants/roles"
-import { requireRole } from "~~/server/utils/requireRole"
+import { deleteProjectById } from "~~/server/services/projects.service";
+import { ROLE_GROUPS } from "~~/server/constants/roles";
+import { requireRole } from "~~/server/utils/requireRole";
 
 export default defineEventHandler(async (event) => {
+  await requireRole(event, ROLE_GROUPS.MANAGEMENT);
+  const id = getRouterParam(event, "id");
 
-await requireRole(event, ROLE_GROUPS.MANAGEMENT)
-const id = getRouterParam(event, 'id')
-if (!id) {
+  if (!id) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Project ID is required',
-    })
+      statusMessage: "Project ID is required",
+    });
   }
-  const project = await deleteProjectById(id)
 
-    if (!project) {
-      throw createError({
-        statusCode: 404,
-        statusMessage: 'Project not found',
-      })
-    }
+  const project = await deleteProjectById(id);
 
-    return project
-})
+  if (!project) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: "Project not found",
+    });
+  }
+
+  return project;
+});

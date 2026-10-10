@@ -1,5 +1,5 @@
-
 import type { TaskStatus } from "~/constants/taskStatuses";
+
 export interface TasksModel {
   assignees: AssigneesModel[];
   createdAt: string;
@@ -17,18 +17,18 @@ export interface AssigneesModel {
   avatar: string;
 }
 export interface TasksResponseModel {
-  page: number
-  limit: number
-  total: number
-  totalPages: number
-  tasks: TasksModel[]
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+  tasks: TasksModel[];
 }
 export interface TaskCreateModel {
-  title: string, 
-  description: string,
-  status: TaskStatus,
-  startDate: string,
-  endDate: string,
+  title: string;
+  description: string;
+  status: TaskStatus;
+  startDate: string;
+  endDate: string;
   projectId: string;
-  assigneeIds: string[]
+  assigneeIds: string[];
 }

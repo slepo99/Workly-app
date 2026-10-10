@@ -1,10 +1,12 @@
 import { defineStore } from "pinia";
 import type { TasksModel } from "~/composables/api/useTasksApi/types";
 import { TASK_STATUSES } from "~/constants/taskStatuses";
+
 interface TasksStateModel {
   tasks: TasksModel[];
   isLoading: boolean;
 }
+
 export const useTasksStore = defineStore("tasks", {
   state: (): TasksStateModel => {
     return {
@@ -24,9 +26,12 @@ export const useTasksStore = defineStore("tasks", {
   actions: {
     async loadAllTasks() {
       const { getTasks } = useTasksApi();
+
       this.isLoading = true;
+
       try {
         const tasks = await getTasks();
+
         this.tasks = tasks.tasks;
       } finally {
         this.isLoading = false;

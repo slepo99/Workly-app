@@ -107,7 +107,7 @@
           <UIRoundedProgress :percent="getTaskCompletionRate" size="24" />
         </template>
         <template #title>Completion rate</template>
-        <template #value>{{ getTaskCompletionRate}}%</template>
+        <template #value>{{ getTaskCompletionRate }}%</template>
       </ProjectSmallStat>
 
       <ProjectSmallStat class="min-w-0 w-full">
@@ -127,11 +127,13 @@ import type { ProjectMemberModel } from "~/composables/api/useProjectMembersApi/
 import { useStatuses } from "~/composables/useStatuses";
 import type { TasksModel } from "~/composables/api/useTasksApi/types";
 import { useDetails } from "~/composables/components/project/useDetails";
+
 const props = defineProps<{
   project: ProjectModel;
   members: ProjectMemberModel[];
   tasks: TasksModel[];
 }>();
+
 const refTasks = toRef(props, "tasks");
 const { getProjectStatusLabel, getProjectStatusColor } = useStatuses();
 const { getComplitedTasks, getTaskCompletionRate } = useDetails(refTasks);

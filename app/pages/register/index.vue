@@ -21,31 +21,31 @@
     >
       <UFormField :label="t('register.form.name')" name="name">
         <UInput
+          v-model="state.name"
           type="text"
           autocomplete="name"
           class="w-full"
           placeholder="Name"
-          v-model="state.name"
         />
       </UFormField>
 
       <UFormField :label="t('register.form.email')" name="email">
         <UInput
+          v-model="state.email"
           type="email"
           autocomplete="email"
           class="w-full"
           placeholder="you@example.com"
-          v-model="state.email"
         />
       </UFormField>
 
       <UFormField :label="t('register.form.password')" name="password">
         <UInput
+          v-model="state.password"
           type="password"
           autocomplete="new-password"
           class="w-full"
           placeholder="••••••••"
-          v-model="state.password"
         />
       </UFormField>
 

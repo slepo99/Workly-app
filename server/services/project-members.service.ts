@@ -2,6 +2,7 @@ import { db } from "~~/server/db";
 import { projectMembers, projects, users } from "~~/server/db/schema";
 import { eq, inArray, and } from "drizzle-orm";
 import { type Role, ROLES } from "~~/server/constants/roles";
+
 export async function createProjectMembers(data: {
   projectId: string;
   members: {
@@ -97,6 +98,7 @@ export async function deleteProjectMember(
       statusMessage: "Project member not found",
     });
   }
+
   if (ROLES.ADMIN === currentUserRole || ROLES.SUPERADMIN === currentUserRole) {
     const [deletedMember] = await db
       .delete(projectMembers)
@@ -112,6 +114,7 @@ export async function deleteProjectMember(
 
     return deletedMember;
   }
+
   if (ROLES.MANAGER === currentUserRole) {
     if (memberToDelete.userId === currentUserId) {
       throw createError({
@@ -151,6 +154,7 @@ export async function deleteProjectMember(
 
     return deletedMember;
   }
+
   throw createError({
     statusCode: 403,
     statusMessage: "Forbidden",

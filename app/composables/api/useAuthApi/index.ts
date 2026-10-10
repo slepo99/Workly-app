@@ -1,11 +1,13 @@
 import type { Login, AuthUser, Register } from "./types";
+
 export function useAuthApi() {
   const { $api } = useNuxtApp();
+
   enum API {
     LOGIN = "/auth/login",
     GET_ME = "/auth/me",
     LOGOUT = "/auth/logout",
-    REGISTER = '/auth/register'
+    REGISTER = "/auth/register",
   }
 
   const login = (data: Login) => {
@@ -14,24 +16,28 @@ export function useAuthApi() {
       body: data,
     });
   };
+
   const getMe = () => {
-    return $api<AuthUser>(API.GET_ME)
-  }
+    return $api<AuthUser>(API.GET_ME);
+  };
+
   const logout = () => {
     return $api(API.LOGOUT, {
-        method: 'POST'
-    })
-  }
+      method: "POST",
+    });
+  };
+
   const register = (Data: Register) => {
     return $api<AuthUser>(API.REGISTER, {
-      method: 'POST',
-      body: Data
-    })
-  }
+      method: "POST",
+      body: Data,
+    });
+  };
+
   return {
     login,
     getMe,
     logout,
-    register
+    register,
   };
 }

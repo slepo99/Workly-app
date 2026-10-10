@@ -12,7 +12,13 @@
       </div>
     </template>
 
-    <UForm :schema="schema" :state="state" class="space-y-4" @submit="onLogin" loading-auto>
+    <UForm
+      :schema="schema"
+      :state="state"
+      class="space-y-4"
+      loading-auto
+      @submit="onLogin"
+    >
       <UFormField :label="t('login.form.email')" name="email">
         <UInput
           v-model="state.email"
@@ -58,6 +64,7 @@
 <script setup lang="ts">
 import { useI18n } from "#imports";
 import { useLogin } from "~/composables/pages/useLogin";
+
 definePageMeta({
   layout: "auth",
 });

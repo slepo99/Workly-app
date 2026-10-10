@@ -2,6 +2,7 @@ import { useI18n } from "#imports";
 import { z } from "zod";
 import { useAuthStore } from "~/stores/auth";
 import type { Login } from "~/composables/api/useAuthApi/types";
+
 export function useLogin() {
   const { t } = useI18n();
   const toast = useToast();
@@ -41,6 +42,7 @@ export function useLogin() {
       });
     }
   }
+
   return {
     state,
     schema,

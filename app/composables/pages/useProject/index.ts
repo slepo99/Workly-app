@@ -1,10 +1,12 @@
 import { useProjectStore } from "~/stores/project";
 import type { BreadcrumbItem } from "@nuxt/ui";
+
 export function useProject(projectId: Ref<string>) {
   const projectStore = useProjectStore();
   const toast = useToast();
   const isMmeberUpdating = ref(false);
   const isMemberRemoving = ref(false);
+
   async function onFirstLoadProject() {
     await callOnce(
       `project-${projectId.value}`,
@@ -14,6 +16,7 @@ export function useProject(projectId: Ref<string>) {
       { mode: "navigation" },
     );
   }
+
   async function onLoadProjectMembers() {
     await callOnce(
       `project-members-${projectId.value}`,
@@ -23,6 +26,7 @@ export function useProject(projectId: Ref<string>) {
       { mode: "navigation" },
     );
   }
+
   async function onLoadProjectTasks() {
     await callOnce(
       `project-tasks-${projectId.value}`,
@@ -32,12 +36,14 @@ export function useProject(projectId: Ref<string>) {
       { mode: "navigation" },
     );
   }
+
   async function onUpdateMemberRole(data: {
     projectId: string;
     userId: string;
     role: string;
   }) {
     isMmeberUpdating.value = true;
+
     try {
       await projectStore.updateProjectMemberRole(
         data.projectId,
@@ -58,7 +64,9 @@ export function useProject(projectId: Ref<string>) {
 
   async function onRemoveProjectMember(id: string) {
     const { deleteProjectMember } = useProjectMembersApi();
+
     isMemberRemoving.value = true;
+
     try {
       await deleteProjectMember(id);
       await projectStore.loadProjectMembers(projectId.value);
@@ -88,6 +96,7 @@ export function useProject(projectId: Ref<string>) {
       },
     ];
   }
+
   return {
     onFirstLoadProject,
     getBreadcumbs,

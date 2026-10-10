@@ -3,6 +3,7 @@ import type { ProjectMemberModel } from "~/composables/api/useProjectMembersApi/
 import type { TaskCreateModel } from "~/composables/api/useTasksApi/types";
 import { z } from "zod";
 import { useProjectStore } from "~/stores/project";
+
 export function useProjectCreateTask(
   projectMembers: Ref<ProjectMemberModel[]>,
   project: Ref<ProjectModel>,
@@ -12,6 +13,7 @@ export function useProjectCreateTask(
 
   const isOpen = ref(false);
   const isSaving = ref(false);
+
   const form = reactive<TaskCreateModel>({
     title: "",
     description: "",
@@ -34,6 +36,7 @@ export function useProjectCreateTask(
         : undefined,
     })),
   );
+
   function resetForm() {
     form.title = "";
     form.description = "";
@@ -42,8 +45,10 @@ export function useProjectCreateTask(
     form.endDate = "";
     form.startDate = "";
   }
+
   async function createTask() {
     const { postTask } = useTasksApi();
+
     try {
       isSaving.value = true;
       await postTask(form);
@@ -66,6 +71,7 @@ export function useProjectCreateTask(
       isSaving.value = false;
     }
   }
+
   const taskDates = computed({
     get() {
       return {
@@ -79,6 +85,7 @@ export function useProjectCreateTask(
       form.endDate = value.end;
     },
   });
+
   const schema = z.object({
     title: z.string().min(1, "Task title is required"),
     description: z.string().optional(),
@@ -88,6 +95,7 @@ export function useProjectCreateTask(
     endDate: z.string().optional(),
     projectId: z.string(),
   });
+
   return {
     memberItems,
     form,

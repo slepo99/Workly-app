@@ -1,6 +1,6 @@
 <template>
   <div class="flex min-h-screen flex-col">
-    <LayoutAppLoginHeader/>
+    <LayoutAppLoginHeader />
     <main class="flex flex-1 items-center justify-center">
       <UContainer class="w-full max-w-md">
         <slot />

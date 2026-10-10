@@ -1,4 +1,5 @@
 import { useProjectStore } from "~/stores/project";
+
 export function useProjectNewMember(projectId: Ref<string>) {
   const projectStore = useProjectStore();
   const toast = useToast();
@@ -7,9 +8,10 @@ export function useProjectNewMember(projectId: Ref<string>) {
   const isOpen = ref(false);
   const isSaving = ref(false);
   const selectedUsers = ref<string[]>([]);
- 
+
   async function loadUsers() {
     isLoading.value = true;
+
     try {
       await projectStore.loadAvailableUsersForProject(projectId.value);
     } catch (e) {
@@ -23,7 +25,6 @@ export function useProjectNewMember(projectId: Ref<string>) {
       isLoading.value = false;
     }
   }
-
 
   const getUsersList = computed(() => {
     return projectStore.availableUsers.map((user) => ({
@@ -40,6 +41,7 @@ export function useProjectNewMember(projectId: Ref<string>) {
 
   async function addMembersToProject() {
     const { addProjectMember } = useProjectMembersApi();
+
     const data = {
       projectId: projectId.value,
       members: selectedUsers.value.map((userId) => {
@@ -49,7 +51,9 @@ export function useProjectNewMember(projectId: Ref<string>) {
         };
       }),
     };
+
     isSaving.value = true;
+
     try {
       await addProjectMember(data);
       await projectStore.loadProjectMembers(projectId.value);
@@ -71,6 +75,7 @@ export function useProjectNewMember(projectId: Ref<string>) {
       isSaving.value = false;
     }
   }
+
   return {
     addMembersToProject,
     getUsersList,

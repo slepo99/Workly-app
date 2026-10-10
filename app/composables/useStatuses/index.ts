@@ -1,8 +1,10 @@
 import { PROJECT_STATUSES } from "~/constants/projectStatuses";
 import { TASK_STATUSES } from "~/constants/taskStatuses";
 import { useI18n } from "#imports";
+
 export function useStatuses() {
   const { t } = useI18n();
+
   const getProjectStatuses = computed(() => {
     return [
       {
@@ -41,7 +43,7 @@ export function useStatuses() {
       getProjectStatuses.value.find((s) => s.value === status)?.label || ""
     );
   };
-  
+
   const getTaskStatuses = computed(() => {
     return [
       {

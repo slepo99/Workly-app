@@ -1,9 +1,11 @@
 import { defineStore } from "pinia";
 import type { DashboardStatsModel } from "~/composables/api/useDashboardApi/types";
+
 interface DashboardStateModel {
   stats: DashboardStatsModel;
-  isLoading: boolean
+  isLoading: boolean;
 }
+
 export const useDashboardStore = defineStore("dashboard", {
   state: (): DashboardStateModel => {
     return {
@@ -13,7 +15,7 @@ export const useDashboardStore = defineStore("dashboard", {
         totalProjects: 0,
         totalUsers: 0,
       },
-      isLoading: false
+      isLoading: false,
     };
   },
 
@@ -22,12 +24,14 @@ export const useDashboardStore = defineStore("dashboard", {
   actions: {
     async loadStats() {
       const { getDashboardStats } = useDashboardApi();
+
       try {
-        this.isLoading = true
+        this.isLoading = true;
         const stats = await getDashboardStats();
+
         this.stats = stats;
       } finally {
-        this.isLoading = false
+        this.isLoading = false;
       }
     },
   },

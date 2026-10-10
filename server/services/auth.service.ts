@@ -1,26 +1,26 @@
-import { eq } from "drizzle-orm"
-import bcrypt from "bcryptjs"
-import { db } from "~~/server/db"
-import { users } from "~~/server/db/schema"
+import { eq } from "drizzle-orm";
+import bcrypt from "bcryptjs";
+import { db } from "~~/server/db";
+import { users } from "~~/server/db/schema";
 
 export async function registerUser(data: {
-  name: string
-  email: string
-  password: string
+  name: string;
+  email: string;
+  password: string;
 }) {
   const [existingUser] = await db
     .select()
     .from(users)
-    .where(eq(users.email, data.email))
+    .where(eq(users.email, data.email));
 
   if (existingUser) {
     throw createError({
       statusCode: 409,
       statusMessage: "User with this email already exists",
-    })
+    });
   }
 
-  const passwordHash = await bcrypt.hash(data.password, 12)
+  const passwordHash = await bcrypt.hash(data.password, 12);
 
   const [user] = await db
     .insert(users)
@@ -37,44 +37,41 @@ export async function registerUser(data: {
       position: users.position,
       avatar: users.avatar,
       createdAt: users.createdAt,
-    })
+    });
 
   if (!user) {
     throw createError({
       statusCode: 500,
       statusMessage: "Failed to create user",
-    })
+    });
   }
 
-  return user
+  return user;
 }
 
-export async function loginUser(data: {
-  email: string
-  password: string
-}) {
+export async function loginUser(data: { email: string; password: string }) {
   const [user] = await db
     .select()
     .from(users)
-    .where(eq(users.email, data.email))
+    .where(eq(users.email, data.email));
 
   if (!user || !user.passwordHash) {
     throw createError({
       statusCode: 401,
       statusMessage: "Invalid email or password",
-    })
+    });
   }
 
   const passwordMatches = await bcrypt.compare(
     data.password,
     user.passwordHash,
-  )
+  );
 
   if (!passwordMatches) {
     throw createError({
       statusCode: 401,
       statusMessage: "Invalid email or password",
-    })
+    });
   }
 
   return {
@@ -85,5 +82,5 @@ export async function loginUser(data: {
     position: user.position,
     avatar: user.avatar,
     createdAt: user.createdAt,
-  }
+  };
 }

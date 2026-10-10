@@ -5,18 +5,20 @@ import type {
   ProjectModel,
 } from "./types";
 
-import type { UserModel } from "~/composables/api/useUsersApi/types"
+import type { UserModel } from "~/composables/api/useUsersApi/types";
 import { PROJECTS_PAGINATION } from "~/constants/api";
 import type { ProjectStatus } from "~/constants/projectStatuses";
 
 export function useProjectsApi() {
   const { $api } = useNuxtApp();
+
   enum API {
     GET_PROJECTS = "/projects",
     CREATE_PROJECT = "/projects",
     UPDATE_PROJECT = "/projects",
     DELETE_PROJECT = "/projects",
   }
+
   const getProjects = ({
     page = PROJECTS_PAGINATION.PAGE,
     limit = PROJECTS_PAGINATION.LIMIT,
@@ -61,6 +63,7 @@ export function useProjectsApi() {
   const getProjectById = (id: string) => {
     return $api<ProjectModel>(`${API.GET_PROJECTS}/${id}`);
   };
+
   const getAvailableUsersForProject = (projectId: string) => {
     return $api<UserModel[]>(
       `${API.GET_PROJECTS}/${projectId}/available-users`,
@@ -73,6 +76,6 @@ export function useProjectsApi() {
     updateProject,
     deleteProject,
     getProjectById,
-    getAvailableUsersForProject
+    getAvailableUsersForProject,
   };
 }

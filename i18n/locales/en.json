@@ -107,7 +107,7 @@
       }
     }
   },
-  "projects" : {
+  "projects": {
     "statuses": {
       "active": "Active",
       "completed": "Completed",

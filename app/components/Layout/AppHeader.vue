@@ -25,8 +25,10 @@
 <script lang="ts" setup>
 import type { NavigationMenuItem } from "@nuxt/ui";
 import { useI18n } from "vue-i18n";
+
 const route = useRoute();
 const { t } = useI18n();
+
 const items = computed<NavigationMenuItem[]>(() => [
   {
     label: t("navigation.dashboard"),

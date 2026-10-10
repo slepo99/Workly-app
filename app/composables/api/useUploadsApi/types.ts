@@ -1,4 +1,4 @@
 export interface UploadFileResponseModel {
-  url: string
-  path: string
+  url: string;
+  path: string;
 }

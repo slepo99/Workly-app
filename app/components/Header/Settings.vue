@@ -69,7 +69,6 @@
 <script setup lang="ts">
 import type { DropdownMenuItem } from "@nuxt/ui";
 import { useI18n } from "vue-i18n";
-import { toUpperCase } from "zod";
 import { useAuthStore } from "~/stores/auth";
 
 const authStore = useAuthStore();
@@ -98,6 +97,7 @@ const items = computed<DropdownMenuItem[][]>(() => {
         icon: "i-lucide-log-out",
         color: "error",
         kbds: ["shift", "meta", "q"],
+
         onSelect: async () => {
           await authStore.logout();
           await navigateTo("/login");
@@ -119,8 +119,10 @@ const items = computed<DropdownMenuItem[][]>(() => {
       },
     ]);
   }
+
   return menu;
 });
+
 const currentTheme = computed(() => {
   return t(`header.settings.theme.${colorMode.preference}`);
 });

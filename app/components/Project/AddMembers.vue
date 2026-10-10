@@ -59,17 +59,19 @@ import { useProjectStore } from "~/stores/project";
 const props = defineProps<{
   projectId: string;
 }>();
+
 const projectId = toRef(props, "projectId");
 const projectStore = useProjectStore();
-const { getUsersList, isLoading, isOpen, loadUsers, isSaving, selectedUsers, addMembersToProject } =
-  useProjectNewMember(projectId);
 
-const items = ref([]);
+const {
+  getUsersList,
+  isLoading,
+  isOpen,
+  loadUsers,
+  isSaving,
+  selectedUsers,
+  addMembersToProject,
+} = useProjectNewMember(projectId);
 
-watch(
-  () => selectedUsers.value,
-  (newVal) => {
-    console.log(newVal);
-  },
-);
+
 </script>

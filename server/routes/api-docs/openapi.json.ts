@@ -1,5 +1,5 @@
-import { openapi } from '~~/server/openapi'
+import { openapi } from "~~/server/openapi";
 
 export default defineEventHandler(() => {
-  return openapi
-})
+  return openapi;
+});

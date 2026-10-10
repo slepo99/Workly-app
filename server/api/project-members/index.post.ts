@@ -4,10 +4,7 @@ import { ROLE_GROUPS } from "~~/server/constants/roles";
 import { requireRole } from "~~/server/utils/requireRole";
 
 export default defineEventHandler(async (event) => {
-  await requireRole(
-    event,
-    ROLE_GROUPS.MANAGEMENT,
-  );
+  await requireRole(event, ROLE_GROUPS.MANAGEMENT);
 
   const body = await readBody(event);
 

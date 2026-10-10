@@ -3,6 +3,7 @@ import { z } from "zod";
 import type { Register } from "~/composables/api/useAuthApi/types";
 import { useAuthStore } from "~/stores/auth";
 import { useI18n } from "#imports";
+
 export function useRegister() {
   const authStore = useAuthStore();
   const { t } = useI18n();
@@ -13,6 +14,7 @@ export function useRegister() {
     email: "",
     password: "",
   });
+
   const schema = z.object({
     name: z.string().min(2, "Name must be at least 2 characters"),
     email: z.string().email("Invalid email"),
@@ -38,6 +40,7 @@ export function useRegister() {
           color: "error",
           duration: 7000,
         });
+
         return;
       }
 
@@ -49,9 +52,10 @@ export function useRegister() {
       });
     }
   }
+
   return {
     state,
     schema,
-    onRegister
-  }
+    onRegister,
+  };
 }

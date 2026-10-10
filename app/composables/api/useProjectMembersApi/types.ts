@@ -15,9 +15,9 @@ export interface ProjectMemberPostModel {
   }[];
 }
 export interface AllProjectMembersResponseModel {
-    id: string;
-    userId: string;
-    projectId: string;
-    role: string;
-    createdAt: string;
+  id: string;
+  userId: string;
+  projectId: string;
+  role: string;
+  createdAt: string;
 }

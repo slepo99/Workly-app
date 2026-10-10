@@ -15,14 +15,14 @@ export default defineNuxtConfig({
   imports: {
     dirs: ["~/composables", "~/composables/api/*/index.{ts,js,mjs,mts}"],
   },
-  modules: ["@nuxt/ui", "@nuxtjs/i18n", '@pinia/nuxt'],
+  modules: ["@nuxt/ui", "@nuxtjs/i18n", "@pinia/nuxt", "@nuxt/eslint"],
   css: ["~/assets/css/main.css"],
   colorMode: {
     preference: "system",
     fallback: "light",
   },
   i18n: {
-    strategy: 'no_prefix',
+    strategy: "no_prefix",
     locales: [
       { code: "en", name: "English", file: "en.json" },
       { code: "uk", name: "Українська", file: "uk.json" },

@@ -2,7 +2,7 @@
   <UCard
     :ui="{
       header: 'flex items-center justify-between',
-      body: 'p-4'
+      body: 'p-4',
     }"
   >
     <template #header>

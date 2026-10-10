@@ -1,16 +1,10 @@
 import { getTaskById, updateTaskById } from "~~/server/services/tasks.service";
 import { updateTaskSchema } from "~~/server/validation/tasks.schema";
-import {
-  ROLE_GROUPS,
-  type Role,
-} from "~~/server/constants/roles";
+import { ROLE_GROUPS, type Role } from "~~/server/constants/roles";
 import { requireRole } from "~~/server/utils/requireRole";
 
 export default defineEventHandler(async (event) => {
-  const currentUser = await requireRole(
-    event,
-    ROLE_GROUPS.MANAGEMENT,
-  );
+  const currentUser = await requireRole(event, ROLE_GROUPS.MANAGEMENT);
 
   const id = getRouterParam(event, "id");
 

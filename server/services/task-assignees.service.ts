@@ -1,6 +1,6 @@
-import { and, eq } from "drizzle-orm"
-import { db } from "~~/server/db"
-import { taskAssignees, users } from "~~/server/db/schema"
+import { and, eq } from "drizzle-orm";
+import { db } from "~~/server/db";
+import { taskAssignees, users } from "~~/server/db/schema";
 
 export async function getTaskAssignees(taskId: string) {
   return db
@@ -11,7 +11,7 @@ export async function getTaskAssignees(taskId: string) {
     })
     .from(taskAssignees)
     .innerJoin(users, eq(taskAssignees.userId, users.id))
-    .where(eq(taskAssignees.taskId, taskId))
+    .where(eq(taskAssignees.taskId, taskId));
 }
 export async function addTaskAssignee(taskId: string, userId: string) {
   const [assignee] = await db
@@ -20,20 +20,17 @@ export async function addTaskAssignee(taskId: string, userId: string) {
       taskId,
       userId,
     })
-    .returning()
+    .returning();
 
-  return assignee
+  return assignee;
 }
 export async function removeTaskAssignee(taskId: string, userId: string) {
   const [assignee] = await db
     .delete(taskAssignees)
     .where(
-      and(
-        eq(taskAssignees.taskId, taskId),
-        eq(taskAssignees.userId, userId),
-      ),
+      and(eq(taskAssignees.taskId, taskId), eq(taskAssignees.userId, userId)),
     )
-    .returning()
+    .returning();
 
-  return assignee
+  return assignee;
 }

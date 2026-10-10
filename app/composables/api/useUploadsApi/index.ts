@@ -17,14 +17,16 @@ export function useUploadsApi() {
       body: formData,
     });
   };
-  const deleteFile = (path: string ) => {
+
+  const deleteFile = (path: string) => {
     return $api(API.POST_IMAGE, {
-        method: "DELETE",
-        body: path
-    })
+      method: "DELETE",
+      body: path,
+    });
   };
+
   return {
     uploadFile,
-    deleteFile
+    deleteFile,
   };
 }

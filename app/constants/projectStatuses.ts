@@ -2,7 +2,7 @@ export const PROJECT_STATUSES = {
   ACTIVE: "active",
   ON_HOLD: "on_hold",
   COMPLETED: "completed",
-  CANCELLED: "cancelled"
+  CANCELLED: "cancelled",
 } as const;
 
 export type ProjectStatus =

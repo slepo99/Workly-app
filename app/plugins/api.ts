@@ -1,9 +1,9 @@
 export default defineNuxtPlugin(() => {
-  const config = useRuntimeConfig()
+  const config = useRuntimeConfig();
 
   const headers = import.meta.server
     ? useRequestHeaders(["cookie"])
-    : undefined
+    : undefined;
 
   const api = $fetch.create({
     baseURL: config.public.apiBaseUrl,
@@ -16,11 +16,11 @@ export default defineNuxtPlugin(() => {
     onResponseError({ response }) {
       // 401 / 403 handling later
     },
-  })
+  });
 
   return {
     provide: {
       api,
     },
-  }
-})
+  };
+});

@@ -6,6 +6,7 @@ import type {
 } from "~/composables/api/useProjectMembersApi/types";
 import type { UserModel } from "~/composables/api/useUsersApi/types";
 import type { TasksModel } from "~/composables/api/useTasksApi/types";
+
 interface ProjectStateModel {
   project: ProjectModel | null;
   isLoading: boolean; // todo: remove isLoading from store and replace to the composable
@@ -38,56 +39,75 @@ export const useProjectStore = defineStore("project", {
     // },
     async loadProjectById(id: string) {
       const { getProjectById } = useProjectsApi();
+
       this.isLoading = true;
+
       try {
         const project = await getProjectById(id);
+
         this.project = project;
       } finally {
         this.isLoading = false;
       }
     },
+
     async loadProjectMembers(projectId: string) {
       const { getProjectMembersById } = useProjectMembersApi();
+
       this.isLoading = true;
 
       try {
         const projectMembers = await getProjectMembersById(projectId);
+
         this.projectMembers = projectMembers;
       } finally {
         this.isLoading = false;
       }
     },
+
     async loadProjectTasks(projectId: string) {
       const { getProjectTasks } = useTasksApi();
+
       this.isLoading = true;
 
       try {
         const tasks = await getProjectTasks(projectId);
+
         this.projectTasks = tasks.tasks;
       } finally {
         this.isLoading = false;
       }
     },
+
     async loadAvailableUsersForProject(projectId: string) {
       const { getAvailableUsersForProject } = useProjectsApi();
+
       this.isLoading = true;
 
       try {
         const users = await getAvailableUsersForProject(projectId);
+
         this.availableUsers = users;
       } finally {
         this.isLoading = false;
       }
     },
-    async updateProjectMemberRole(projectId: string, userId: string, role: string) {
+
+    async updateProjectMemberRole(
+      projectId: string,
+      userId: string,
+      role: string,
+    ) {
       const { updateMemberRole } = useProjectMembersApi();
+
       this.isLoading = true;
+
       try {
-         await updateMemberRole(projectId, userId, role);
-      //  this.setProjectMemberNewRole(member);
+        await updateMemberRole(projectId, userId, role);
+        //  this.setProjectMemberNewRole(member);
       } finally {
         this.isLoading = false;
       }
-    }
+    },
   },
 });

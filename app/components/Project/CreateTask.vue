@@ -8,7 +8,12 @@
     />
 
     <template #body>
-      <UForm :state="form" :schema="schema" class="flex flex-col gap-4" @submit="createTask">
+      <UForm
+        :state="form"
+        :schema="schema"
+        class="flex flex-col gap-4"
+        @submit="createTask"
+      >
         <UFormField label="Task title" name="title" required>
           <UInput v-model="form.title" placeholder="Task name" class="w-full" />
         </UFormField>
@@ -86,6 +91,7 @@ const props = defineProps<{
 const { getTaskStatuses } = useStatuses();
 const refProjectMembers = toRef(props, "projectMembers");
 const refProject = toRef(props, "project");
+
 const {
   memberItems,
   form,

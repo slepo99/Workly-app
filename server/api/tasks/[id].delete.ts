@@ -1,9 +1,9 @@
 import { deleteTaskById } from "~~/server/services/tasks.service";
-import { ROLE_GROUPS } from "~~/server/constants/roles"
-import { requireRole } from "~~/server/utils/requireRole"
+import { ROLE_GROUPS } from "~~/server/constants/roles";
+import { requireRole } from "~~/server/utils/requireRole";
 
 export default defineEventHandler(async (event) => {
-  await requireRole(event, ROLE_GROUPS.MANAGEMENT)
+  await requireRole(event, ROLE_GROUPS.MANAGEMENT);
   const id = getRouterParam(event, "id");
 
   if (!id) {
@@ -21,5 +21,6 @@ export default defineEventHandler(async (event) => {
       statusMessage: "Task not found",
     });
   }
+
   return task;
 });

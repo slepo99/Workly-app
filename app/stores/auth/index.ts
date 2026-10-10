@@ -4,12 +4,14 @@ import type {
   AuthUser,
   Register,
 } from "~~/app/composables/api/useAuthApi/types";
+
 interface AuthStateModel {
   user: null | AuthUser;
   isLoading: boolean;
   isInitialized: boolean;
   registratedUser: null | AuthUser;
 }
+
 export const useAuthStore = defineStore("auth", {
   state: (): AuthStateModel => {
     return {
@@ -22,6 +24,7 @@ export const useAuthStore = defineStore("auth", {
 
   getters: {
     isAuthenticated: (state) => !!state.user,
+
     isRegistrated: (state) => !!state.registratedUser,
   },
 
@@ -30,16 +33,21 @@ export const useAuthStore = defineStore("auth", {
       const { login } = useAuthApi();
 
       this.isLoading = true;
+
       try {
         const user = await login(Data);
+
         this.user = user;
       } finally {
         this.isLoading = false;
       }
     },
+
     async fetchMe() {
       if (this.isInitialized) return;
+
       const { getMe } = useAuthApi();
+
       try {
         this.user = await getMe();
       } catch {
@@ -51,8 +59,10 @@ export const useAuthStore = defineStore("auth", {
 
     async logout() {
       const { logout } = useAuthApi();
+
       await logout();
       this.clearAuth();
+
       if (import.meta.client) {
         const channel = new BroadcastChannel("auth");
 
@@ -63,12 +73,15 @@ export const useAuthStore = defineStore("auth", {
         channel.close();
       }
     },
+
     clearAuth() {
       this.user = null;
       this.isInitialized = true;
     },
+
     async register(data: Register) {
       const { register } = useAuthApi();
+
       this.isLoading = true;
       this.registratedUser = null;
 

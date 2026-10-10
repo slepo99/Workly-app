@@ -296,7 +296,7 @@ export async function getMembersByProjectId(
         },
         projectId: projectMembers.projectId,
         id: projectMembers.id,
-        createdAt: projectMembers.createdAt
+        createdAt: projectMembers.createdAt,
       })
       .from(projectMembers)
       .innerJoin(users, eq(users.id, projectMembers.userId))
@@ -304,6 +304,7 @@ export async function getMembersByProjectId(
 
     return rows;
   }
+
   if (ROLES.MANAGER === role || ROLES.WORKER === role) {
     const [membership] = await db
       .select()
@@ -318,6 +319,7 @@ export async function getMembersByProjectId(
     if (!membership) {
       return null;
     }
+
     const rows = await db
       .select({
         role: projectMembers.role,
@@ -332,7 +334,7 @@ export async function getMembersByProjectId(
         },
         projectId: projectMembers.projectId,
         id: projectMembers.id,
-        createdAt: projectMembers.createdAt
+        createdAt: projectMembers.createdAt,
       })
       .from(projectMembers)
       .innerJoin(users, eq(users.id, projectMembers.userId))
@@ -340,6 +342,7 @@ export async function getMembersByProjectId(
 
     return rows;
   }
+
   return null;
 }
 
@@ -463,6 +466,7 @@ export async function getAvailableUsersByProjectId(projectId: string) {
       statusMessage: "Project not found",
     });
   }
+
   const availableUsers = await db
     .select({
       id: users.id,

@@ -1,7 +1,7 @@
 export default defineAppConfig({
   ui: {
     colors: {
-      neutral: 'zinc',
+      neutral: "zinc",
     },
     separator: {
       slots: {
@@ -9,4 +9,4 @@ export default defineAppConfig({
       },
     },
   },
-})
+});

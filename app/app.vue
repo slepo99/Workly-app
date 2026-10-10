@@ -10,10 +10,7 @@ const uiLocale = computed(() => {
 </script>
 
 <template>
-  <UApp
-    :toaster="{ position: 'top-right' }"
-    :locale="uiLocale"
-  >
+  <UApp :toaster="{ position: 'top-right' }" :locale="uiLocale">
     <NuxtLoadingIndicator color="#22c55e" :height="3" />
 
     <NuxtLayout>

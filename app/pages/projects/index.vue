@@ -76,6 +76,7 @@ import { useProjectsStore } from "~/stores/projects";
 import { PROJECTS_PAGINATION } from "~/constants/api";
 import { useProjects } from "~/composables/pages/useProjects";
 import { useStatuses } from "~/composables/useStatuses";
+
 const projectsStore = useProjectsStore();
 
 const {
@@ -84,7 +85,9 @@ const {
   firstLoadProjects,
   filterProjectsStatus,
 } = useProjects();
+
 const { getProjectStatuses } = useStatuses();
+
 await firstLoadProjects();
 </script>
 

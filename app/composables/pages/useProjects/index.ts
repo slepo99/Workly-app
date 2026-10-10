@@ -1,10 +1,8 @@
-
 import { useProjectsStore } from "~/stores/projects";
 import { useDebounceFn } from "@vueuse/core";
 
 export function useProjects() {
   const projectsStore = useProjectsStore();
-
 
   const searchProjects = useDebounceFn(async () => {
     await projectsStore.searchProjects();
@@ -39,11 +37,11 @@ export function useProjects() {
       await projectsStore.searchProjects();
     }
   }
-  
+
   return {
     searchProjects,
     updateProjectsPage,
     firstLoadProjects,
-    filterProjectsStatus
+    filterProjectsStatus,
   };
 }

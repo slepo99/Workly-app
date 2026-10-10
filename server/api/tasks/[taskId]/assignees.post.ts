@@ -4,10 +4,7 @@ import { db } from "~~/server/db";
 import { projectMembers } from "~~/server/db/schema";
 import { addTaskAssignee } from "~~/server/services/task-assignees.service";
 import { getTaskById } from "~~/server/services/tasks.service";
-import {
-  ROLE_GROUPS,
-  type Role,
-} from "~~/server/constants/roles";
+import { ROLE_GROUPS, type Role } from "~~/server/constants/roles";
 import { requireRole } from "~~/server/utils/requireRole";
 
 const bodySchema = z.object({
@@ -15,10 +12,7 @@ const bodySchema = z.object({
 });
 
 export default defineEventHandler(async (event) => {
-  const currentUser = await requireRole(
-    event,
-    ROLE_GROUPS.MANAGEMENT,
-  );
+  const currentUser = await requireRole(event, ROLE_GROUPS.MANAGEMENT);
 
   const taskId = getRouterParam(event, "taskId");
 

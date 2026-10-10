@@ -1,6 +1,6 @@
 export interface DashboardStatsModel {
-    totalTasks: number
-    completedTasks: number
-    totalProjects: number
-    totalUsers: number
+  totalTasks: number;
+  completedTasks: number;
+  totalProjects: number;
+  totalUsers: number;
 }

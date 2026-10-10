@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import {
-  CalendarDate,
   DateFormatter,
   getLocalTimeZone,
   parseDate,
   type DateValue,
 } from "@internationalized/date";
-import { DATE_LOCALES, LOCALES } from "~/constants/locale";
+import { DATE_LOCALES } from "~/constants/locale";
+
 const modelValue = defineModel<string | undefined>();
 
 const { locale, t } = useI18n();
@@ -29,26 +29,23 @@ const calendarValue = computed<DateValue | undefined>({
     return parseDate(modelValue.value.slice(0, 10));
   },
 
-set(value) {
-  if (!value) {
-    modelValue.value = undefined;
-    return;
-  }
+  set(value) {
+    if (!value) {
+      modelValue.value = undefined;
 
-  modelValue.value = new Date(
-    Date.UTC(value.year, value.month - 1, value.day),
-  ).toISOString();
-},
+      return;
+    }
+
+    modelValue.value = new Date(
+      Date.UTC(value.year, value.month - 1, value.day),
+    ).toISOString();
+  },
 });
 </script>
 
 <template>
   <UPopover>
-    <UButton
-      color="neutral"
-      variant="subtle"
-      icon="i-lucide-calendar"
-    >
+    <UButton color="neutral" variant="subtle" icon="i-lucide-calendar">
       {{
         calendarValue
           ? df.format(calendarValue.toDate(getLocalTimeZone()))
@@ -57,10 +54,7 @@ set(value) {
     </UButton>
 
     <template #content>
-      <UCalendar
-        v-model="calendarValue"
-        class="p-2"
-      />
+      <UCalendar v-model="calendarValue" class="p-2" />
     </template>
   </UPopover>
 </template>

@@ -63,10 +63,7 @@ export async function updateUserById(
     avatar?: string;
   },
 ) {
-  const [oldUser] = await db
-    .select()
-    .from(users)
-    .where(eq(users.id, id));
+  const [oldUser] = await db.select().from(users).where(eq(users.id, id));
 
   if (!oldUser) {
     return undefined;
@@ -78,21 +75,14 @@ export async function updateUserById(
     .where(eq(users.id, id))
     .returning(publicUserFields);
 
-  if (
-    "avatar" in data &&
-    oldUser.avatar &&
-    data.avatar !== oldUser.avatar
-  ) {
+  if ("avatar" in data && oldUser.avatar && data.avatar !== oldUser.avatar) {
     await deleteImageByUrl(oldUser.avatar);
   }
 
   return updatedUser;
 }
 
-export async function updateUserRole(
-  userId: string,
-  role: Role,
-) {
+export async function updateUserRole(userId: string, role: Role) {
   const [user] = await db
     .update(users)
     .set({ role })

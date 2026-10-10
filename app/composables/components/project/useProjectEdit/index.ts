@@ -13,6 +13,7 @@ export function useProjectEdit(project: Ref<ProjectModel>) {
   const isSaving = ref(false);
   const isImageRemoved = ref(false);
   const toast = useToast();
+
   const form = reactive<{
     name: string;
     description: string;
@@ -88,9 +89,11 @@ export function useProjectEdit(project: Ref<ProjectModel>) {
       isSaving.value = false;
     }
   }
+
   const projectStatusSchema = z.enum(
     Object.values(PROJECT_STATUSES) as [ProjectStatus, ...ProjectStatus[]],
   );
+
   const schema = z.object({
     name: z
       .string()
@@ -110,6 +113,7 @@ export function useProjectEdit(project: Ref<ProjectModel>) {
       },
     ),
   });
+
   return {
     isOpen,
     isSaving,

@@ -1,9 +1,8 @@
 import { defineStore } from "pinia";
 import type { ProjectModel } from "~/composables/api/useProjectsApi/types";
 import { PROJECTS_PAGINATION } from "~/constants/api";
-import {
-  type ProjectStatus,
-} from "~/constants/projectStatuses";
+import type { ProjectStatus } from "~/constants/projectStatuses";
+
 interface ProjectsStateModel {
   projects: ProjectModel[];
   isLoading: boolean;
@@ -34,6 +33,7 @@ export const useProjectsStore = defineStore("projects", {
       const { getProjects } = useProjectsApi();
 
       this.isLoading = true;
+
       try {
         const projects = await getProjects({
           page: page,
@@ -49,6 +49,7 @@ export const useProjectsStore = defineStore("projects", {
         this.isLoading = false;
       }
     },
+
     async searchProjects(page = PROJECTS_PAGINATION.PAGE) {
       const { getProjects } = useProjectsApi();
 
@@ -70,6 +71,5 @@ export const useProjectsStore = defineStore("projects", {
         this.isLoading = false;
       }
     },
-
   },
 });

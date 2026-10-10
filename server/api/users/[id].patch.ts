@@ -13,11 +13,12 @@ export default defineEventHandler(async (event) => {
       statusMessage: "User ID is required",
     });
   }
+
   const canUpdate =
     currentUser.id === id ||
     currentUser.role === ROLES.ADMIN ||
     currentUser.role === ROLES.SUPERADMIN;
-    
+
   if (canUpdate) {
     const body = await readBody(event);
     const data = updateUserSchema.parse(body);

@@ -8,7 +8,9 @@
     <div class="flex flex-col items-center gap-2 text-center text-muted">
       <UIcon name="i-lucide-plus" class="size-7" />
 
-      <span class="font-medium text-default select-none"> Add new project </span>
+      <span class="font-medium text-default select-none">
+        Add new project
+      </span>
 
       <p class="max-w-56 text-sm leading-5 select-none">
         Start a new project and invite your team members to collaborate

@@ -6,11 +6,7 @@
       height: `${size}px`,
     }"
   >
-    <svg
-      class="-rotate-90"
-      :width="size"
-      :height="size"
-    >
+    <svg class="-rotate-90" :width="size" :height="size">
       <circle
         :cx="center"
         :cy="center"
@@ -46,48 +42,44 @@
 <script setup lang="ts">
 const props = withDefaults(
   defineProps<{
-    percent: number
-    size?: number | string
-    strokeWidth?: number
+    percent: number;
+    size?: number | string;
+    strokeWidth?: number;
   }>(),
   {
     size: 80,
     strokeWidth: 2,
   },
-)
+);
 
-const center = computed(() => Number(props.size) / 2)
+const center = computed(() => Number(props.size) / 2);
 
-const radius = computed(() =>
-  Number(props.size) / 2 - props.strokeWidth / 2,
-)
+const radius = computed(() => Number(props.size) / 2 - props.strokeWidth / 2);
 
-const circumference = computed(() =>
-  2 * Math.PI * radius.value,
-)
+const circumference = computed(() => 2 * Math.PI * radius.value);
 
 const normalizedPercent = computed(() =>
   Math.min(100, Math.max(0, props.percent)),
-)
+);
 
-const progressOffset = computed(() =>
-  circumference.value -
-  (normalizedPercent.value / 100) * circumference.value,
-)
+const progressOffset = computed(
+  () =>
+    circumference.value - (normalizedPercent.value / 100) * circumference.value,
+);
 
 const progressColor = computed(() => {
   if (normalizedPercent.value < 20) {
-    return "text-error"
+    return "text-error";
   }
 
   if (normalizedPercent.value < 40) {
-    return "text-warning"
+    return "text-warning";
   }
 
   if (normalizedPercent.value < 60) {
-    return "text-info"
+    return "text-info";
   }
 
-  return "text-success"
-})
+  return "text-success";
+});
 </script>

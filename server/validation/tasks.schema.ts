@@ -9,7 +9,7 @@ const taskStatusSchema = z.enum(
 );
 
 const optionalDateSchema = z.preprocess(
-  (value) => value === "" || value === null ? undefined : value,
+  (value) => (value === "" || value === null ? undefined : value),
   z.coerce.date().optional(),
 );
 

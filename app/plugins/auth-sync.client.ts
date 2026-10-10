@@ -1,17 +1,17 @@
-import { useAuthStore } from "~/stores/auth"
+import { useAuthStore } from "~/stores/auth";
 
 export default defineNuxtPlugin(() => {
-  const authStore = useAuthStore()
+  const authStore = useAuthStore();
 
-  const channel = new BroadcastChannel("auth")
+  const channel = new BroadcastChannel("auth");
 
   channel.addEventListener("message", async (event) => {
     if (event.data?.type !== "logout") {
-      return
+      return;
     }
 
-    authStore.clearAuth()
+    authStore.clearAuth();
 
-    await navigateTo("/login")
-  })
-})
+    await navigateTo("/login");
+  });
+});
