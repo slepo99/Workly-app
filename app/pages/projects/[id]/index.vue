@@ -5,6 +5,7 @@
       <ProjectDetails
         :project="projectStore.project"
         :members="projectStore.projectMembers"
+        :tasks="projectStore.projectTasks"
         @edit-project="editProject"
         class="mt-4"
       />

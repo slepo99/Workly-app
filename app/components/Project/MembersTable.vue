@@ -206,7 +206,7 @@ const columns: TableColumn<ProjectMemberModel>[] = [
           size: "sm",
           "aria-label": "View member",
           onClick: () => {
-            console.log("Open member:", row.original.user.id);
+            window.open(`/users/${row.original.user.id}`, "_blank");
           },
         }),
 

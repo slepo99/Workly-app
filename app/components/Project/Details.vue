@@ -37,9 +37,7 @@
               size="lg"
               class="shrink-0"
             >
-              {{
-                getProjectStatusLabel(project.status)
-              }}
+              {{ getProjectStatusLabel(project.status) }}
             </UBadge>
           </div>
 
@@ -54,8 +52,11 @@
           class="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-wrap xl:shrink-0"
         >
           <ProjectEdit :project="props.project" />
- 
-          <ProjectCreateTask :project-members="props.members" :project="props.project"/>
+
+          <ProjectCreateTask
+            :project-members="props.members"
+            :project="props.project"
+          />
         </div>
       </div>
     </div>
@@ -88,7 +89,7 @@
           <UIcon name="i-lucide-clipboard-check" class="text-2xl" />
         </template>
         <template #title>Total tasks</template>
-        <template #value>{{ project.tasksCount }}</template>
+        <template #value>{{ props.tasks.length }}</template>
       </ProjectSmallStat>
 
       <ProjectSmallStat class="min-w-0 w-full">
@@ -97,18 +98,16 @@
         </template>
         <template #title>Completed tasks</template>
         <template #value>
-          {{
-            getPercentageValue(project.tasksCount, project.completionPercent)
-          }}
+          {{ getComplitedTasks }}
         </template>
       </ProjectSmallStat>
 
       <ProjectSmallStat class="min-w-0 w-full">
         <template #icon>
-          <UIRoundedProgress :percent="project.completionPercent" size="24" />
+          <UIRoundedProgress :percent="getTaskCompletionRate" size="24" />
         </template>
         <template #title>Completion rate</template>
-        <template #value>{{ project.completionPercent }}%</template>
+        <template #value>{{ getTaskCompletionRate}}%</template>
       </ProjectSmallStat>
 
       <ProjectSmallStat class="min-w-0 w-full">
@@ -116,7 +115,7 @@
           <UIcon name="i-lucide-users" class="text-2xl" />
         </template>
         <template #title>Project members</template>
-        <template #value>{{ members.length }}</template>
+        <template #value>{{ props.members.length }}</template>
       </ProjectSmallStat>
     </div>
   </div>
@@ -126,13 +125,16 @@
 import type { ProjectModel } from "~/composables/api/useProjectsApi/types";
 import type { ProjectMemberModel } from "~/composables/api/useProjectMembersApi/types";
 import { useStatuses } from "~/composables/useStatuses";
-
+import type { TasksModel } from "~/composables/api/useTasksApi/types";
+import { useDetails } from "~/composables/components/project/useDetails";
 const props = defineProps<{
   project: ProjectModel;
   members: ProjectMemberModel[];
+  tasks: TasksModel[];
 }>();
-
+const refTasks = toRef(props, "tasks");
 const { getProjectStatusLabel, getProjectStatusColor } = useStatuses();
+const { getComplitedTasks, getTaskCompletionRate } = useDetails(refTasks);
 </script>
 
 <style scoped></style>
