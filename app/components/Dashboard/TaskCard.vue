@@ -33,7 +33,6 @@
       <UAvatarGroup max="3">
         <UAvatar
           v-for="i in 6"
-          :key="i"
           src="https://github.com/benjamincanac.png"
           alt="Benjamin Canac"
         />

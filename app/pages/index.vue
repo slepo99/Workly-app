@@ -38,16 +38,10 @@
 
 <script lang="ts" setup>
 import { useI18n } from "vue-i18n";
-import { useProjectsStore } from "~/stores/projects";
-import { useTasksStore } from "~/stores/tasks";
-import { useUsersStore } from "~/stores/users";
 import { useDashboardStore } from "~/stores/dashboard";
 import { useDashboard } from "~/composables/pages/useDashboard";
 
 const { t } = useI18n();
-const projectsStore = useProjectsStore();
-const tasksStore = useTasksStore();
-const usersStore = useUsersStore();
 const dashboardStore = useDashboardStore();
 
 const { loadDashboard } = useDashboard();

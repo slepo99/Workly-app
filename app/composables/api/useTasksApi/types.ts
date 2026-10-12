@@ -32,3 +32,4 @@ export interface TaskCreateModel {
   projectId: string;
   assigneeIds: string[];
 }
+export interface TaskUpdateModel extends Partial<TaskCreateModel> {}

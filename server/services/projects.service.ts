@@ -6,7 +6,7 @@ import {
   tasks,
   taskAssignees,
 } from "~~/server/db/schema";
-import { eq, and, count, desc, ilike, inArray, isNull } from "drizzle-orm";
+import { eq, and, count, desc, ilike, inArray, isNull, asc } from "drizzle-orm";
 import { ROLES, type Role } from "~~/server/constants/roles";
 import { getTaskAssignees } from "./task-assignees.service";
 import { TASK_STATUSES } from "~~/server/constants/taskStatuses";
@@ -300,7 +300,8 @@ export async function getMembersByProjectId(
       })
       .from(projectMembers)
       .innerJoin(users, eq(users.id, projectMembers.userId))
-      .where(eq(projectMembers.projectId, projectId));
+      .where(eq(projectMembers.projectId, projectId))
+      .orderBy(asc(projectMembers.createdAt), asc(projectMembers.id))
 
     return rows;
   }
@@ -338,7 +339,8 @@ export async function getMembersByProjectId(
       })
       .from(projectMembers)
       .innerJoin(users, eq(users.id, projectMembers.userId))
-      .where(eq(projectMembers.projectId, projectId));
+      .where(eq(projectMembers.projectId, projectId))
+      .orderBy(asc(projectMembers.createdAt), asc(projectMembers.id))
 
     return rows;
   }
@@ -372,6 +374,7 @@ export async function getTasksByProjectId(
       .select()
       .from(tasks)
       .where(eq(tasks.projectId, projectId))
+      .orderBy(asc(tasks.createdAt), asc(tasks.id))
       .limit(limit)
       .offset(offset);
   } else if (role === ROLES.MANAGER) {
@@ -403,6 +406,7 @@ export async function getTasksByProjectId(
       .where(
         and(eq(tasks.projectId, projectId), eq(projectMembers.userId, userId)),
       )
+      .orderBy(asc(tasks.createdAt), asc(tasks.id))
       .limit(limit)
       .offset(offset);
   } else {
@@ -434,6 +438,7 @@ export async function getTasksByProjectId(
       .where(
         and(eq(taskAssignees.userId, userId), eq(tasks.projectId, projectId)),
       )
+      .orderBy(asc(tasks.createdAt), asc(tasks.id))
       .limit(limit)
       .offset(offset);
   }

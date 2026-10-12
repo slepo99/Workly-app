@@ -1,11 +1,12 @@
 import { useProjectStore } from "~/stores/project";
 import type { BreadcrumbItem } from "@nuxt/ui";
-
+import type { TaskStatus } from "~/constants/taskStatuses";
 export function useProject(projectId: Ref<string>) {
   const projectStore = useProjectStore();
   const toast = useToast();
   const isMmeberUpdating = ref(false);
   const isMemberRemoving = ref(false);
+  const isTaskUpdating = ref(false);
 
   async function onFirstLoadProject() {
     await callOnce(
@@ -82,6 +83,27 @@ export function useProject(projectId: Ref<string>) {
     }
   }
 
+  async function onUpdateTaskStatus(taskId: string, status: TaskStatus) {
+    const { updateTask } = useTasksApi();
+
+    isTaskUpdating.value = true;
+    try {
+      await updateTask(taskId, { status });
+      await projectStore.loadProjectTasks(projectId.value);
+    } catch {
+      toast.add({
+        title: "Error updating task status",
+        color: "warning",
+      });
+    } finally {
+      isTaskUpdating.value = false
+    }
+  }
+
+  async function onEditTask(taskId: string) {
+    
+  }
+
   function getBreadcumbs(projectId: string): BreadcrumbItem[] {
     return [
       {
@@ -104,5 +126,7 @@ export function useProject(projectId: Ref<string>) {
     onLoadProjectTasks,
     onUpdateMemberRole,
     onRemoveProjectMember,
+    onUpdateTaskStatus,
+    onEditTask
   };
 }

@@ -15,7 +15,7 @@
         @update-role="onUpdateMemberRole"
         @remove="onRemoveProjectMember"
       />
-      <DashboardTasklistTable :tasks="projectStore.projectTasks" class="mt-4" />
+      <DashboardTasklistTable :tasks="projectStore.projectTasks" class="mt-4" @update-status="onUpdateTaskStatus" @editTask="onEditTask"/>
     </div>
   </UPage>
 </template>
@@ -36,6 +36,8 @@ const {
   getBreadcumbs,
   onUpdateMemberRole,
   onRemoveProjectMember,
+  onUpdateTaskStatus,
+  onEditTask
 } = useProject(projectId);
 
 await Promise.all([

@@ -1,4 +1,4 @@
-import type { TasksResponseModel, TasksModel, TaskCreateModel } from "./types";
+import type { TasksResponseModel, TasksModel, TaskCreateModel, TaskUpdateModel } from "./types";
 
 export function useTasksApi() {
   const { $api } = useNuxtApp();
@@ -18,9 +18,10 @@ export function useTasksApi() {
     );
   };
 
-  const updateTask = (taskId: string) => {
+  const updateTask = (taskId: string, body: TaskUpdateModel) => {
     return $api<TasksModel>(`${API.GET_TASKS}/${taskId}`, {
       method: "PATCH",
+      body
     });
   };
 

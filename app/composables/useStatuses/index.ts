@@ -65,10 +65,23 @@ export function useStatuses() {
     ];
   });
 
+  const getTaskStatusColors = (status: string) => {
+    if (TASK_STATUSES.CANCELLED === status) {
+      return "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300";
+    } else if (TASK_STATUSES.COMPLETED === status) {
+      return "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300";
+    } else if (TASK_STATUSES.IN_PROGRESS === status) {
+      return "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300";
+    } else if (TASK_STATUSES.PENDING === status) {
+      return "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300";
+    }
+  };
+  
   return {
     getProjectStatuses,
     getProjectStatusColor,
     getProjectStatusLabel,
     getTaskStatuses,
+    getTaskStatusColors
   };
 }
