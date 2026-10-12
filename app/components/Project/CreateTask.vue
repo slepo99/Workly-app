@@ -1,11 +1,8 @@
 <template>
   <UModal v-model:open="isOpen" title="Create task" @after:leave="resetForm">
-    <UButton
-      label="Create task"
-      icon="i-lucide-plus"
-      color="secondary"
-      class="min-w-0 cursor-pointer justify-center"
-    />
+    <slot name="trigger">
+
+    </slot>
 
     <template #body>
       <TasksForm

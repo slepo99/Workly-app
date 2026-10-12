@@ -56,7 +56,16 @@
           <ProjectCreateTask
             :project-members="props.members"
             :project="props.project"
-          />
+          >
+            <template #trigger>
+              <UButton
+                label="Create task"
+                icon="i-lucide-plus"
+                color="secondary"
+                class="min-w-0 cursor-pointer justify-center"
+              />
+            </template>
+          </ProjectCreateTask>
         </div>
       </div>
     </div>
