@@ -15,7 +15,17 @@
         @update-role="onUpdateMemberRole"
         @remove="onRemoveProjectMember"
       />
-      <DashboardTasklistTable :tasks="projectStore.projectTasks" class="mt-4" @update-status="onUpdateTaskStatus" @editTask="onEditTask"/>
+      <DashboardTasklistTable
+        :tasks="projectStore.projectTasks"
+        class="mt-4"
+        @update-status="onUpdateTaskStatus"
+        @editTask="onEditTask"
+      />
+      <ProjectEditTask
+        v-model:open="isTaskEditModalOpen"
+        :project-members="projectStore.projectMembers"
+        :task="projectStore.getTaskByTaskId"
+      />
     </div>
   </UPage>
 </template>
@@ -37,7 +47,8 @@ const {
   onUpdateMemberRole,
   onRemoveProjectMember,
   onUpdateTaskStatus,
-  onEditTask
+  onEditTask,
+  isTaskEditModalOpen,
 } = useProject(projectId);
 
 await Promise.all([

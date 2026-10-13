@@ -71,15 +71,15 @@
 
 <script setup lang="ts">
 import type { ZodType } from "zod";
-import type { TaskCreateModel } from "~/composables/api/useTasksApi/types";
+import type { TaskUpdateModel } from "~/composables/api/useTasksApi/types";
 
 withDefaults(
   defineProps<{
-    form: TaskCreateModel;
+    form: TaskUpdateModel;
     schema: ZodType;
     selectStatusItems: {
       label: string;
-      value: TaskCreateModel["status"];
+      value: TaskUpdateModel["status"];
     }[];
     selectMembersItems: {
       label: string;

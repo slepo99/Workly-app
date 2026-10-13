@@ -7,6 +7,7 @@ export function useProject(projectId: Ref<string>) {
   const isMmeberUpdating = ref(false);
   const isMemberRemoving = ref(false);
   const isTaskUpdating = ref(false);
+  const isTaskEditModalOpen = ref(false);
 
   async function onFirstLoadProject() {
     await callOnce(
@@ -96,12 +97,13 @@ export function useProject(projectId: Ref<string>) {
         color: "warning",
       });
     } finally {
-      isTaskUpdating.value = false
+      isTaskUpdating.value = false;
     }
   }
 
   async function onEditTask(taskId: string) {
-    
+    projectStore.setTaskId(taskId);
+    isTaskEditModalOpen.value = true;
   }
 
   function getBreadcumbs(projectId: string): BreadcrumbItem[] {
@@ -127,6 +129,7 @@ export function useProject(projectId: Ref<string>) {
     onUpdateMemberRole,
     onRemoveProjectMember,
     onUpdateTaskStatus,
-    onEditTask
+    onEditTask,
+    isTaskEditModalOpen,
   };
 }

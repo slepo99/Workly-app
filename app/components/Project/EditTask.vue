@@ -1,13 +1,11 @@
 <template>
-  <UModal v-model:open="isOpen" title="Create task" @after:leave="resetForm">
-    <slot name="trigger">
-      <!-- <UButton
-        label="Edit task"
-        icon="i-lucide-edit"
-        color="secondary"
-        class="min-w-0 cursor-pointer justify-center"
-      /> -->
-    </slot>
+  <UModal
+    v-model:open="isOpen"
+    title="Create task"
+    @enter="resetForm"
+
+  >
+    <slot name="trigger"> </slot>
 
     <template #body>
       <TasksForm
@@ -18,7 +16,7 @@
         :select-members-items="memberItems"
         :is-saving="isSaving"
         submitLabel="Edit task"
-        @create-task="createTask"
+        @create-task="editTask"
         @close-modal="isOpen = false"
       />
     </template>
@@ -29,25 +27,20 @@
 import { useStatuses } from "~/composables/useStatuses";
 import { useProjectEditTask } from "~/composables/components/project/useProjectEditTask";
 import type { ProjectMemberModel } from "~/composables/api/useProjectMembersApi/types";
-import type { ProjectModel } from "~/composables/api/useProjectsApi/types";
-
+import type { TasksModel } from "~/composables/api/useTasksApi/types";
 const props = defineProps<{
   projectMembers: ProjectMemberModel[];
-  project: ProjectModel;
+  task: TasksModel | null;
 }>();
 
-const { getTaskStatuses } = useStatuses();
-const refProjectMembers = toRef(props, "projectMembers");
-const refProject = toRef(props, "project");
 
-const {
-  memberItems,
-  form,
-  isOpen,
-  isSaving,
-  resetForm,
-  createTask,
-  taskDates,
-  schema,
-} = useProjectEditTask(refProjectMembers, refProject);
+
+const isOpen = defineModel<boolean>("open", { default: false });
+const { getTaskStatuses } = useStatuses();
+const refTask = toRef(props, "task");
+const refProjectMembers = toRef(props, "projectMembers");
+
+const { memberItems, form, isSaving, resetForm, editTask, taskDates, schema } =
+  useProjectEditTask(refProjectMembers, refTask, isOpen);
+console.log("edit component created");
 </script>

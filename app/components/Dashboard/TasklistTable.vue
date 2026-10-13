@@ -45,10 +45,7 @@ defineProps<{
 }>();
 
 const emit = defineEmits<{
-  "update-status": [
-      taskId: string,
-      status: TaskStatus
-  ];
+  "update-status": [taskId: string, status: TaskStatus];
   open: [taskId: string];
   editTask: [taskId: string];
   delete: [taskId: string];
@@ -148,35 +145,36 @@ const columns: TableColumn<ProjectTaskModel>[] = [
 
   {
     accessorKey: "assignees",
-
     header: "Assigned to",
 
     cell: ({ row }) => {
       const assignees = row.original.assignees;
 
       if (!assignees.length) {
-        return h(
-          "span",
-          {
-            class: "text-muted",
-          },
-          "—",
-        );
+        return h("span", { class: "text-muted" }, "—");
       }
+
+      const groupKey = JSON.stringify([
+        row.original.id,
+        assignees.map((user) => [user.id, user.name, user.avatar]),
+      ]);
 
       return h(
         UAvatarGroup,
         {
+          key: groupKey,
           max: 3,
         },
-        () =>
-          assignees.map((user) =>
-            h(UAvatar, {
-              key: user.id,
-              alt: user.name,
-              src: user.avatar ?? undefined,
-            }),
-          ),
+        {
+          default: () =>
+            assignees.map((user) =>
+              h(UAvatar, {
+                key: user.id,
+                alt: user.name,
+                src: user.avatar ?? undefined,
+              }),
+            ),
+        },
       );
     },
   },

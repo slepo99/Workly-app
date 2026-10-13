@@ -13,6 +13,7 @@ interface ProjectStateModel {
   projectMembers: ProjectMemberModel[];
   projectTasks: TasksModel[];
   availableUsers: UserModel[];
+  beingEditedTaskId: string | null;
 }
 
 export const useProjectStore = defineStore("project", {
@@ -23,10 +24,19 @@ export const useProjectStore = defineStore("project", {
       projectMembers: [],
       projectTasks: [],
       availableUsers: [],
+      beingEditedTaskId: null,
     };
   },
 
-  getters: {},
+  getters: {
+    getTaskByTaskId(state) {
+      return (
+        state.projectTasks.find(
+          (task) => task.id === state.beingEditedTaskId,
+        ) || null
+      );
+    },
+  },
 
   actions: {
     // setProjectMemberNewRole(member: AllProjectMembersResponseModel) {
@@ -37,6 +47,9 @@ export const useProjectStore = defineStore("project", {
     //     this.projectMembers[index].role = member.role;
     //   }
     // },
+    setTaskId(taskId?: string) {
+      this.beingEditedTaskId = taskId?.length && taskId.length ? taskId : null;
+    },
     async loadProjectById(id: string) {
       const { getProjectById } = useProjectsApi();
 

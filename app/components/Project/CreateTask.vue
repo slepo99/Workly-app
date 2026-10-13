@@ -30,6 +30,7 @@ const props = defineProps<{
   project: ProjectModel;
 }>();
 
+const isOpen = defineModel<boolean>("open", { default: false });
 const { getTaskStatuses } = useStatuses();
 const refProjectMembers = toRef(props, "projectMembers");
 const refProject = toRef(props, "project");
@@ -37,11 +38,10 @@ const refProject = toRef(props, "project");
 const {
   memberItems,
   form,
-  isOpen,
   isSaving,
   resetForm,
   createTask,
   taskDates,
   schema,
-} = useProjectCreateTask(refProjectMembers, refProject);
+} = useProjectCreateTask(refProjectMembers, refProject, isOpen);
 </script>

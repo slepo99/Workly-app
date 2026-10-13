@@ -7,11 +7,11 @@ import { useProjectStore } from "~/stores/project";
 export function useProjectCreateTask(
   projectMembers: Ref<ProjectMemberModel[]>,
   project: Ref<ProjectModel>,
+  isOpen: Ref<boolean>,
 ) {
   const projectStore = useProjectStore();
   const toast = useToast();
 
-  const isOpen = ref(false);
   const isSaving = ref(false);
 
   const form = reactive<TaskCreateModel>({
@@ -99,7 +99,6 @@ export function useProjectCreateTask(
   return {
     memberItems,
     form,
-    isOpen,
     isSaving,
     resetForm,
     createTask,
