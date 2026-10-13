@@ -50,6 +50,7 @@ export const useProjectStore = defineStore("project", {
     setTaskId(taskId?: string) {
       this.beingEditedTaskId = taskId?.length && taskId.length ? taskId : null;
     },
+
     async loadProjectById(id: string) {
       const { getProjectById } = useProjectsApi();
 

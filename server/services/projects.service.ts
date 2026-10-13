@@ -301,7 +301,7 @@ export async function getMembersByProjectId(
       .from(projectMembers)
       .innerJoin(users, eq(users.id, projectMembers.userId))
       .where(eq(projectMembers.projectId, projectId))
-      .orderBy(asc(projectMembers.createdAt), asc(projectMembers.id))
+      .orderBy(asc(projectMembers.createdAt), asc(projectMembers.id));
 
     return rows;
   }
@@ -340,7 +340,7 @@ export async function getMembersByProjectId(
       .from(projectMembers)
       .innerJoin(users, eq(users.id, projectMembers.userId))
       .where(eq(projectMembers.projectId, projectId))
-      .orderBy(asc(projectMembers.createdAt), asc(projectMembers.id))
+      .orderBy(asc(projectMembers.createdAt), asc(projectMembers.id));
 
     return rows;
   }

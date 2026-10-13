@@ -1,9 +1,11 @@
-import type { TaskUpdateModel } from "~/composables/api/useTasksApi/types";
+import type {
+  TaskUpdateModel,
+  TasksModel,
+} from "~/composables/api/useTasksApi/types";
 import type { ProjectModel } from "~/composables/api/useProjectsApi/types";
 import type { ProjectMemberModel } from "~/composables/api/useProjectMembersApi/types";
 import { useProjectStore } from "~/stores/project";
 import { z } from "zod";
-import type { TasksModel } from "~/composables/api/useTasksApi/types";
 
 export function useProjectEditTask(
   projectMembers: Ref<ProjectMemberModel[]>,
@@ -78,7 +80,6 @@ export function useProjectEditTask(
     form.startDate = selectedTask?.startDate ?? "";
   }
 
-
   async function editTask() {
     const selectedTask = task.value;
 
@@ -124,6 +125,7 @@ export function useProjectEditTask(
       console.error("Failed to refresh tasks:", error);
     }
   }
+
   return {
     isSaving,
     form,

@@ -1,10 +1,11 @@
-export interface CreateProjectInput {
+import type { ProjectStatus } from "~/constants/projectStatuses";
+export interface CreateProjectModel {
   name: string;
   description?: string;
-  status?: string;
+  status?: ProjectStatus;
   image: string | null;
 }
-export interface UpdateProjectInput extends Partial<CreateProjectInput> {}
+export interface UpdateProjectModel extends Partial<CreateProjectModel> {}
 export interface ProjectsResponseModel {
   page: number;
   limit: number;

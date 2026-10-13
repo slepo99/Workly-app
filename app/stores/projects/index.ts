@@ -34,6 +34,7 @@ export const useProjectsStore = defineStore("projects", {
     resetSearch() {
       this.search = "";
     },
+
     cancelProjectsLoad() {
       const controller = projectsControllers.get(this.$state);
 

@@ -49,6 +49,7 @@
             icon="i-lucide-plus"
             color="secondary"
             class="w-full justify-center sm:w-auto"
+            @click="triggerCreateProject"
           />
         </div>
       </div>
@@ -63,7 +64,8 @@
     <div
       class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mt-8"
     >
-      <ProjectsCardNew v-if="projectsStore.page === 1" />
+      <ProjectsCardNew v-if="projectsStore.page === 1" @click="triggerCreateProject"/>
+      <ProjectsNewProjectModal v-if="isCreateProjectPopup" v-model:open="isCreateProjectPopup"/>
       <ProjectsCard
         v-for="project in projectsStore.projects"
         :key="project.id"
@@ -95,7 +97,9 @@ const {
   updateProjectsPage,
   firstLoadProjects,
   filterProjectsStatus,
-  clearSearchInput
+  clearSearchInput,
+  triggerCreateProject,
+  isCreateProjectPopup
 } = useProjects();
 
 const { getProjectStatuses } = useStatuses();

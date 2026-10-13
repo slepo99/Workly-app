@@ -72,6 +72,4 @@ const {
   selectedUsers,
   addMembersToProject,
 } = useProjectNewMember(projectId);
-
-
 </script>

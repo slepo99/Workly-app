@@ -1,4 +1,9 @@
-import type { TasksResponseModel, TasksModel, TaskCreateModel, TaskUpdateModel } from "./types";
+import type {
+  TasksResponseModel,
+  TasksModel,
+  TaskCreateModel,
+  TaskUpdateModel,
+} from "./types";
 
 export function useTasksApi() {
   const { $api } = useNuxtApp();
@@ -21,7 +26,7 @@ export function useTasksApi() {
   const updateTask = (taskId: string, body: TaskUpdateModel) => {
     return $api<TasksModel>(`${API.GET_TASKS}/${taskId}`, {
       method: "PATCH",
-      body
+      body,
     });
   };
 
@@ -34,14 +39,15 @@ export function useTasksApi() {
 
   const deleteTask = (taskId: string) => {
     return $api(`${API.GET_TASKS}/${taskId}`, {
-      method: "DELETE"
-    })
-  }
+      method: "DELETE",
+    });
+  };
+
   return {
     getTasks,
     getProjectTasks,
     updateTask,
     postTask,
-    deleteTask
+    deleteTask,
   };
 }

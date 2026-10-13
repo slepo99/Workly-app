@@ -1,6 +1,6 @@
 <template>
   <UModal v-model:open="isOpen" title="Edit task" @enter="resetForm">
-    <slot name="trigger"> </slot>
+    <slot name="trigger" />
 
     <template #body>
       <TasksForm
@@ -10,7 +10,7 @@
         :select-status-items="getTaskStatuses"
         :select-members-items="memberItems"
         :is-saving="isSaving"
-        submitLabel="Edit task"
+        submit-label="Edit task"
         @create-task="editTask"
         @close-modal="isOpen = false"
       />
@@ -36,5 +36,4 @@ const refProjectMembers = toRef(props, "projectMembers");
 
 const { memberItems, form, isSaving, resetForm, editTask, taskDates, schema } =
   useProjectEditTask(refProjectMembers, refTask, isOpen);
-
 </script>

@@ -4,6 +4,7 @@ import type {
   AuthUser,
   Register,
 } from "~~/app/composables/api/useAuthApi/types";
+
 //todo: Logout does not clear all project statement
 interface AuthStateModel {
   user: null | AuthUser;

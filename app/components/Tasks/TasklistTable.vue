@@ -22,6 +22,7 @@ import type { Column } from "@tanstack/vue-table";
 import { formatDate } from "~/utils/date";
 import { useStatuses } from "~/composables/useStatuses";
 import type { TaskStatus } from "~/constants/taskStatuses";
+
 interface TaskAssigneeModel {
   id: string;
   name: string;
@@ -50,6 +51,7 @@ const emit = defineEmits<{
   editTask: [taskId: string];
   delete: [taskId: string];
 }>();
+
 const { getTaskStatuses, getTaskStatusColors } = useStatuses();
 const USelect = resolveComponent("USelect");
 const UAvatarGroup = resolveComponent("UAvatarGroup");

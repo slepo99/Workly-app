@@ -2,6 +2,7 @@ import { useProjectsStore } from "~/stores/projects";
 import { useDebouncedFn } from "~/composables/useDebounce";
 
 export function useProjects() {
+  const isCreateProjectPopup = ref(false);
   const projectsStore = useProjectsStore();
 
   const searchProjects = useDebouncedFn(() => projectsStore.loadProjects());
@@ -32,12 +33,16 @@ export function useProjects() {
     projectsStore.resetSearch();
     await projectsStore.loadProjects();
   }
-
+  function triggerCreateProject() {
+    isCreateProjectPopup.value = true;
+  }
   return {
     searchProjects,
     updateProjectsPage,
     firstLoadProjects,
     filterProjectsStatus,
     clearSearchInput,
+    triggerCreateProject,
+    isCreateProjectPopup,
   };
 }

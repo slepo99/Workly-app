@@ -74,6 +74,7 @@ export function useProject(projectId: Ref<string>) {
     const { deleteProjectMember } = useProjectMembersApi();
 
     isMemberRemoving.value = true;
+
     // todo: fix try/catch structure
     try {
       await deleteProjectMember(currentMemberId.value);
@@ -96,6 +97,7 @@ export function useProject(projectId: Ref<string>) {
     const { updateTask } = useTasksApi();
 
     isTaskUpdating.value = true;
+
     try {
       await updateTask(taskId, { status });
       await projectStore.loadProjectTasks(projectId.value);
@@ -155,10 +157,12 @@ export function useProject(projectId: Ref<string>) {
     currentTaskId.value = id;
     isTaskRemoveModalOpen.value = true;
   }
+
   function onEditTask(taskId: string) {
     projectStore.setTaskId(taskId);
     isTaskEditModalOpen.value = true;
   }
+
   return {
     onFirstLoadProject,
     getBreadcumbs,

@@ -19,7 +19,7 @@
         :tasks="projectStore.projectTasks"
         class="mt-4"
         @update-status="onUpdateTaskStatus"
-        @editTask="onEditTask"
+        @edit-task="onEditTask"
         @delete="triggerTaskRemove"
       />
       <ProjectEditTask
@@ -40,8 +40,8 @@
               label="Cancel"
               color="neutral"
               variant="outline"
-              @click="close"
               :disabled="isMemberRemoving"
+              @click="close"
             />
             <UButton
               :loading="isMemberRemoving"
@@ -53,7 +53,7 @@
         </template>
       </UModal>
 
-        <UModal
+      <UModal
         v-model:open="isTaskRemoveModalOpen"
         title="Remove task"
         description="Are you sure you want to remove project task ?"
@@ -66,8 +66,8 @@
               label="Cancel"
               color="neutral"
               variant="outline"
-              @click="close"
               :disabled="isTaskRemoving"
+              @click="close"
             />
             <UButton
               :loading="isTaskRemoving"
@@ -107,7 +107,7 @@ const {
   isMemberRemoving,
   onRemoveTask,
   triggerTaskRemove,
-  isTaskRemoving
+  isTaskRemoving,
 } = useProject(projectId);
 
 await Promise.all([

@@ -1,6 +1,6 @@
 import type {
-  CreateProjectInput,
-  UpdateProjectInput,
+  CreateProjectModel,
+  UpdateProjectModel,
   ProjectsResponseModel,
   ProjectModel,
 } from "./types";
@@ -43,14 +43,14 @@ export function useProjectsApi() {
     });
   };
 
-  const createProject = (data: CreateProjectInput) => {
+  const createProject = (data: CreateProjectModel) => {
     return $api(API.CREATE_PROJECT, {
       method: "POST",
       body: data,
     });
   };
 
-  const updateProject = (id: string, data: UpdateProjectInput) => {
+  const updateProject = (id: string, data: UpdateProjectModel) => {
     return $api(`${API.UPDATE_PROJECT}/${id}`, {
       method: "PATCH",
       body: data,

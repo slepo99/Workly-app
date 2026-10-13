@@ -76,12 +76,12 @@ export function useStatuses() {
       return "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300";
     }
   };
-  
+
   return {
     getProjectStatuses,
     getProjectStatusColor,
     getProjectStatusLabel,
     getTaskStatuses,
-    getTaskStatusColors
+    getTaskStatusColors,
   };
 }

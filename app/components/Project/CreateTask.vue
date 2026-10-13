@@ -1,8 +1,6 @@
 <template>
   <UModal v-model:open="isOpen" title="Create task" @after:leave="resetForm">
-    <slot name="trigger">
-
-    </slot>
+    <slot name="trigger" />
 
     <template #body>
       <TasksForm

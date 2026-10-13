@@ -8,5 +8,3 @@ const taskId = computed(() => route.params.id as string);
 </script>
 
 <style scoped></style>
-
-
