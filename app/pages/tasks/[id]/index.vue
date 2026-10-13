@@ -1,5 +1,5 @@
 <template>
-  <div />
+  <div>{{ taskId }}</div>
 </template>
 
 <script setup lang="ts">
@@ -8,3 +8,5 @@ const taskId = computed(() => route.params.id as string);
 </script>
 
 <style scoped></style>
+
+

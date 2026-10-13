@@ -13,19 +13,71 @@
         :project-id="projectId"
         class="mt-4"
         @update-role="onUpdateMemberRole"
-        @remove="onRemoveProjectMember"
+        @remove="triggerMemberRemove"
       />
-      <DashboardTasklistTable
+      <TasksTasklistTable
         :tasks="projectStore.projectTasks"
         class="mt-4"
         @update-status="onUpdateTaskStatus"
         @editTask="onEditTask"
+        @delete="triggerTaskRemove"
       />
       <ProjectEditTask
         v-model:open="isTaskEditModalOpen"
         :project-members="projectStore.projectMembers"
         :task="projectStore.getTaskByTaskId"
       />
+      <UModal
+        v-model:open="isMmeberRemoveModalOpen"
+        title="Remove member"
+        description="Are you sure you want to remove project member ?"
+        :close="false"
+        :dismissible="!isMemberRemoving"
+      >
+        <template #body="{ close }">
+          <div class="flex items-center justify-between">
+            <UButton
+              label="Cancel"
+              color="neutral"
+              variant="outline"
+              @click="close"
+              :disabled="isMemberRemoving"
+            />
+            <UButton
+              :loading="isMemberRemoving"
+              label="Remove"
+              color="neutral"
+              @click="onRemoveProjectMember"
+            />
+          </div>
+        </template>
+      </UModal>
+
+        <UModal
+        v-model:open="isTaskRemoveModalOpen"
+        title="Remove task"
+        description="Are you sure you want to remove project task ?"
+        :close="false"
+        :dismissible="!isTaskRemoving"
+      >
+        <template #body="{ close }">
+          <div class="flex items-center justify-between">
+            <UButton
+              label="Cancel"
+              color="neutral"
+              variant="outline"
+              @click="close"
+              :disabled="isTaskRemoving"
+            />
+            <UButton
+              :loading="isTaskRemoving"
+              label="Remove"
+              color="neutral"
+              @click="onRemoveTask"
+            />
+          </div>
+        </template>
+      </UModal>
     </div>
   </UPage>
 </template>
@@ -48,7 +100,14 @@ const {
   onRemoveProjectMember,
   onUpdateTaskStatus,
   onEditTask,
+  triggerMemberRemove,
   isTaskEditModalOpen,
+  isMmeberRemoveModalOpen,
+  isTaskRemoveModalOpen,
+  isMemberRemoving,
+  onRemoveTask,
+  triggerTaskRemove,
+  isTaskRemoving
 } = useProject(projectId);
 
 await Promise.all([

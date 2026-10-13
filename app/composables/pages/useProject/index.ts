@@ -1,13 +1,19 @@
 import { useProjectStore } from "~/stores/project";
 import type { BreadcrumbItem } from "@nuxt/ui";
 import type { TaskStatus } from "~/constants/taskStatuses";
+
 export function useProject(projectId: Ref<string>) {
   const projectStore = useProjectStore();
   const toast = useToast();
   const isMmeberUpdating = ref(false);
   const isMemberRemoving = ref(false);
   const isTaskUpdating = ref(false);
+  const isTaskRemoving = ref(false);
   const isTaskEditModalOpen = ref(false);
+  const isMmeberRemoveModalOpen = ref(false);
+  const isTaskRemoveModalOpen = ref(false);
+  const currentMemberId = ref("");
+  const currentTaskId = ref("");
 
   async function onFirstLoadProject() {
     await callOnce(
@@ -64,13 +70,13 @@ export function useProject(projectId: Ref<string>) {
     }
   }
 
-  async function onRemoveProjectMember(id: string) {
+  async function onRemoveProjectMember() {
     const { deleteProjectMember } = useProjectMembersApi();
 
     isMemberRemoving.value = true;
-
+    // todo: fix try/catch structure
     try {
-      await deleteProjectMember(id);
+      await deleteProjectMember(currentMemberId.value);
       await projectStore.loadProjectMembers(projectId.value);
     } catch (e: any) {
       console.error("Error romoving member", e);
@@ -81,6 +87,8 @@ export function useProject(projectId: Ref<string>) {
       });
     } finally {
       isMemberRemoving.value = false;
+      currentMemberId.value = "";
+      isMmeberRemoveModalOpen.value = false;
     }
   }
 
@@ -101,9 +109,26 @@ export function useProject(projectId: Ref<string>) {
     }
   }
 
-  async function onEditTask(taskId: string) {
-    projectStore.setTaskId(taskId);
-    isTaskEditModalOpen.value = true;
+  async function onRemoveTask() {
+    const { deleteTask } = useTasksApi();
+
+    isTaskRemoving.value = true;
+
+    try {
+      await deleteTask(currentTaskId.value);
+      await projectStore.loadProjectTasks(projectId.value);
+    } catch (e: any) {
+      console.error("Error romoving task", e);
+      toast.add({
+        title: "Error romoving task",
+        description: e.statusMessage,
+        color: "warning",
+      });
+    } finally {
+      isTaskRemoving.value = false;
+      currentTaskId.value = "";
+      isTaskRemoveModalOpen.value = false;
+    }
   }
 
   function getBreadcumbs(projectId: string): BreadcrumbItem[] {
@@ -121,6 +146,19 @@ export function useProject(projectId: Ref<string>) {
     ];
   }
 
+  function triggerMemberRemove(id: string) {
+    currentMemberId.value = id;
+    isMmeberRemoveModalOpen.value = true;
+  }
+
+  function triggerTaskRemove(id: string) {
+    currentTaskId.value = id;
+    isTaskRemoveModalOpen.value = true;
+  }
+  function onEditTask(taskId: string) {
+    projectStore.setTaskId(taskId);
+    isTaskEditModalOpen.value = true;
+  }
   return {
     onFirstLoadProject,
     getBreadcumbs,
@@ -130,6 +168,13 @@ export function useProject(projectId: Ref<string>) {
     onRemoveProjectMember,
     onUpdateTaskStatus,
     onEditTask,
+    triggerMemberRemove,
+    triggerTaskRemove,
     isTaskEditModalOpen,
+    isMmeberRemoveModalOpen,
+    isMemberRemoving,
+    isTaskRemoveModalOpen,
+    onRemoveTask,
+    isTaskRemoving,
   };
 }

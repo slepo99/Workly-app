@@ -216,7 +216,7 @@ const columns: TableColumn<ProjectTaskModel>[] = [
             size: "sm",
 
             onClick: () => {
-              emit("open", row.original.id);
+              window.open(`/tasks/${row.original.id}`, "_blank");
             },
           }),
 

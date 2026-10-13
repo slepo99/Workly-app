@@ -32,10 +32,16 @@ export function useTasksApi() {
     });
   };
 
+  const deleteTask = (taskId: string) => {
+    return $api(`${API.GET_TASKS}/${taskId}`, {
+      method: "DELETE"
+    })
+  }
   return {
     getTasks,
     getProjectTasks,
     updateTask,
     postTask,
+    deleteTask
   };
 }

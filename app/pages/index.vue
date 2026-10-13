@@ -32,7 +32,7 @@
     <DashboardSkeletonsUpcomingMeetingsCardSkeleton/>
     <DashboardSkeletonsRecentActivityCardSkeleton/> -->
     </div>
-    <!-- <DashboardTasklistTable class="my-6" /> -->
+    <!-- <TasksTasklistTable class="my-6" /> -->
   </UPage>
 </template>
 
