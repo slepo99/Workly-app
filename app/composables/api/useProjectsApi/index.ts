@@ -24,13 +24,16 @@ export function useProjectsApi() {
     limit = PROJECTS_PAGINATION.LIMIT,
     search = "",
     statuses = [],
+    signal,
   }: {
     page?: number;
     limit?: number;
     search?: string;
     statuses?: ProjectStatus[];
+    signal?: AbortSignal;
   }) => {
     return $api<ProjectsResponseModel>(API.GET_PROJECTS, {
+      signal,
       query: {
         page,
         limit,

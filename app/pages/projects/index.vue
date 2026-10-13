@@ -29,7 +29,18 @@
               base: 'rounded-full',
             }"
             @update:model-value="searchProjects"
-          />
+          >
+            <template v-if="projectsStore.search" #trailing>
+              <UButton
+                color="neutral"
+                variant="link"
+                size="sm"
+                icon="i-lucide-circle-x"
+                aria-label="Clear input"
+                @click="clearSearchInput"
+              />
+            </template>
+          </UInput>
 
           <USeparator orientation="vertical" class="hidden h-10 sm:block" />
 
@@ -84,6 +95,7 @@ const {
   updateProjectsPage,
   firstLoadProjects,
   filterProjectsStatus,
+  clearSearchInput
 } = useProjects();
 
 const { getProjectStatuses } = useStatuses();

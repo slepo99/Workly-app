@@ -1,19 +1,13 @@
 import { useProjectsStore } from "~/stores/projects";
-import { useDebounceFn } from "@vueuse/core";
+import { useDebouncedFn } from "~/composables/useDebounce";
 
 export function useProjects() {
   const projectsStore = useProjectsStore();
 
-  const searchProjects = useDebounceFn(async () => {
-    await projectsStore.searchProjects();
-  }, 500);
+  const searchProjects = useDebouncedFn(() => projectsStore.loadProjects());
 
   async function updateProjectsPage(value: number) {
-    if (!projectsStore.search) {
-      await projectsStore.loadAllProjects(value);
-    } else {
-      await projectsStore.searchProjects(value);
-    }
+    await projectsStore.loadProjects(value);
   }
 
   async function firstLoadProjects() {
@@ -21,7 +15,7 @@ export function useProjects() {
       await callOnce(
         "projects",
         async () => {
-          await projectsStore.loadAllProjects();
+          await projectsStore.loadProjects();
         },
         { mode: "navigation" },
       );
@@ -31,11 +25,12 @@ export function useProjects() {
   }
 
   async function filterProjectsStatus() {
-    if (!projectsStore.search) {
-      await projectsStore.loadAllProjects();
-    } else {
-      await projectsStore.searchProjects();
-    }
+    await projectsStore.loadProjects();
+  }
+
+  async function clearSearchInput() {
+    projectsStore.resetSearch();
+    await projectsStore.loadProjects();
   }
 
   return {
@@ -43,5 +38,6 @@ export function useProjects() {
     updateProjectsPage,
     firstLoadProjects,
     filterProjectsStatus,
+    clearSearchInput,
   };
 }
