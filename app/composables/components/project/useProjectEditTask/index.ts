@@ -67,6 +67,7 @@ export function useProjectEditTask(
     form.title = selectedTask?.title ?? "";
     form.description = selectedTask?.description ?? "";
     form.status = selectedTask?.status ?? "in_progress";
+    //todo: remove asignees filter logic to server side
     form.assigneeIds =
       selectedTask?.assignees
         .filter((as) =>
