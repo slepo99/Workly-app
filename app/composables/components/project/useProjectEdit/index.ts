@@ -35,14 +35,17 @@ export function useProjectEdit(project: Ref<ProjectModel>) {
   }
 
   async function saveProject() {
+    if (isSaving.value) return;
+
     const { updateProject } = useProjectsApi();
     const { uploadFile, deleteFile } = useUploadsApi();
 
+    const projectId = project.value.id;
     let uploadedImagePath: string | null = null;
 
-    try {
-      isSaving.value = true;
+    isSaving.value = true;
 
+    try {
       let imageUrl: string | null = project.value.image;
 
       if (form.image) {
@@ -54,28 +57,17 @@ export function useProjectEdit(project: Ref<ProjectModel>) {
         imageUrl = null;
       }
 
-      await updateProject(project.value.id, {
+      await updateProject(projectId, {
         name: form.name,
         description: form.description,
         status: form.status,
         image: imageUrl,
       });
-
-      await projectStore.loadProjectById(project.value.id);
-
-      toast.add({
-        title: "Project updated",
-        description: "Project has been successfully updated.",
-        color: "success",
-      });
-      isOpen.value = false;
     } catch (error) {
       if (uploadedImagePath) {
-        try {
-          await deleteFile(uploadedImagePath);
-        } catch (deleteError) {
+        await deleteFile(uploadedImagePath).catch((deleteError) => {
           console.error("Failed to delete uploaded image:", deleteError);
-        }
+        });
       }
 
       console.error("Failed to update project:", error);
@@ -85,8 +77,31 @@ export function useProjectEdit(project: Ref<ProjectModel>) {
         description: "Please try again.",
         color: "error",
       });
+
+      return;
     } finally {
       isSaving.value = false;
+    }
+
+    isOpen.value = false;
+
+    toast.add({
+      title: "Project updated",
+      description: "Project has been successfully updated.",
+      color: "success",
+    });
+
+    try {
+      await projectStore.loadProjectById(projectId);
+    } catch (error) {
+      console.error("Failed to refresh project:", error);
+
+      toast.add({
+        title: "Failed to refresh project",
+        description:
+          "Changes were saved, but the project could not be refreshed.",
+        color: "warning",
+      });
     }
   }
 
