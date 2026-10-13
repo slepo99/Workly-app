@@ -6,7 +6,6 @@ import {
   type DateValue,
 } from "@internationalized/date";
 import type { DateRange } from "reka-ui";
-
 import { DATE_LOCALES } from "~/constants/locale";
 
 type DateRangeModel = {
@@ -39,45 +38,37 @@ function toISOString(value: DateValue) {
   ).toISOString();
 }
 
-const calendarValue = shallowRef<DateRange | undefined>(
-  modelValue.value.start && modelValue.value.end
-    ? {
-        start: parseDate(modelValue.value.start.slice(0, 10)),
-        end: parseDate(modelValue.value.end.slice(0, 10)),
-      }
-    : undefined,
-);
+const calendarValue = computed<DateRange | undefined>(() => {
+  const { start, end } = modelValue.value;
 
-function onCalendarChange(value: DateRange | null) {
-  calendarValue.value = value ?? undefined;
-
-  if (!value?.start) {
-    modelValue.value = {
-      start: "",
-      end: "",
-    };
-
-    return;
+  if (!start && !end) {
+    return undefined;
   }
 
+  return {
+    start: start ? parseDate(start.slice(0, 10)) : undefined,
+    end: end ? parseDate(end.slice(0, 10)) : undefined,
+  };
+});
+
+function onCalendarChange(value: DateRange | null | undefined) {
   modelValue.value = {
-    start: toISOString(value.start),
-    end: value.end ? toISOString(value.end) : "",
+    start: value?.start ? toISOString(value.start) : "",
+    end: value?.end ? toISOString(value.end) : "",
   };
 }
 
 const label = computed(() => {
-  if (!modelValue.value.start) {
+  const start = calendarValue.value?.start;
+  const end = calendarValue.value?.end;
+
+  if (!start) {
     return t("UI.datePicker.placeholder");
   }
 
-  const start = parseDate(modelValue.value.start.slice(0, 10));
-
-  if (!modelValue.value.end) {
+  if (!end) {
     return df.value.format(start.toDate(tz));
   }
-
-  const end = parseDate(modelValue.value.end.slice(0, 10));
 
   return `${df.value.format(start.toDate(tz))} - ${df.value.format(
     end.toDate(tz),

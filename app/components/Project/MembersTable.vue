@@ -105,7 +105,7 @@ const columns: TableColumn<ProjectMemberModel>[] = [
   },
   {
     accessorKey: "name",
-
+    accessorFn: (row) => row.user.name,
     header: ({ column }) => getHeader(column, "Name"),
 
     cell: ({ row }) =>
@@ -120,7 +120,7 @@ const columns: TableColumn<ProjectMemberModel>[] = [
   },
   {
     accessorKey: "email",
-
+    accessorFn: (row) => row.user.email,
     header: ({ column }) => getHeader(column, "Email"),
 
     cell: ({ row }) =>
@@ -136,7 +136,7 @@ const columns: TableColumn<ProjectMemberModel>[] = [
   },
   {
     accessorKey: "position",
-
+    accessorFn: (row) => row.user.position,
     header: ({ column }) => getHeader(column, "Position"),
 
     cell: ({ row }) =>
