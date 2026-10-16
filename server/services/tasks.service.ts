@@ -163,50 +163,32 @@ export async function getTasks(
   };
 }
 
-export async function getTaskById(id: string, userId: string, role: Role) {
-  let task;
+export async function getTaskById(
+  id: string,
+  userId: string,
+  role: Role,
+) {
+  const accessCondition = getTaskAccessCondition(userId, role);
 
-  if (role === ROLES.SUPERADMIN || role === ROLES.ADMIN) {
-    const [result] = await db.select().from(tasks).where(eq(tasks.id, id));
-
-    task = result;
-  } else if (role === ROLES.MANAGER) {
-    const [result] = await db
-      .select({
-        id: tasks.id,
-        projectId: tasks.projectId,
-        title: tasks.title,
-        description: tasks.description,
-        status: tasks.status,
-        startDate: tasks.startDate,
-        endDate: tasks.endDate,
-        createdAt: tasks.createdAt,
-        updatedAt: tasks.updatedAt,
-      })
-      .from(tasks)
-      .innerJoin(projectMembers, eq(projectMembers.projectId, tasks.projectId))
-      .where(and(eq(tasks.id, id), eq(projectMembers.userId, userId)));
-
-    task = result;
-  } else {
-    const [result] = await db
-      .select({
-        id: tasks.id,
-        projectId: tasks.projectId,
-        title: tasks.title,
-        description: tasks.description,
-        status: tasks.status,
-        startDate: tasks.startDate,
-        endDate: tasks.endDate,
-        createdAt: tasks.createdAt,
-        updatedAt: tasks.updatedAt,
-      })
-      .from(tasks)
-      .innerJoin(taskAssignees, eq(taskAssignees.taskId, tasks.id))
-      .where(and(eq(tasks.id, id), eq(taskAssignees.userId, userId)));
-
-    task = result;
-  }
+  const [task] = await db
+    .select({
+      id: tasks.id,
+      projectId: tasks.projectId,
+      title: tasks.title,
+      description: tasks.description,
+      status: tasks.status,
+      startDate: tasks.startDate,
+      endDate: tasks.endDate,
+      createdAt: tasks.createdAt,
+      updatedAt: tasks.updatedAt,
+    })
+    .from(tasks)
+    .where(
+      and(
+        eq(tasks.id, id),
+        accessCondition,
+      ),
+    );
 
   if (!task) {
     return undefined;
