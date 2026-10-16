@@ -10,6 +10,8 @@ import { eq, and, count, desc, sql  } from "drizzle-orm";
 import { getTaskAssignees } from "./task-assignees.service";
 import { ROLES, type Role } from "~~/server/constants/roles";
 import type { TaskSort } from "../constants/taskSort";
+import { getTaskAccessCondition } from "../policies/task.policy";
+
 export async function createTask(data: {
   projectId: string;
   assigneeIds?: string[];
@@ -109,40 +111,22 @@ export async function getTasks(
   role: Role,
   page: number,
   limit: number,
-  sort: TaskSort
+  sort: TaskSort,
 ) {
   const offset = (page - 1) * limit;
   const sortColumn = tasks[sort];
-  let taskList;
-  let total = 0;
 
-  if (role === ROLES.SUPERADMIN || role === ROLES.ADMIN) {
-    const totalResult = await db
-      .select({
-        count: count(),
-      })
-      .from(tasks);
+  const accessCondition = getTaskAccessCondition(userId, role);
 
-    total = totalResult[0]?.count ?? 0;
-
-    taskList = await db
-      .select()
-      .from(tasks)
-      .orderBy(sql`${sortColumn} DESC NULLS LAST`)
-      .limit(limit)
-      .offset(offset);
-  } else if (role === ROLES.MANAGER) {
-    const totalResult = await db
+  const [totalResult, taskList] = await Promise.all([
+    db
       .select({
         count: count(),
       })
       .from(tasks)
-      .innerJoin(projectMembers, eq(projectMembers.projectId, tasks.projectId))
-      .where(eq(projectMembers.userId, userId));
+      .where(accessCondition),
 
-    total = totalResult[0]?.count ?? 0;
-
-    taskList = await db
+    db
       .select({
         id: tasks.id,
         projectId: tasks.projectId,
@@ -155,41 +139,13 @@ export async function getTasks(
         updatedAt: tasks.updatedAt,
       })
       .from(tasks)
-      .innerJoin(projectMembers, eq(projectMembers.projectId, tasks.projectId))
-      .where(eq(projectMembers.userId, userId))
-      .orderBy(sql`${sortColumn} DESC NULLS LAST`)
+      .where(accessCondition)
+      .orderBy(desc(sortColumn))
       .limit(limit)
-      .offset(offset);
-  } else {
-    const totalResult = await db
-      .select({
-        count: count(),
-      })
-      .from(tasks)
-      .innerJoin(taskAssignees, eq(taskAssignees.taskId, tasks.id))
-      .where(eq(taskAssignees.userId, userId));
+      .offset(offset),
+  ]);
 
-    total = totalResult[0]?.count ?? 0;
-
-    taskList = await db
-      .select({
-        id: tasks.id,
-        projectId: tasks.projectId,
-        title: tasks.title,
-        description: tasks.description,
-        status: tasks.status,
-        startDate: tasks.startDate,
-        endDate: tasks.endDate,
-        createdAt: tasks.createdAt,
-        updatedAt: tasks.updatedAt,
-      })
-      .from(tasks)
-      .innerJoin(taskAssignees, eq(taskAssignees.taskId, tasks.id))
-      .where(eq(taskAssignees.userId, userId))
-      .orderBy(sql`${sortColumn} DESC NULLS LAST`)
-      .limit(limit)
-      .offset(offset);
-  }
+  const total = totalResult[0]?.count ?? 0;
 
   const tasksWithAssignees = await Promise.all(
     taskList.map(async (task) => ({
