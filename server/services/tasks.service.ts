@@ -9,7 +9,7 @@ import {
 import { eq, and, count, desc } from "drizzle-orm";
 import { getTaskAssignees } from "./task-assignees.service";
 import { ROLES, type Role } from "~~/server/constants/roles";
-
+import type { TaskSort } from "../constants/taskSort";
 export async function createTask(data: {
   projectId: string;
   assigneeIds?: string[];
@@ -109,9 +109,10 @@ export async function getTasks(
   role: Role,
   page: number,
   limit: number,
+  sort: TaskSort
 ) {
   const offset = (page - 1) * limit;
-
+  const sortColumn = tasks[sort];
   let taskList;
   let total = 0;
 
@@ -127,7 +128,7 @@ export async function getTasks(
     taskList = await db
       .select()
       .from(tasks)
-      .orderBy(desc(tasks.updatedAt))
+      .orderBy(desc(sortColumn))
       .limit(limit)
       .offset(offset);
   } else if (role === ROLES.MANAGER) {
@@ -156,7 +157,7 @@ export async function getTasks(
       .from(tasks)
       .innerJoin(projectMembers, eq(projectMembers.projectId, tasks.projectId))
       .where(eq(projectMembers.userId, userId))
-      .orderBy(desc(tasks.updatedAt))
+      .orderBy(desc(sortColumn))
       .limit(limit)
       .offset(offset);
   } else {
@@ -185,7 +186,7 @@ export async function getTasks(
       .from(tasks)
       .innerJoin(taskAssignees, eq(taskAssignees.taskId, tasks.id))
       .where(eq(taskAssignees.userId, userId))
-      .orderBy(desc(tasks.updatedAt))
+      .orderBy(desc(sortColumn))
       .limit(limit)
       .offset(offset);
   }
