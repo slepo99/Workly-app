@@ -583,30 +583,58 @@ export const openapi = {
 
     "/tasks": {
       get: {
-        tags: ["Tasks"],
-        operationId: "getTasks",
-        summary: "Get tasks",
-        description:
-          "Admin/superadmin see all tasks. Manager sees tasks from their projects. Worker sees tasks assigned to them.",
-        security: cookieSecurity,
-        parameters: [
-          {
-            name: "page",
-            in: "query",
-            schema: { type: "integer", minimum: 1, default: 1 },
-          },
-          {
-            name: "limit",
-            in: "query",
-            schema: { type: "integer", minimum: 1, default: 20 },
-          },
-        ],
-        responses: {
-          200: jsonResponse("Paginated tasks", ref("TasksPage")),
-          401: responseRef("Unauthorized"),
-          403: responseRef("Forbidden"),
-        },
+  tags: ["Tasks"],
+  operationId: "getTasks",
+  summary: "Get tasks",
+  description:
+    "Admin/superadmin see all tasks. Manager sees tasks from their projects. Worker sees tasks assigned to them. Tasks are sorted in descending order by the selected field.",
+  security: cookieSecurity,
+  parameters: [
+    {
+      name: "page",
+      in: "query",
+      description: "Page number",
+      schema: {
+        type: "integer",
+        minimum: 1,
+        default: 1,
       },
+    },
+    {
+      name: "limit",
+      in: "query",
+      description: "Number of tasks per page",
+      schema: {
+        type: "integer",
+        minimum: 1,
+        default: 20,
+      },
+    },
+    {
+      name: "sort",
+      in: "query",
+      description:
+        "Task field used for descending sorting. Invalid values fall back to updatedAt.",
+      schema: {
+        type: "string",
+        enum: [
+          "updatedAt",
+          "createdAt",
+          "startDate",
+          "endDate",
+          "title",
+          "status",
+        ],
+        default: "updatedAt",
+      },
+    },
+  ],
+  responses: {
+    200: jsonResponse("Paginated tasks", ref("TasksPage")),
+    401: responseRef("Unauthorized"),
+    403: responseRef("Forbidden"),
+  },
+},
 
       post: {
         tags: ["Tasks"],
