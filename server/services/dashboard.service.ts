@@ -1,4 +1,15 @@
-import { and, count, eq, inArray } from "drizzle-orm";
+import {
+  and,
+  count,
+  eq,
+  inArray,
+  asc,
+  desc,
+  gte,
+  isNotNull,
+  lte,
+  notInArray,
+} from "drizzle-orm";
 
 import { db } from "~~/server/db";
 
@@ -11,8 +22,10 @@ import {
 } from "~~/server/db/schema";
 
 import { ROLES, type Role } from "~~/server/constants/roles";
-
 import { TASK_STATUSES } from "~~/server/constants/taskStatuses";
+import { getTaskAccessCondition } from "../policies/task.policy";
+import { getTaskAssignees } from "~~/server/services/task-assignees.service";
+
 
 async function getAdminStats() {
   const [
@@ -146,5 +159,63 @@ export async function getStats(userId: string, role: Role) {
   return {
     ...taskStats,
     ...projectStats,
+  };
+}
+export async function getDashboardTasks(userId: string, role: Role) {
+  const accessCondition = getTaskAccessCondition(userId, role);
+
+  const now = new Date();
+
+  const deadlineLimit = new Date(now);
+
+  deadlineLimit.setDate(deadlineLimit.getDate() + 7);
+
+  const [recentTasks, upcomingDeadlines] = await Promise.all([
+    db
+      .select()
+      .from(tasks)
+      .where(accessCondition)
+      .orderBy(desc(tasks.updatedAt), desc(tasks.id))
+      .limit(2),
+
+    db
+      .select()
+      .from(tasks)
+      .where(
+        and(
+          accessCondition,
+          isNotNull(tasks.endDate),
+          gte(tasks.endDate, now),
+          lte(tasks.endDate, deadlineLimit),
+          notInArray(tasks.status, [
+            TASK_STATUSES.COMPLETED,
+            TASK_STATUSES.CANCELLED,
+          ]),
+        ),
+      )
+      .orderBy(asc(tasks.endDate), asc(tasks.id))
+      .limit(3),
+  ]);
+
+  const [recentTasksWithAssignees, upcomingDeadlinesWithAssignees] =
+    await Promise.all([
+      Promise.all(
+        recentTasks.map(async (task) => ({
+          ...task,
+          assignees: await getTaskAssignees(task.id),
+        })),
+      ),
+
+      Promise.all(
+        upcomingDeadlines.map(async (task) => ({
+          ...task,
+          assignees: await getTaskAssignees(task.id),
+        })),
+      ),
+    ]);
+
+  return {
+    recentTasks: recentTasksWithAssignees,
+    upcomingDeadlines: upcomingDeadlinesWithAssignees,
   };
 }

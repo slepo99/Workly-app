@@ -131,6 +131,24 @@ export const openapi = {
         },
       },
     },
+    "/dashboard/tasks": {
+      get: {
+        tags: ["Dashboard", "Tasks"],
+        operationId: "getDashboardTasks",
+        summary: "Get dashboard task lists",
+        description:
+          "Returns 2 recently updated tasks and 3 tasks with deadlines within the next 7 days. Completed and cancelled tasks are excluded from upcoming deadlines. Admin/superadmin see all tasks, manager sees tasks from their projects, and worker sees assigned tasks only.",
+        security: cookieSecurity,
+        responses: {
+          200: jsonResponse(
+            "Recently updated tasks and upcoming deadlines",
+            ref("DashboardTasks"),
+          ),
+          401: responseRef("Unauthorized"),
+          403: responseRef("Forbidden"),
+        },
+      },
+    },
 
     "/roles": {
       get: {
@@ -583,58 +601,58 @@ export const openapi = {
 
     "/tasks": {
       get: {
-  tags: ["Tasks"],
-  operationId: "getTasks",
-  summary: "Get tasks",
-  description:
-    "Admin/superadmin see all tasks. Manager sees tasks from their projects. Worker sees tasks assigned to them. Tasks are sorted in descending order by the selected field.",
-  security: cookieSecurity,
-  parameters: [
-    {
-      name: "page",
-      in: "query",
-      description: "Page number",
-      schema: {
-        type: "integer",
-        minimum: 1,
-        default: 1,
-      },
-    },
-    {
-      name: "limit",
-      in: "query",
-      description: "Number of tasks per page",
-      schema: {
-        type: "integer",
-        minimum: 1,
-        default: 20,
-      },
-    },
-    {
-      name: "sort",
-      in: "query",
-      description:
-        "Task field used for descending sorting. Invalid values fall back to updatedAt.",
-      schema: {
-        type: "string",
-        enum: [
-          "updatedAt",
-          "createdAt",
-          "startDate",
-          "endDate",
-          "title",
-          "status",
+        tags: ["Tasks"],
+        operationId: "getTasks",
+        summary: "Get tasks",
+        description:
+          "Admin/superadmin see all tasks. Manager sees tasks from their projects. Worker sees tasks assigned to them. Tasks are sorted in descending order by the selected field.",
+        security: cookieSecurity,
+        parameters: [
+          {
+            name: "page",
+            in: "query",
+            description: "Page number",
+            schema: {
+              type: "integer",
+              minimum: 1,
+              default: 1,
+            },
+          },
+          {
+            name: "limit",
+            in: "query",
+            description: "Number of tasks per page",
+            schema: {
+              type: "integer",
+              minimum: 1,
+              default: 20,
+            },
+          },
+          {
+            name: "sort",
+            in: "query",
+            description:
+              "Task field used for descending sorting. Invalid values fall back to updatedAt.",
+            schema: {
+              type: "string",
+              enum: [
+                "updatedAt",
+                "createdAt",
+                "startDate",
+                "endDate",
+                "title",
+                "status",
+              ],
+              default: "updatedAt",
+            },
+          },
         ],
-        default: "updatedAt",
+        responses: {
+          200: jsonResponse("Paginated tasks", ref("TasksPage")),
+          401: responseRef("Unauthorized"),
+          403: responseRef("Forbidden"),
+        },
       },
-    },
-  ],
-  responses: {
-    200: jsonResponse("Paginated tasks", ref("TasksPage")),
-    401: responseRef("Unauthorized"),
-    403: responseRef("Forbidden"),
-  },
-},
 
       post: {
         tags: ["Tasks"],
