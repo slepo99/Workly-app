@@ -21,7 +21,13 @@
     </template>
     <template #default>
       <div class="flex flex-row gap-4 max-sm:flex-col">
-        <DashboardTaskCard v-for="task in tasks" :key="task.id" :task="task" class="w-full" />
+        <DashboardTaskCard
+          v-for="task in tasks"
+          :key="task.id"
+          :task="task"
+          class="w-full"
+          @delete-task="onRemoveTask"
+        />
       </div>
     </template>
   </UCard>
@@ -30,11 +36,14 @@
 <script setup lang="ts">
 import { useI18n } from "#imports";
 import type { TasksModel } from "~/composables/api/useTasksApi/types";
+import { useRecentActivityCard } from "~/composables/components/dashboard/useRecentActivityCard";
 const { t } = useI18n();
 
 const props = defineProps<{
-  tasks: TasksModel[]
+  tasks: TasksModel[];
 }>();
+
+const { onRemoveTask } = useRecentActivityCard();
 </script>
 
 <style scoped></style>

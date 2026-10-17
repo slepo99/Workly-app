@@ -19,7 +19,7 @@
       </div>
       <div class="flex items-center justify-between mt-4">
         <div class="flex items-center gap-2">
-          <UIcon name="i-lucide-calendar" class="mr-1" />
+          <UIcon name="i-lucide-calendar-clock" class="mr-1" />
           <span class="text-sm">{{ formatDate(task.endDate) }}</span>
         </div>
         <UBadge
@@ -64,25 +64,9 @@ const { t } = useI18n();
 const { getTaskStatusLabel, getTaskStatusColors, getTaskTermination } =
   useStatuses();
 
-const badgeColor = computed(() => {
-  if (true) {
-    return "success";
-  } else if (false) {
-    return "warning";
-  } else {
-    return "neutral";
-  }
-});
-
-const statusColor = computed(() => {
-  if (true) {
-    return "warning";
-  } else if (false) {
-    return "warning";
-  } else {
-    return "neutral";
-  }
-});
+const emit = defineEmits<{
+  deleteTask: [taskId: string]
+}>()
 
 const dropDownMenuItems = ref<DropdownMenuItem[][]>([
   [
@@ -108,7 +92,7 @@ const dropDownMenuItems = ref<DropdownMenuItem[][]>([
       color: "error",
 
       onClick: () => {
-        console.log("Delete Task clicked");
+        emit('deleteTask', props.task.id)
       },
     },
   ],
