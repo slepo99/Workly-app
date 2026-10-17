@@ -1,5 +1,5 @@
 import { PROJECT_STATUSES } from "~/constants/projectStatuses";
-import { TASK_STATUSES } from "~/constants/taskStatuses";
+import { TASK_STATUSES, type TaskStatus } from "~/constants/taskStatuses";
 import { useI18n } from "#imports";
 
 export function useStatuses() {
@@ -64,6 +64,11 @@ export function useStatuses() {
       },
     ];
   });
+  const getTaskStatusLabel = (status: TaskStatus) => {
+    return (
+      getTaskStatuses.value.find((stat) => stat.value === status)?.label ?? ""
+    );
+  };
 
   const getTaskStatusColors = (status: string) => {
     if (TASK_STATUSES.CANCELLED === status) {
@@ -76,12 +81,58 @@ export function useStatuses() {
       return "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300";
     }
   };
+  type TaskTermination = {
+    label: "low" | "medium" | "high";
+    color: "success" | "warning" | "error";
+  };
 
+  const getTaskTermination = (endDate: string | Date | null,): TaskTermination => {
+    if (!endDate) {
+      return {
+        label: "low",
+        color: "success",
+      };
+    }
+
+    const deadlineTime = new Date(endDate).getTime();
+
+    if (Number.isNaN(deadlineTime)) {
+      return {
+        label: "low",
+        color: "success",
+      };
+    }
+
+    const millisecondsInDay = 1000 * 60 * 60 * 24;
+    const millisecondsLeft = deadlineTime - Date.now();
+    const daysLeft = millisecondsLeft / millisecondsInDay;
+
+    if (daysLeft > 4) {
+      return {
+        label: "low",
+        color: "success",
+      };
+    }
+
+    if (daysLeft > 1) {
+      return {
+        label: "medium",
+        color: "warning",
+      };
+    }
+
+    return {
+      label: "high",
+      color: "error",
+    };
+  };
   return {
     getProjectStatuses,
     getProjectStatusColor,
     getProjectStatusLabel,
     getTaskStatuses,
     getTaskStatusColors,
+    getTaskStatusLabel,
+    getTaskTermination
   };
 }

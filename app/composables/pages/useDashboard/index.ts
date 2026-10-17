@@ -8,12 +8,10 @@ export function useDashboard() {
       await callOnce(
         "dashboard",
         async () => {
-          await dashboardStore.loadStats();
-          //           await Promise.all([
-          //   dashboardStore.loadStats(),
-          //   dashboardStore.loadTasks(),
-          //   dashboardStore.loadProjects(),
-          // ])
+          await Promise.all([
+            dashboardStore.loadStats(),
+            dashboardStore.loadTasks(),
+          ]);
         },
         { mode: "navigation" },
       );

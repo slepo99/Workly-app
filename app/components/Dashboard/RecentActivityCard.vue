@@ -21,7 +21,7 @@
     </template>
     <template #default>
       <div class="flex flex-row gap-4 max-sm:flex-col">
-        <DashboardTaskCard v-for="i in 2" :key="i" class="w-full" />
+        <DashboardTaskCard v-for="task in tasks" :key="task.id" :task="task" class="w-full" />
       </div>
     </template>
   </UCard>
@@ -29,8 +29,12 @@
 
 <script setup lang="ts">
 import { useI18n } from "#imports";
-
+import type { TasksModel } from "~/composables/api/useTasksApi/types";
 const { t } = useI18n();
+
+const props = defineProps<{
+  tasks: TasksModel[]
+}>();
 </script>
 
 <style scoped></style>

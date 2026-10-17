@@ -1,40 +1,41 @@
 <template>
   <UCard
-    class="bg-elevated"
+    class="bg-elevated flex h-full flex-col h-auto"
     :ui="{
       header: 'flex items-center justify-between lg:p-4 lg:pb-2',
-      body: 'lg:p-4 lg:pt-2',
+      body: 'lg:p-4 lg:pt-2 flex-1',
       footer: 'flex items-center justify-between lg:p-4',
     }"
   >
     <template #header>
-      <span class="text-sm"> Task 1 </span>
-      <UBadge :color="badgeColor">{{
-        t("dashboard.taskActivity.status.complited")
+      <span class="text-sm"> {{ task.title }} </span>
+      <UBadge :class="getTaskStatusColors(task.status)">{{
+        getTaskStatusLabel(task.status)
       }}</UBadge>
     </template>
     <template #default>
-      <div class="mt-2 text-sm text-neutral-500">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod,
-        nunc ut aliquam lacinia, nunc nisl aliquam nisl, eget aliquam nunc nisl
-        eget nunc.
+      <div class="mt-2 text-sm text-neutral-500 line-clamp-6">
+        {{ task.description }}
       </div>
       <div class="flex items-center justify-between mt-4">
         <div class="flex items-center gap-2">
           <UIcon name="i-lucide-calendar" class="mr-1" />
-          <span class="text-sm">2024-06-01</span>
+          <span class="text-sm">{{ formatDate(task.endDate) }}</span>
         </div>
-        <UBadge :color="statusColor">{{
-          t("dashboard.taskActivity.priority.medium")
-        }}</UBadge>
+        <UBadge
+          v-if="task.status !== TASK_STATUSES.COMPLETED"
+          :color="getTaskTermination(task.endDate).color"
+          >{{ getTaskTermination(task.endDate).label }}</UBadge
+        >
       </div>
     </template>
     <template #footer>
       <UAvatarGroup max="3">
         <UAvatar
-          v-for="i in 6"
-          src="https://github.com/benjamincanac.png"
-          alt="Benjamin Canac"
+          v-for="assignee in task.assignees"
+          :key="assignee.id"
+          :src="assignee.avatar"
+          :alt="assignee.name"
         />
       </UAvatarGroup>
       <UDropdownMenu :items="dropDownMenuItems">
@@ -52,8 +53,16 @@
 <script setup lang="ts">
 import type { DropdownMenuItem } from "@nuxt/ui";
 import { useI18n } from "#imports";
+import type { TasksModel } from "~/composables/api/useTasksApi/types";
+import { useStatuses } from "~/composables/useStatuses";
+import { TASK_STATUSES } from "~/constants/taskStatuses";
+const props = defineProps<{
+  task: TasksModel;
+}>();
 
 const { t } = useI18n();
+const { getTaskStatusLabel, getTaskStatusColors, getTaskTermination } =
+  useStatuses();
 
 const badgeColor = computed(() => {
   if (true) {
