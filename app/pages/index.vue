@@ -32,7 +32,7 @@
     <DashboardSkeletonsUpcomingMeetingsCardSkeleton/>
     <DashboardSkeletonsRecentActivityCardSkeleton/> -->
     </div>
-    <TasksTasklistTable :tasks="dashboardStore.tasksList" class="my-6" />
+    <TasksTasklistTable :tasks="dashboardStore.tasksList" class="my-6" view-mode/>
   </UPage>
 </template>
 
