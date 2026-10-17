@@ -4,14 +4,16 @@ export function useRecentActivityCard() {
   const isTaskRemoving = ref(false);
   const toast = useToast();
   const dashboardStore = useDashboardStore();
-  async function onRemoveTask(taskId: string) {
+  const isTaskRemoveModalOpen = ref(false);
+  const currentTaskId = ref("");
+  async function onRemoveTask() {
     const { deleteTask } = useTasksApi();
 
     isTaskRemoving.value = true;
 
     try {
-      await deleteTask(taskId);
-      await dashboardStore.loadTasks();
+      await deleteTask(currentTaskId.value);
+      await dashboardStore.loadDashboardTasks();
     } catch (e: any) {
       console.error("Error romoving task", e);
       toast.add({
@@ -21,9 +23,17 @@ export function useRecentActivityCard() {
       });
     } finally {
       isTaskRemoving.value = false;
+      isTaskRemoveModalOpen.value = false;
     }
+  }
+  function triggerTaskRemove(taskId: string) {
+    currentTaskId.value = taskId;
+    isTaskRemoveModalOpen.value = true;
   }
   return {
     onRemoveTask,
+    isTaskRemoving,
+    isTaskRemoveModalOpen,
+    triggerTaskRemove,
   };
 }

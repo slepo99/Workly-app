@@ -7,6 +7,7 @@ interface DashboardStateModel {
   isLoading: boolean;
   recentTasks: TasksModel[];
   upcomingDeadlines: TasksModel[];
+  tasksList: TasksModel[];
 }
 
 export const useDashboardStore = defineStore("dashboard", {
@@ -21,6 +22,7 @@ export const useDashboardStore = defineStore("dashboard", {
       isLoading: false,
       recentTasks: [],
       upcomingDeadlines: [],
+      tasksList: [],
     };
   },
 
@@ -29,21 +31,19 @@ export const useDashboardStore = defineStore("dashboard", {
   actions: {
     async loadStats() {
       const { getDashboardStats } = useDashboardApi();
-
-      try {
-        this.isLoading = true;
-        const stats = await getDashboardStats();
-
-        this.stats = stats;
-      } finally {
-        this.isLoading = false;
-      }
+      const stats = await getDashboardStats();
+      this.stats = stats;
     },
-    async loadTasks() {
+    async loadDashboardTasks() {
       const { getDashboardTasks } = useDashboardApi();
       const tasks = await getDashboardTasks();
       this.recentTasks = tasks.recentTasks;
       this.upcomingDeadlines = tasks.upcomingDeadlines;
+    },
+    async loadTasks() {
+      const { getTasks } = useTasksApi();
+      const tasks = await getTasks();
+      this.tasksList = tasks.tasks;
     },
   },
 });

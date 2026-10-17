@@ -10,7 +10,8 @@ export function useDashboard() {
         async () => {
           await Promise.all([
             dashboardStore.loadStats(),
-            dashboardStore.loadTasks(),
+            dashboardStore.loadDashboardTasks(),
+            dashboardStore.loadTasks()
           ]);
         },
         { mode: "navigation" },

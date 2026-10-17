@@ -1,20 +1,20 @@
 import type { TaskStatus } from "~/constants/taskStatuses";
 
 export interface TasksModel {
-  assignees: AssigneesModel[];
-  createdAt: string;
-  description: string;
   id: string;
   projectId: string;
-  status: TaskStatus;
   title: string;
-  startDate: string;
-  endDate: string;
+  description: string;
+  status: string;
+  startDate: string | null;
+  endDate: string | null;
+  createdAt: string;
+  assignees: AssigneesModel[];
 }
 export interface AssigneesModel {
   id: string;
   name: string;
-  avatar: string;
+  avatar: string | null;
 }
 export interface TasksResponseModel {
   page: number;

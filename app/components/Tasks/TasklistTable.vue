@@ -22,27 +22,27 @@ import type { Column } from "@tanstack/vue-table";
 import { formatDate } from "~/utils/date";
 import { useStatuses } from "~/composables/useStatuses";
 import type { TaskStatus } from "~/constants/taskStatuses";
+import type { TasksModel } from "~/composables/api/useTasksApi/types";
+// interface TaskAssigneeModel {
+//   id: string;
+//   name: string;
+//   avatar: string | null;
+// }
 
-interface TaskAssigneeModel {
-  id: string;
-  name: string;
-  avatar: string | null;
-}
-
-interface ProjectTaskModel {
-  id: string;
-  projectId: string;
-  title: string;
-  description: string;
-  status: string;
-  startDate: string | null;
-  endDate: string | null;
-  createdAt: string;
-  assignees: TaskAssigneeModel[];
-}
+// interface ProjectTaskModel {
+//   id: string;
+//   projectId: string;
+//   title: string;
+//   description: string;
+//   status: string;
+//   startDate: string | null;
+//   endDate: string | null;
+//   createdAt: string;
+//   assignees: TaskAssigneeModel[];
+// }
 
 defineProps<{
-  tasks: ProjectTaskModel[];
+  tasks: TasksModel[];
 }>();
 
 const emit = defineEmits<{
@@ -60,7 +60,7 @@ const UButton = resolveComponent("UButton");
 
 const sorting = ref([]);
 
-const columns: TableColumn<ProjectTaskModel>[] = [
+const columns: TableColumn<TasksModel>[] = [
   {
     accessorKey: "id",
 
@@ -237,7 +237,7 @@ const columns: TableColumn<ProjectTaskModel>[] = [
   },
 ];
 
-function getHeader(column: Column<ProjectTaskModel>, label: string) {
+function getHeader(column: Column<TasksModel>, label: string) {
   return h(UButton, {
     color: "neutral",
     variant: "ghost",

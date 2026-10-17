@@ -2,14 +2,14 @@
   <UCard
     class="bg-elevated flex h-full flex-col h-auto"
     :ui="{
-      header: 'flex items-center justify-between lg:p-4 lg:pb-2',
+      header: 'flex items-center justify-between lg:p-4 lg:pb-2 gap-2',
       body: 'lg:p-4 lg:pt-2 flex-1',
       footer: 'flex items-center justify-between lg:p-4',
     }"
   >
     <template #header>
       <span class="text-sm"> {{ task.title }} </span>
-      <UBadge :class="getTaskStatusColors(task.status)">{{
+      <UBadge :class="getTaskStatusColors(task.status)" class="whitespace-nowrap">{{
         getTaskStatusLabel(task.status)
       }}</UBadge>
     </template>
@@ -56,6 +56,8 @@ import { useI18n } from "#imports";
 import type { TasksModel } from "~/composables/api/useTasksApi/types";
 import { useStatuses } from "~/composables/useStatuses";
 import { TASK_STATUSES } from "~/constants/taskStatuses";
+import { usePermissions } from "~/composables/usePermissions";
+
 const props = defineProps<{
   task: TasksModel;
 }>();
@@ -64,37 +66,41 @@ const { t } = useI18n();
 const { getTaskStatusLabel, getTaskStatusColors, getTaskTermination } =
   useStatuses();
 
-const emit = defineEmits<{
-  deleteTask: [taskId: string]
-}>()
+const { isManagement } = usePermissions();
 
-const dropDownMenuItems = ref<DropdownMenuItem[][]>([
+const emit = defineEmits<{
+  deleteTask: [taskId: string];
+}>();
+
+const dropDownMenuItems = computed<DropdownMenuItem[][]>(() => [
   [
     {
       label: t("dashboard.taskActivity.actions.viewDetails"),
       icon: "i-lucide-eye",
-
-      onClick: () => {
+      onSelect: () => {
         console.log("View Details clicked");
       },
     },
-    {
-      label: t("dashboard.taskActivity.actions.editTsk"),
-      icon: "i-lucide-edit",
 
-      onClick: () => {
-        console.log("Edit Task clicked");
-      },
-    },
-    {
-      label: t("dashboard.taskActivity.actions.deleteTask"),
-      icon: "i-lucide-trash-2",
-      color: "error",
-
-      onClick: () => {
-        emit('deleteTask', props.task.id)
-      },
-    },
+    ...(isManagement.value
+      ? [
+          {
+            label: t("dashboard.taskActivity.actions.editTask"),
+            icon: "i-lucide-edit",
+            onSelect: () => {
+              console.log("Edit Task clicked");
+            },
+          },
+          {
+            label: t("dashboard.taskActivity.actions.deleteTask"),
+            icon: "i-lucide-trash-2",
+            color: "error" as const,
+            onSelect: () => {
+              emit("deleteTask", props.task.id);
+            },
+          },
+        ]
+      : []),
   ],
 ]);
 </script>

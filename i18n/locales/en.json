@@ -42,7 +42,7 @@
       },
       "actions": {
         "viewDetails": "View details",
-        "editTsk": "Edit task",
+        "editTask": "Edit task",
         "deleteTask": "Delete task"
       }
     },

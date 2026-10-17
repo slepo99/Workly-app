@@ -26,8 +26,33 @@
           :key="task.id"
           :task="task"
           class="w-full"
-          @delete-task="onRemoveTask"
+          @delete-task="triggerTaskRemove"
         />
+        <UModal
+          v-model:open="isTaskRemoveModalOpen"
+          title="Remove task"
+          description="Are you sure you want to remove project task ?"
+          :close="false"
+          :dismissible="!isTaskRemoving"
+        >
+          <template #body="{ close }">
+            <div class="flex items-center justify-between">
+              <UButton
+                label="Cancel"
+                color="neutral"
+                variant="outline"
+                :disabled="isTaskRemoving"
+                @click="close"
+              />
+              <UButton
+                :loading="isTaskRemoving"
+                label="Remove"
+                color="neutral"
+                @click="onRemoveTask"
+              />
+            </div>
+          </template>
+        </UModal>
       </div>
     </template>
   </UCard>
@@ -43,7 +68,12 @@ const props = defineProps<{
   tasks: TasksModel[];
 }>();
 
-const { onRemoveTask } = useRecentActivityCard();
+const {
+  onRemoveTask,
+  triggerTaskRemove,
+  isTaskRemoveModalOpen,
+  isTaskRemoving,
+} = useRecentActivityCard();
 </script>
 
 <style scoped></style>
