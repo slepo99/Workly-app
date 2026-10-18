@@ -1,6 +1,6 @@
 import { db } from "~~/server/db";
 import { users } from "~~/server/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, ilike, count } from "drizzle-orm";
 import type { Role } from "~~/server/constants/roles";
 import { deleteImageByUrl } from "~~/server/services/uploads.service";
 
@@ -13,18 +13,39 @@ const publicUserFields = {
   avatar: users.avatar,
   createdAt: users.createdAt,
 };
-export async function getUsers() {
-    return await db
-    .select({
-      id: users.id,
-      name: users.name,
-      email: users.email,
-      role: users.role,
-      position: users.position,
-      avatar: users.avatar,
-      createdAt: users.createdAt,
-    })
-    .from(users);
+export async function getUsers(page: number, limit: number, search: string) {
+  const offset = (page - 1) * limit;
+  const searchVal = search ? ilike(users.name, `%${search}%`) : undefined;
+  const [totalResult, usersList] = await Promise.all([
+    db
+      .select({
+        count: count(),
+      })
+      .from(users),
+
+    db
+      .select({
+        id: users.id,
+        name: users.name,
+        email: users.email,
+        role: users.role,
+        position: users.position,
+        avatar: users.avatar,
+        createdAt: users.createdAt,
+      })
+      .from(users)
+      .where(searchVal)
+      .limit(limit)
+      .offset(offset),
+  ]);
+  const total = totalResult[0]?.count ?? 0;
+  return {
+    page,
+    limit,
+    total,
+    totalPages: Math.ceil(total / limit),
+    users: usersList,
+  };
 }
 export async function createUser(data: {
   name: string;
