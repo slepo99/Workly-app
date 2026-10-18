@@ -13,7 +13,19 @@ const publicUserFields = {
   avatar: users.avatar,
   createdAt: users.createdAt,
 };
-
+export async function getUsers() {
+    return await db
+    .select({
+      id: users.id,
+      name: users.name,
+      email: users.email,
+      role: users.role,
+      position: users.position,
+      avatar: users.avatar,
+      createdAt: users.createdAt,
+    })
+    .from(users);
+}
 export async function createUser(data: {
   name: string;
   email: string;
