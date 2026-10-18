@@ -20,16 +20,8 @@ export const useUsersStore = defineStore("users", {
   actions: {
     async loadAllUsers() {
       const { getUsers } = useUsersApi();
-
-      this.isLoading = true;
-
-      try {
-        const users = await getUsers();
-
-        this.users = users;
-      } finally {
-        this.isLoading = false;
-      }
+      const users = await getUsers();
+      this.users = users;
     },
   },
 });
