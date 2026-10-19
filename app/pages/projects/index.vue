@@ -64,8 +64,14 @@
     <div
       class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mt-8"
     >
-      <ProjectsCardNew v-if="projectsStore.page === 1" @click="triggerCreateProject"/>
-      <ProjectsNewProjectModal v-if="isCreateProjectPopup" v-model:open="isCreateProjectPopup"/>
+      <ProjectsCardNew
+        v-if="projectsStore.page === 1"
+        @click="triggerCreateProject"
+      />
+      <ProjectsNewProjectModal
+        v-if="isCreateProjectPopup"
+        v-model:open="isCreateProjectPopup"
+      />
       <ProjectsCard
         v-for="project in projectsStore.projects"
         :key="project.id"
@@ -85,6 +91,8 @@
 </template>
 
 <script setup lang="ts">
+//todo: implement search and page state in to page route
+
 import { useProjectsStore } from "~/stores/projects";
 import { PROJECTS_PAGINATION } from "~/constants/api";
 import { useProjects } from "~/composables/pages/useProjects";
@@ -99,7 +107,7 @@ const {
   filterProjectsStatus,
   clearSearchInput,
   triggerCreateProject,
-  isCreateProjectPopup
+  isCreateProjectPopup,
 } = useProjects();
 
 const { getProjectStatuses } = useStatuses();

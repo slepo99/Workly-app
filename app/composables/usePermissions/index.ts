@@ -13,10 +13,12 @@ export function usePermissions() {
       role === ROLES.MANAGER
     );
   });
+
   const isAdmin = computed(() => {
     const role = authStore.user?.role;
     return role === ROLES.ADMIN || role === ROLES.SUPERADMIN;
   });
+  
   return {
     isManagement,
     isAdmin

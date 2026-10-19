@@ -67,6 +67,7 @@
 </template>
 
 <script setup lang="ts">
+//todo: implement search and page state in to page route
 import { useUsers } from "~/composables/pages/useUsers";
 import { useUsersStore } from "~/stores/users";
 import { USERS_PAGINATION } from "~/constants/api";
