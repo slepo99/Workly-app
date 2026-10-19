@@ -24,8 +24,13 @@ export function useUsersApi() {
       },
     });
   };
-
+  const deleteUser = (userId: string) => {
+    return $api(`${API.GET_USERS}/${userId}`, {
+      method: "DELETE",
+    });
+  };
   return {
     getUsers,
+    deleteUser
   };
 }

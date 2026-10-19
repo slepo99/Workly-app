@@ -25,7 +25,36 @@
         </template>
       </UInput>
     </div>
-    <UsersTable :users="usersStore.users" class="mt-4"/>
+    <UsersTable
+      :users="usersStore.users"
+      class="mt-4"
+      @remove="triggerUserRemove"
+    />
+    <UModal
+      v-model:open="isUserRemoveModalOpen"
+      title="Remove task"
+      description="Are you sure you want to remove user ?"
+      :close="false"
+      :dismissible="!isUserRemoving"
+    >
+      <template #body="{ close }">
+        <div class="flex items-center justify-between">
+          <UButton
+            label="Cancel"
+            color="neutral"
+            variant="outline"
+            :disabled="isUserRemoving"
+            @click="close"
+          />
+          <UButton
+            :loading="isUserRemoving"
+            label="Remove"
+            color="neutral"
+            @click="onRemoveUser"
+          />
+        </div>
+      </template>
+    </UModal>
     <div class="flex items-center justify-center mt-4">
       <UPagination
         :page="usersStore.page"
@@ -45,8 +74,16 @@ definePageMeta({
   middleware: ["management"],
 });
 
-const { onFirstLoadUsers, updateUsersPage, searchUsers, clearSearchInput } =
-  useUsers();
+const {
+  onFirstLoadUsers,
+  updateUsersPage,
+  searchUsers,
+  clearSearchInput,
+  triggerUserRemove,
+  onRemoveUser,
+  isUserRemoveModalOpen,
+  isUserRemoving,
+} = useUsers();
 const usersStore = useUsersStore();
 await onFirstLoadUsers();
 </script>

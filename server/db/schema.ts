@@ -34,6 +34,7 @@ export const users = pgTable("users", {
   avatar: varchar("avatar", { length: 500 }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
 export const projects = pgTable("projects", {
   id: uuid("id").defaultRandom().primaryKey(),
   name: varchar("name", { length: 150 }).notNull(),
@@ -45,6 +46,7 @@ export const projects = pgTable("projects", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
   image: varchar("image", { length: 500 }),
 });
+
 export const projectMembers = pgTable(
   "project_members",
   {
@@ -52,7 +54,9 @@ export const projectMembers = pgTable(
 
     userId: uuid("user_id")
       .notNull()
-      .references(() => users.id),
+      .references(() => users.id, {
+        onDelete: "cascade",
+      }),
 
     projectId: uuid("project_id")
       .notNull()
@@ -66,6 +70,7 @@ export const projectMembers = pgTable(
   },
   (table) => [unique().on(table.userId, table.projectId)],
 );
+
 export const tasks = pgTable("tasks", {
   id: uuid("id").defaultRandom().primaryKey(),
   projectId: uuid("project_id")
@@ -84,6 +89,7 @@ export const tasks = pgTable("tasks", {
   endDate: timestamp("end_date"),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
+
 export const taskAssignees = pgTable(
   "task_assignees",
   {
@@ -97,9 +103,11 @@ export const taskAssignees = pgTable(
 
     userId: uuid("user_id")
       .notNull()
-      .references(() => users.id),
+      .references(() => users.id, {
+        onDelete: "cascade",
+      }),
 
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [unique().on(table.taskId, table.userId)],
-);
+); 
