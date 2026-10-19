@@ -11,7 +11,7 @@
 import type { UserModel } from "~/composables/api/useUsersApi/types";
 import type { TableColumn } from "@nuxt/ui";
 import type { Column, SortingState } from "@tanstack/vue-table";
-
+import { usePermissions } from "~/composables/usePermissions";
 defineProps<{
   users: UserModel[];
 }>();
@@ -19,6 +19,7 @@ const emit = defineEmits<{
   remove: [userId: string];
 }>();
 
+const { isAdmin } = usePermissions();
 const sorting = ref<SortingState>([]);
 
 const UAvatar = resolveComponent("UAvatar");
@@ -153,33 +154,45 @@ const columns: TableColumn<UserModel>[] = [
     header: "Actions",
     enableSorting: false,
 
-    cell: ({ row }) =>
-      h("div", { class: "flex items-center gap-1" }, [
+    cell: ({ row }) => {
+      const actions = [
         h(UButton, {
           icon: "i-lucide-eye",
           color: "neutral",
           variant: "ghost",
           size: "sm",
-          "aria-label": "View member",
+          "aria-label": "View user",
 
           onClick: () => {
-            // window.open(`/users/${row.original.id}`, "_blank");
             navigateTo(`/users/${row.original.id}`);
           },
         }),
 
-        h(UButton, {
-          icon: "i-lucide-trash-2",
-          color: "error",
-          variant: "ghost",
-          size: "sm",
-          "aria-label": "Remove member",
+        ...(isAdmin.value
+          ? [
+              h(UButton, {
+                icon: "i-lucide-trash-2",
+                color: "error",
+                variant: "ghost",
+                size: "sm",
+                "aria-label": "Remove user",
 
-          onClick: () => {
-            emit("remove", row.original.id);
-          },
-        }),
-      ]),
+                onClick: () => {
+                  emit("remove", row.original.id);
+                },
+              }),
+            ]
+          : []),
+      ];
+
+      return h(
+        "div",
+        {
+          class: "flex items-center gap-1",
+        },
+        actions,
+      );
+    },
   },
 ];
 
