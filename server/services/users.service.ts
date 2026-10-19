@@ -1,6 +1,6 @@
 import { db } from "~~/server/db";
 import { users } from "~~/server/db/schema";
-import { eq, ilike, count } from "drizzle-orm";
+import { eq, ilike, count, asc, or } from "drizzle-orm";
 import type { Role } from "~~/server/constants/roles";
 import { deleteImageByUrl } from "~~/server/services/uploads.service";
 
@@ -15,13 +15,18 @@ const publicUserFields = {
 };
 export async function getUsers(page: number, limit: number, search: string) {
   const offset = (page - 1) * limit;
-  const searchVal = search ? ilike(users.name, `%${search}%`) : undefined;
+
+  const searchCondition = search
+    ? or(ilike(users.name, `%${search}%`), ilike(users.email, `%${search}%`))
+    : undefined;
+
   const [totalResult, usersList] = await Promise.all([
     db
       .select({
         count: count(),
       })
-      .from(users),
+      .from(users)
+      .where(searchCondition),
 
     db
       .select({
@@ -34,11 +39,14 @@ export async function getUsers(page: number, limit: number, search: string) {
         createdAt: users.createdAt,
       })
       .from(users)
-      .where(searchVal)
+      .where(searchCondition)
+      .orderBy(asc(users.createdAt), asc(users.id))
       .limit(limit)
       .offset(offset),
   ]);
+
   const total = totalResult[0]?.count ?? 0;
+
   return {
     page,
     limit,

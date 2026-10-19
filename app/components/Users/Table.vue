@@ -1,11 +1,14 @@
 <template>
-
-    <UTable v-model:sorting="sorting" :data="users" :columns="columns" class="flex-1" />
-
+  <UTable
+    v-model:sorting="sorting"
+    :data="users"
+    :columns="columns"
+    class="flex-1"
+  />
 </template>
 
 <script setup lang="ts">
-import type { UserModel } from '~/composables/api/useUsersApi/types';
+import type { UserModel } from "~/composables/api/useUsersApi/types";
 import type { TableColumn } from "@nuxt/ui";
 import type { Column, SortingState } from "@tanstack/vue-table";
 
@@ -13,9 +16,7 @@ defineProps<{
   users: UserModel[];
 }>();
 const emit = defineEmits<{
-
-  view: [memberId: string];
-  remove: [memberId: string];
+  remove: [userId: string];
 }>();
 
 const sorting = ref<SortingState>([]);
@@ -109,15 +110,15 @@ const columns: TableColumn<UserModel>[] = [
     cell: ({ row }) => {
       const status = row.original.role;
 
-     return h(
+      return h(
         "div",
         {
           class: "max-w-48 truncate",
           title: row.original.role || undefined,
         },
         row.original.role || "—",
-      )
-    }
+      );
+    },
   },
   {
     accessorKey: "createdAt",
@@ -162,7 +163,8 @@ const columns: TableColumn<UserModel>[] = [
           "aria-label": "View member",
 
           onClick: () => {
-            window.open(`/users/${row.original.id}`, "_blank");
+            // window.open(`/users/${row.original.id}`, "_blank");
+            navigateTo(`/users/${row.original.id}`);
           },
         }),
 
@@ -200,6 +202,4 @@ function getHeader(column: Column<UserModel>, label: string) {
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>
