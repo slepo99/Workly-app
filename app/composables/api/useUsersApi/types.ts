@@ -8,3 +8,11 @@ export interface UserModel {
   avatar: string | null;
   createdAt: string;
 }
+
+export interface UsersModelResponse {
+ page: number
+ limit: number
+ total: number
+ totalPages: number
+ users: UserModel[]
+}

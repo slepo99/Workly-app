@@ -1,4 +1,4 @@
-import type { UserModel } from "./types";
+import type { UsersModelResponse } from "./types";
 
 export function useUsersApi() {
   const { $api } = useNuxtApp();
@@ -8,7 +8,7 @@ export function useUsersApi() {
   }
 
   const getUsers = () => {
-    return $api<UserModel[]>(API.GET_USERS);
+    return $api<UsersModelResponse>(API.GET_USERS);
   };
 
   return {

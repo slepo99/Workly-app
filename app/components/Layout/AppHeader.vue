@@ -10,10 +10,6 @@
     </template>
     <UNavigationMenu :items="items" />
     <template #right>
-      <!-- <UColorModeButton />
-
-      <UButton @click="$i18n.setLocale('uk')"> UA </UButton>
-      <UButton @click="$i18n.setLocale('en')"> EN </UButton> -->
       <HeaderSettings />
     </template>
     <template #body>
@@ -25,9 +21,11 @@
 <script lang="ts" setup>
 import type { NavigationMenuItem } from "@nuxt/ui";
 import { useI18n } from "vue-i18n";
+import { usePermissions } from "~/composables/usePermissions";
 
 const route = useRoute();
 const { t } = useI18n();
+const { isManagement } = usePermissions();
 
 const items = computed<NavigationMenuItem[]>(() => [
   {
@@ -40,11 +38,15 @@ const items = computed<NavigationMenuItem[]>(() => [
     to: "/projects",
     active: route.path.startsWith("/projects"),
   },
-  {
-    label: t("navigation.users"),
-    to: "/users",
-    active: route.path.startsWith("/users"),
-  },
+  ...(isManagement.value
+    ? [
+        {
+          label: t("navigation.users"),
+          to: "/users",
+          active: route.path.startsWith("/users"),
+        },
+      ]
+    : []),
   {
     label: t("navigation.tasks"),
     to: "/tasks",
