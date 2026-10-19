@@ -8,6 +8,7 @@ interface UsersStateModel {
   page: number;
   total: number;
   totalPages: number;
+  search: string;
 }
 
 export const useUsersStore = defineStore("users", {
@@ -17,20 +18,25 @@ export const useUsersStore = defineStore("users", {
       isLoading: false,
       page: USERS_PAGINATION.PAGE,
       total: 0,
-      totalPages: 0
+      totalPages: 0,
+      search: "",
     };
   },
 
   getters: {},
 
   actions: {
-    async loadAllUsers() {
+    async loadAllUsers(page = USERS_PAGINATION.PAGE) {
       const { getUsers } = useUsersApi();
-      const response = await getUsers();
+      const response = await getUsers({
+        page,
+        limit: USERS_PAGINATION.LIMIT,
+        search: this.search,
+      });
       this.users = response.users;
-      this.page = response.page
-      this.total = response.total
-      this.totalPages = response.totalPages
+      this.page = response.page;
+      this.total = response.total;
+      this.totalPages = response.totalPages;
     },
   },
 });

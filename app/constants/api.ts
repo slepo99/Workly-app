@@ -5,6 +5,6 @@ export const PROJECTS_PAGINATION = {
   LIMIT: 12,
 };
 export const USERS_PAGINATION = {
-    PAGE: 1,
+  PAGE: 1,
   LIMIT: 12,
-}
+};

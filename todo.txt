@@ -1,0 +1,12 @@
+1) create users statistics feature 
+  1. workers time tracking
+  2. workers work time statistics per week/month/year
+  3. workers overtime hours, bonuses/avances
+2) finances and accounting
+  1. workers monthly payment
+  2. Salary review
+  3. income networh
+  4. outcome networth
+  5. financlial profit
+  6. quarterly taxes auto counter
+  7. quarterly report

@@ -10,7 +10,11 @@ export function useUsers() {
       { mode: "navigation" },
     );
   }
+  async function updateUsersPage(page:number) {
+    await usersStore.loadAllUsers(page);
+  }
   return {
-    onFirstLoadUsers
+    onFirstLoadUsers,
+    updateUsersPage
   }
 }
