@@ -10,3 +10,52 @@
   5. financlial profit
   6. quarterly taxes auto counter
   7. quarterly report
+
+
+Project structure: {
+  dashboard,
+  projects: {
+    project
+  },
+  users: {
+    user
+  },
+  tasks: {
+    task
+  },
+  meetings,
+  myProfile
+}
+
+Post-MVP
+
+1. Time tracking
+   - Task timer
+   - Manual time entries
+   - Weekly timesheets
+   - Manager approval
+   - Weekly/monthly/yearly statistics
+   - Overtime tracking
+
+2. Payroll
+   - Employee salaries
+   - Salary history and reviews
+   - Bonuses and advances
+   - Overtime payments
+   - Monthly payroll
+   - Payment history
+
+3. Finance
+   - Revenue
+   - Expenses
+   - Cash flow
+   - Net profit
+   - Project profitability
+   - Transaction categories
+
+4. Accounting and reports
+   - Quarterly tax estimation
+   - Quarterly reports
+   - Period locking
+   - CSV/PDF export
+   - Audit log

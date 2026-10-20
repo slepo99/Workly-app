@@ -158,7 +158,7 @@ const columns: TableColumn<ProjectMemberModel>[] = [
   {
     accessorKey: "role",
 
-    header: ({ column }) => getHeader(column, "Role"),
+    header: ({ column }) => getHeader(column, "Project role"),
 
     cell: ({ row }) => {
       const status = row.original.role;

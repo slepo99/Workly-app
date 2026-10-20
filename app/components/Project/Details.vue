@@ -73,17 +73,18 @@
     <USeparator />
 
     <div class="grid grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-6">
-      <ProjectSmallStat class="min-w-0 w-full">
+      <UISmallStat class="min-w-0 w-full">
         <template #icon>
           <UIcon name="i-lucide-calendar" class="text-xl" />
         </template>
         <template #title>Created at</template>
         <template #value>
           {{ formatDateShort(project.createdAt) }}
-        </template>
-      </ProjectSmallStat>
 
-      <ProjectSmallStat class="min-w-0 w-full">
+        </template>
+      </UISmallStat>
+
+      <UISmallStat class="min-w-0 w-full">
         <template #icon>
           <UIcon name="i-lucide-clock" class="text-xl" />
         </template>
@@ -91,17 +92,17 @@
         <template #value>
           {{ formatDateShort(project.updatedAt) }}
         </template>
-      </ProjectSmallStat>
+      </UISmallStat>
 
-      <ProjectSmallStat class="min-w-0 w-full">
+      <UISmallStat class="min-w-0 w-full">
         <template #icon>
           <UIcon name="i-lucide-clipboard-check" class="text-2xl" />
         </template>
         <template #title>Total tasks</template>
         <template #value>{{ props.tasks.length }}</template>
-      </ProjectSmallStat>
+      </UISmallStat>
 
-      <ProjectSmallStat class="min-w-0 w-full">
+      <UISmallStat class="min-w-0 w-full">
         <template #icon>
           <UIcon name="i-lucide-circle-check" class="text-2xl" />
         </template>
@@ -109,23 +110,23 @@
         <template #value>
           {{ getComplitedTasks }}
         </template>
-      </ProjectSmallStat>
+      </UISmallStat>
 
-      <ProjectSmallStat class="min-w-0 w-full">
+      <UISmallStat class="min-w-0 w-full">
         <template #icon>
           <UIRoundedProgress :percent="getTaskCompletionRate" size="24" />
         </template>
         <template #title>Completion rate</template>
         <template #value>{{ getTaskCompletionRate }}%</template>
-      </ProjectSmallStat>
+      </UISmallStat>
 
-      <ProjectSmallStat class="min-w-0 w-full">
+      <UISmallStat class="min-w-0 w-full">
         <template #icon>
           <UIcon name="i-lucide-users" class="text-2xl" />
         </template>
         <template #title>Project members</template>
         <template #value>{{ props.members.length }}</template>
-      </ProjectSmallStat>
+      </UISmallStat>
     </div>
   </div>
 </template>

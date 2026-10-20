@@ -1,6 +1,13 @@
 <template>
   <UPage>
-    <div class="flex items-center justify-end mt-4">
+    <div class="flex utems-center justify-between gap-2">
+      <div>
+        <h1 class="text-2xl font-semibold">Users</h1>
+
+        <p class="mt-1 text-sm text-muted">
+          Manage employees, roles and access
+        </p>
+      </div>
       <UInput
         v-model="usersStore.search"
         icon="i-lucide-search"

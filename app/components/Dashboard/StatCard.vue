@@ -17,10 +17,6 @@
 
     <div class="mt-6 flex items-end justify-between">
       <span class="text-3xl font-semibold">{{ props.value }}</span>
-
-      <!-- <span class="text-sm text-error">
-      ↓ 2.02%
-    </span> -->
     </div>
   </UCard>
 </template>
