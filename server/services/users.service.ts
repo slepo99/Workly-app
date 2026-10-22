@@ -1,7 +1,7 @@
 import { db } from "~~/server/db";
 import { users } from "~~/server/db/schema";
-import { eq, ilike, count, asc, or } from "drizzle-orm";
-import type { Role } from "~~/server/constants/roles";
+import { eq, ilike, count, asc, or, and } from "drizzle-orm";
+import { ROLES, type Role } from "~~/server/constants/roles";
 import { deleteImageByUrl } from "~~/server/services/uploads.service";
 
 const publicUserFields = {
@@ -131,4 +131,49 @@ export async function updateUserRole(userId: string, role: Role) {
     .returning(publicUserFields);
 
   return user;
+}
+export async function getUsersStats() {
+  const [
+    totalUsersResult,
+    totalAdminsResult,
+    totalManagersResult,
+    totalWorkersResult,
+  ] = await Promise.all([
+    db
+      .select({
+        count: count(),
+      })
+      .from(users),
+
+    db
+      .select({
+        count: count(),
+      })
+      .from(users)
+      .where(or(eq(users.role, ROLES.ADMIN), eq(users.role, ROLES.SUPERADMIN))),
+
+    db
+      .select({
+        count: count(),
+      })
+      .from(users)
+      .where(eq(users.role, ROLES.MANAGER)),
+
+    db
+      .select({
+        count: count(),
+      })
+      .from(users)
+      .where(eq(users.role, ROLES.WORKER)),
+  ]);
+  const total = totalUsersResult[0]?.count ?? 0;
+  const totalAdmins = totalAdminsResult[0]?.count ?? 0;
+  const totalManagers = totalManagersResult[0]?.count ?? 0;
+  const totalWorkers = totalWorkersResult[0]?.count ?? 0;
+  return {
+    totalUsers: total,
+    totalAdmins,
+    totalManagers,
+    totalWorkers
+  };
 }

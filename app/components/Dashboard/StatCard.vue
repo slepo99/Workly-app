@@ -1,5 +1,5 @@
 <template>
-  <UCard>
+  <UCard >
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-2">
         <UIcon :name="props.icon" />

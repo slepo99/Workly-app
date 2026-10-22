@@ -16,3 +16,10 @@ export interface UsersModelResponse {
  totalPages: number
  users: UserModel[]
 }
+
+export interface UsersStatsModel {
+  totalUsers: number
+  totalAdmins: number
+  totalManagers: number
+  totalWorkers: number
+}

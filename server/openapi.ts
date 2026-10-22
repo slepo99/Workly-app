@@ -281,6 +281,38 @@ export const openapi = {
       },
     },
 
+    "/users/stats": {
+      get: {
+        tags: ["Users"],
+        summary: "Get users statistics",
+        description:
+          "Returns the total number of users grouped by administrative, manager and worker roles.",
+        security: [
+          {
+            cookieAuth: [],
+          },
+        ],
+        responses: {
+          200: {
+            description: "Users statistics retrieved successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/UsersStats",
+                },
+              },
+            },
+          },
+          401: {
+            description: "Unauthorized",
+          },
+          403: {
+            description: "Forbidden",
+          },
+        },
+      },
+    },
+
     "/projects": {
       get: {
         tags: ["Projects"],
@@ -1433,6 +1465,34 @@ export const openapi = {
           path: {
             type: "string",
             example: "08e18f96-a9ab-45c8-8b9f-731d8272e573.webp",
+          },
+        },
+      },
+      UsersStats: {
+        type: "object",
+        required: [
+          "totalUsers",
+          "totalAdmins",
+          "totalManagers",
+          "totalWorkers",
+        ],
+        properties: {
+          totalUsers: {
+            type: "integer",
+            example: 24,
+          },
+          totalAdmins: {
+            type: "integer",
+            example: 3,
+            description: "Combined number of admins and superadmins",
+          },
+          totalManagers: {
+            type: "integer",
+            example: 5,
+          },
+          totalWorkers: {
+            type: "integer",
+            example: 16,
           },
         },
       },

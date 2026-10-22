@@ -32,6 +32,7 @@
         </template>
       </UInput>
     </div>
+    <UsersStats v-if="usersStore.stats" :stats="usersStore.stats" class="mt-4"/>
     <UsersTable
       :users="usersStore.users"
       class="mt-4"

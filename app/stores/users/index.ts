@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-import type { UserModel } from "~/composables/api/useUsersApi/types";
+import type { UserModel, UsersStatsModel } from "~/composables/api/useUsersApi/types";
 import { USERS_PAGINATION } from "~/constants/api";
 
 const usersControllers = new WeakMap<object, AbortController>();
@@ -11,6 +11,7 @@ interface UsersStateModel {
   total: number;
   totalPages: number;
   search: string;
+  stats: UsersStatsModel | null
 }
 
 export const useUsersStore = defineStore("users", {
@@ -22,6 +23,7 @@ export const useUsersStore = defineStore("users", {
       total: 0,
       totalPages: 0,
       search: "",
+      stats: null
     };
   },
 
@@ -76,5 +78,10 @@ export const useUsersStore = defineStore("users", {
         }
       }
     },
+    async loadUsersStats(){
+      const { getUsersStats } = useUsersApi();
+      const stats = await getUsersStats()
+      this.stats = stats
+    }
   },
 });

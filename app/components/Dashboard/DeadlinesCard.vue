@@ -30,7 +30,7 @@
             <span>{{ task.title }}</span>
             <div class="flex gap-2 items-center">
               <span class="size-2 rounded-full bg-error" />
-              <span class="text-sm text-neutral-500 "
+              <span v-if="task.endDate" class="text-sm text-neutral-500 "
                 >{{ formatDate(task.endDate) }} </span
               >
             </div>

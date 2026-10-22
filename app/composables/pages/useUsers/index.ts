@@ -2,7 +2,6 @@ import { useUsersStore } from "~/stores/users";
 import { useDebouncedFn } from "~/composables/useDebounce";
 import { useUsersApi } from "#imports";
 import { useToast } from "#imports";
-import { fa } from "zod/v4/locales";
 
 export function useUsers() {
   const usersStore = useUsersStore();
@@ -15,7 +14,11 @@ export function useUsers() {
     await callOnce(
       `users`,
       async () => {
-        await usersStore.loadAllUsers();
+        // await usersStore.loadAllUsers();
+        await Promise.all([
+          usersStore.loadAllUsers(),
+          usersStore.loadUsersStats()
+        ])
       },
       { mode: "navigation" },
     );
