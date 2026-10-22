@@ -1,5 +1,6 @@
 <template>
   <UCard
+    class="card-shadow"
     :ui="{
       header: 'lg:p-4 flex items-center justify-between',
       body: 'lg:p-4',
@@ -42,7 +43,6 @@
         <UAvatarGroup max="3">
           <UAvatar
             v-for="i in 6"
-            :key="i"
             src="https://github.com/benjamincanac.png"
             alt="Benjamin Canac"
           />

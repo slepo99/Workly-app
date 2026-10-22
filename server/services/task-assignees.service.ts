@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { db } from "~~/server/db";
 import { taskAssignees, users } from "~~/server/db/schema";
 
@@ -33,4 +33,37 @@ export async function removeTaskAssignee(taskId: string, userId: string) {
     .returning();
 
   return assignee;
+}
+
+export async function getTaskAssigneesByTaskIds(taskIds: string[]) {
+  if (!taskIds.length) {
+    return new Map();
+  }
+
+  const rows = await db
+    .select({
+      taskId: taskAssignees.taskId,
+
+      user: {
+        id: users.id,
+        name: users.name,
+        avatar: users.avatar,
+      },
+    })
+    .from(taskAssignees)
+    .innerJoin(users, eq(users.id, taskAssignees.userId))
+    .where(inArray(taskAssignees.taskId, taskIds));
+
+  type TaskAssignee = (typeof rows)[number]["user"];
+
+  const assigneesByTaskId = new Map<string, TaskAssignee[]>();
+
+  for (const row of rows) {
+    const assignees = assigneesByTaskId.get(row.taskId) ?? [];
+
+    assignees.push(row.user);
+    assigneesByTaskId.set(row.taskId, assignees);
+  }
+
+  return assigneesByTaskId;
 }

@@ -1,6 +1,6 @@
 <template>
   <UCard
-    class="card-shadow"
+
     :ui="{
       body: 'py-1 sm:py-2 px-2 sm:px-3',
     }"

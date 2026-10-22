@@ -1,6 +1,6 @@
 <template>
   <UCard
-    class="bg-elevated flex h-full flex-col h-auto"
+    class="bg-elevated flex h-full flex-col h-auto card-shadow"
     :ui="{
       header: 'flex items-center justify-between lg:p-4 lg:pb-2 gap-2',
       body: 'lg:p-4 lg:pt-2 flex-1',
@@ -20,7 +20,7 @@
       <div class="flex items-center justify-between mt-4">
         <div class="flex items-center gap-2">
           <UIcon name="i-lucide-calendar-clock" class="mr-1" />
-          <span class="text-sm">{{ formatDate(task.endDate) }}</span>
+          <span class="text-sm">{{ formatDate(String(task.endDate)) }}</span>
         </div>
         <UBadge
           v-if="task.status !== TASK_STATUSES.COMPLETED"
@@ -34,7 +34,7 @@
         <UAvatar
           v-for="assignee in task.assignees"
           :key="assignee.id"
-          :src="assignee.avatar"
+          :src="assignee.avatar || undefined"
           :alt="assignee.name"
         />
       </UAvatarGroup>

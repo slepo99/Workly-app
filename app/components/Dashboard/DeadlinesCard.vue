@@ -1,5 +1,6 @@
 <template>
   <UCard
+    class="card-shadow"
     :ui="{
       header: 'lg:p-4 flex items-center justify-between',
       body: 'lg:p-4',

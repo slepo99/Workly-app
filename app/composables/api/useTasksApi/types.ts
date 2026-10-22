@@ -5,7 +5,7 @@ export interface TasksModel {
   projectId: string;
   title: string;
   description: string;
-  status: string;
+  status: TaskStatus;
   startDate: string | null;
   endDate: string | null;
   createdAt: string;

@@ -6,7 +6,7 @@ import {
   tasks,
   taskAssignees,
 } from "~~/server/db/schema";
-import { eq, and, count, desc, ilike, inArray, isNull, asc } from "drizzle-orm";
+import { eq, and, count, desc, ilike, inArray, isNull, asc, sql } from "drizzle-orm";
 import { ROLES, type Role } from "~~/server/constants/roles";
 import { getTaskAssignees } from "./task-assignees.service";
 import { TASK_STATUSES } from "~~/server/constants/taskStatuses";
@@ -95,42 +95,60 @@ export async function getProjects(
 
   const total = totalResult[0]?.count ?? 0;
 
-  const projectsWithStats = await Promise.all(
-    projectList.map(async (project) => {
-      const allTasksResult = await db
-        .select({
-          count: count(),
-        })
-        .from(tasks)
-        .where(eq(tasks.projectId, project.id));
+  if (!projectList.length) {
+    return {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+      projects: [],
+    };
+  }
 
-      const completedTasksResult = await db
-        .select({
-          count: count(),
-        })
-        .from(tasks)
-        .where(
-          and(
-            eq(tasks.projectId, project.id),
-            eq(tasks.status, TASK_STATUSES.COMPLETED),
-          ),
-        );
+  const projectIds = projectList.map((project) => project.id);
 
-      const tasksCount = allTasksResult[0]?.count ?? 0;
-      const completedCount = completedTasksResult[0]?.count ?? 0;
+  const statsList = await db
+    .select({
+      projectId: tasks.projectId,
 
-      const completionPercent =
-        tasksCount === 0
-          ? 0
-          : Math.round((completedCount / tasksCount) * 100);
+      tasksCount: sql<number>`
+        cast(count(*) as integer)
+      `,
 
-      return {
-        ...project,
-        tasksCount,
-        completionPercent,
-      };
-    }),
+      completedCount: sql<number>`
+        cast(
+          count(*) filter (
+            where ${tasks.status} = ${TASK_STATUSES.COMPLETED}
+          )
+          as integer
+        )
+      `,
+    })
+    .from(tasks)
+    .where(inArray(tasks.projectId, projectIds))
+    .groupBy(tasks.projectId);
+
+  const statsByProjectId = new Map(
+    statsList.map((stats) => [stats.projectId, stats]),
   );
+
+  const projectsWithStats = projectList.map((project) => {
+    const stats = statsByProjectId.get(project.id);
+
+    const tasksCount = stats?.tasksCount ?? 0;
+    const completedCount = stats?.completedCount ?? 0;
+
+    const completionPercent =
+      tasksCount === 0
+        ? 0
+        : Math.round((completedCount / tasksCount) * 100);
+
+    return {
+      ...project,
+      tasksCount,
+      completionPercent,
+    };
+  });
 
   return {
     page,
