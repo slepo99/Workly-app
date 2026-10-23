@@ -376,69 +376,6 @@ export const openapi = {
       },
     },
 
-    "/projects/with-tasks": {
-      get: {
-        tags: ["Projects", "Tasks"],
-        operationId: "getProjectsWithTasks",
-        summary: "Get projects with tasks",
-        description:
-          "Returns a paginated list of accessible projects with task statistics and accessible tasks. Admin/superadmin see all tasks, managers see tasks from their projects, workers see only assigned tasks.",
-        security: cookieSecurity,
-
-        parameters: [
-          {
-            name: "page",
-            in: "query",
-            schema: {
-              type: "integer",
-              minimum: 1,
-              default: 1,
-            },
-          },
-          {
-            name: "limit",
-            in: "query",
-            description: "Number of projects per page",
-            schema: {
-              type: "integer",
-              minimum: 1,
-              default: 5,
-            },
-          },
-          {
-            name: "search",
-            in: "query",
-            description: "Case-insensitive project name search",
-            schema: {
-              type: "string",
-            },
-          },
-          {
-            name: "status",
-            in: "query",
-            description:
-              "Project status filter. The query can contain one status or repeated status parameters.",
-            style: "form",
-            explode: true,
-            schema: {
-              type: "array",
-              items: ref("ProjectStatus"),
-            },
-          },
-        ],
-
-        responses: {
-          200: jsonResponse(
-            "Paginated projects with tasks",
-            ref("ProjectsWithTasksPage"),
-          ),
-          401: responseRef("Unauthorized"),
-          403: responseRef("Forbidden"),
-          500: responseRef("ServerError"),
-        },
-      },
-    },
-
     "/projects/{id}": {
       parameters: [
         {
@@ -763,6 +700,96 @@ export const openapi = {
           401: responseRef("Unauthorized"),
           403: responseRef("Forbidden"),
           404: responseRef("NotFound"),
+          500: responseRef("ServerError"),
+        },
+      },
+    },
+
+    "/tasks/grouped": {
+      get: {
+        tags: ["Tasks"],
+        operationId: "getGroupedTasks",
+        summary: "Get tasks grouped by project",
+        description:
+          "Returns accessible tasks grouped by projects. Pagination is applied to project groups, not individual tasks.",
+        security: cookieSecurity,
+
+        parameters: [
+          {
+            name: "page",
+            in: "query",
+            schema: {
+              type: "integer",
+              minimum: 1,
+              default: 1,
+            },
+          },
+          {
+            name: "limit",
+            in: "query",
+            description: "Number of project groups per page",
+            schema: {
+              type: "integer",
+              minimum: 1,
+              default: 5,
+            },
+          },
+          {
+            name: "search",
+            in: "query",
+            description: "Case-insensitive search by task title or description",
+            schema: {
+              type: "string",
+            },
+          },
+          {
+            name: "status",
+            in: "query",
+            description:
+              "Task status filter. Can contain one or multiple status parameters.",
+            style: "form",
+            explode: true,
+            schema: {
+              type: "array",
+              items: ref("TaskStatus"),
+            },
+          },
+          {
+            name: "sort",
+            in: "query",
+            description: "Field used to sort tasks",
+            schema: {
+              type: "string",
+              enum: [
+                "updatedAt",
+                "createdAt",
+                "startDate",
+                "endDate",
+                "title",
+                "status",
+              ],
+              default: "updatedAt",
+            },
+          },
+          {
+            name: "order",
+            in: "query",
+            description: "Task sorting direction",
+            schema: {
+              type: "string",
+              enum: ["asc", "desc"],
+              default: "desc",
+            },
+          },
+        ],
+
+        responses: {
+          200: jsonResponse(
+            "Tasks grouped by projects",
+            ref("GroupedTasksPage"),
+          ),
+          401: responseRef("Unauthorized"),
+          403: responseRef("Forbidden"),
           500: responseRef("ServerError"),
         },
       },
@@ -1215,21 +1242,7 @@ export const openapi = {
           },
         ],
       },
-      ProjectWithTasks: {
-        allOf: [
-          ref("ProjectWithStats"),
-          {
-            type: "object",
-            required: ["tasks"],
-            properties: {
-              tasks: {
-                type: "array",
-                items: ref("Task"),
-              },
-            },
-          },
-        ],
-      },
+
       ProjectsPage: {
         type: "object",
         required: ["page", "limit", "total", "totalPages", "projects"],
@@ -1241,37 +1254,6 @@ export const openapi = {
           projects: {
             type: "array",
             items: ref("ProjectWithStats"),
-          },
-        },
-      },
-
-      ProjectsWithTasksPage: {
-        type: "object",
-        required: ["page", "limit", "total", "totalPages", "projects"],
-        properties: {
-          page: {
-            type: "integer",
-            minimum: 1,
-            example: 1,
-          },
-          limit: {
-            type: "integer",
-            minimum: 1,
-            example: 5,
-          },
-          total: {
-            type: "integer",
-            minimum: 0,
-            example: 15,
-          },
-          totalPages: {
-            type: "integer",
-            minimum: 0,
-            example: 3,
-          },
-          projects: {
-            type: "array",
-            items: ref("ProjectWithTasks"),
           },
         },
       },
@@ -1456,6 +1438,54 @@ export const openapi = {
           tasks: {
             type: "array",
             items: ref("Task"),
+          },
+        },
+      },
+
+      GroupedTaskProject: {
+        allOf: [
+          ref("Project"),
+          {
+            type: "object",
+            required: ["tasks"],
+            properties: {
+              tasks: {
+                type: "array",
+                items: ref("Task"),
+              },
+            },
+          },
+        ],
+      },
+
+      GroupedTasksPage: {
+        type: "object",
+        required: ["page", "limit", "total", "totalPages", "projects"],
+        properties: {
+          page: {
+            type: "integer",
+            minimum: 1,
+            example: 1,
+          },
+          limit: {
+            type: "integer",
+            minimum: 1,
+            example: 5,
+          },
+          total: {
+            type: "integer",
+            minimum: 0,
+            description: "Number of project groups containing matching tasks",
+            example: 12,
+          },
+          totalPages: {
+            type: "integer",
+            minimum: 0,
+            example: 3,
+          },
+          projects: {
+            type: "array",
+            items: ref("GroupedTaskProject"),
           },
         },
       },
