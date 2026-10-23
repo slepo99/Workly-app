@@ -34,6 +34,9 @@ export const useTasksStore = defineStore("tasks", {
   },
 
   actions: {
+    resetSearch() {
+      this.search = ''
+    },
     async loadAllTasks() {
       const { getTasks } = useTasksApi();
 
