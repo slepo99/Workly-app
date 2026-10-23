@@ -17,10 +17,18 @@ export const formatDateLong = (date: string | Date) => {
   }).format(new Date(date));
 };
 
-export const formatDateShort = (date: string | Date) => {
+export const formatDateShort = (
+  date: string | Date | null | undefined,
+): string => {
+  if (!date) return "";
+
+  const parsedDate = new Date(date);
+
+  if (Number.isNaN(parsedDate.getTime())) return "";
+
   return new Intl.DateTimeFormat("en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",
-  }).format(new Date(date));
+  }).format(parsedDate);
 };

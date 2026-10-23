@@ -30,11 +30,7 @@ export const useTasksStore = defineStore("tasks", {
   },
 
   getters: {
-    getComplitedTasks(state) {
-      return state.tasks.filter(
-        (task) => task.status === TASK_STATUSES.COMPLETED,
-      );
-    },
+    
   },
 
   actions: {

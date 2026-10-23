@@ -71,7 +71,7 @@ export function useStatuses() {
     );
   };
 
-  const getTaskStatusColors = (status: string) => {
+  const getTaskStatusColors = (status: TaskStatus) => {
     if (TASK_STATUSES.CANCELLED === status) {
       return "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300";
     } else if (TASK_STATUSES.COMPLETED === status) {
@@ -127,6 +127,18 @@ export function useStatuses() {
       color: "error",
     };
   };
+
+  const getTaskStatusBageColor = (status: TaskStatus) => {
+    if(TASK_STATUSES.COMPLETED === status) {
+      return "success"
+    } else if(TASK_STATUSES.CANCELLED === status) {
+      return "error"
+    } else if(TASK_STATUSES.IN_PROGRESS === status) {
+      return "secondary"
+    } else if(TASK_STATUSES.PENDING === status) {
+      return "warning"
+    } 
+  }
   return {
     getProjectStatuses,
     getProjectStatusColor,
@@ -134,6 +146,7 @@ export function useStatuses() {
     getTaskStatuses,
     getTaskStatusColors,
     getTaskStatusLabel,
-    getTaskTermination
+    getTaskTermination,
+    getTaskStatusBageColor
   };
 }
