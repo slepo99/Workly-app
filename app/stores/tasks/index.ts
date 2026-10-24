@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 import type { TasksModel, TaskSort, GroupedTasksProjectModel } from "~/composables/api/useTasksApi/types";
 import { TASK_STATUSES, type TaskStatus } from "~/constants/taskStatuses";
 import { GROUPED_TASKS_PAGINATION } from "~/constants/api";
+import { TASK_SORT_FIELDS , TASK_SORT_ORDERS} from "~/constants/taskSort";
 interface TasksStateModel {
   tasks: TasksModel[];
   isLoading: boolean;
@@ -24,7 +25,7 @@ export const useTasksStore = defineStore("tasks", {
       totalPages: 0,
       search: "",
       statuses: [],
-      sortBy: 'updatedAt',
+      sortBy: TASK_SORT_FIELDS.END_DATE,
       groupedTasks: []
     };
   },
@@ -59,7 +60,8 @@ export const useTasksStore = defineStore("tasks", {
           limit: GROUPED_TASKS_PAGINATION.LIMIT,
           search: this.search,
           statuses: this.statuses,
-          sort: this.sortBy
+          sort: this.sortBy,
+          order: TASK_SORT_ORDERS.ASC
         });
 
         this.groupedTasks = response.projects

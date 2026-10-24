@@ -34,7 +34,7 @@
 
         <div class="flex shrink-0 items-center gap-2 sm:gap-4">
           <UProgress
-            v-if="!isMobile"
+      
             :model-value="getTasksComletionRate(groupedTasks.tasks).percent"
             :max="100"
             :color="
@@ -42,7 +42,7 @@
                 getTasksComletionRate(groupedTasks.tasks).percent,
               )
             "
-            class="w-50"
+            class="hidden w-50 sm:block"
           >
             <template #status="{ percent }">
               <div class="w-full">{{ percent }}% completed</div>
@@ -60,12 +60,13 @@
       </div>
 
       <UProgress
-        v-if="isMobile"
+        
         :model-value="getTasksComletionRate(groupedTasks.tasks).percent"
         :max="100"
         :color="
           getProgressColor(getTasksComletionRate(groupedTasks.tasks).percent)
         "
+        class="sm:hidden"
         size="sm"
       >
         <template #status="{ percent }">
@@ -151,7 +152,6 @@
 </template>
 
 <script setup lang="ts">
-import { useAdaptive } from "~/composables/useAdaptive";
 import { useStatuses } from "~/composables/useStatuses";
 import { useTasksProjectGroup } from "~/composables/components/tasks/useTasksProjectGroup";
 import type { GroupedTasksProjectModel } from "~/composables/api/useTasksApi/types";
@@ -159,7 +159,7 @@ import type { GroupedTasksProjectModel } from "~/composables/api/useTasksApi/typ
 const { getTaskStatusLabel, getTaskTermination, getTaskStatusBageColor } =
   useStatuses();
 const { getTasksComletionRate } = useTasksProjectGroup();
-const { isMobile } = useAdaptive();
+
 
 const props = defineProps<{
   groupedTasks: GroupedTasksProjectModel;
