@@ -96,6 +96,7 @@
 </template>
 
 <script setup lang="ts">
+//todo: move sorting from server to client side
 import { useTasks } from "~/composables/pages/useTasks";
 import { useTasksStore } from "~/stores/tasks";
 import { useStatuses } from "~/composables/useStatuses";
