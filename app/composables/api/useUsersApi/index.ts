@@ -1,11 +1,11 @@
-import type { UsersModelResponse, UsersStatsModel } from "./types";
+import type { UsersModelResponse, UsersStatsModel, UserModel } from "./types";
 import { USERS_PAGINATION } from "~/constants/api";
 export function useUsersApi() {
   const { $api } = useNuxtApp();
 
   enum API {
     GET_USERS = "/users",
-    GET_USERS_STATS = '/users/stats'
+    GET_USERS_STATS = '/users/stats',
   }
 
   const getUsers = ({
@@ -36,9 +36,14 @@ export function useUsersApi() {
     return $api<UsersStatsModel>(API.GET_USERS_STATS)
   }
 
+  const getUserById = (userId: string) => {
+    return $api<UserModel>(`${API.GET_USERS}/${userId}`)
+  }
+
   return {
     getUsers,
     deleteUser,
-    getUsersStats
+    getUsersStats,
+    getUserById
   };
 }

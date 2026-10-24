@@ -12,6 +12,7 @@
             alt="Workly"
             class="h-12 w-16 shrink-0 rounded object-cover sm:h-14 sm:w-20"
           />
+          <!-- todo: move to no-image ui component -->
           <div
             v-else
             class="flex h-12 w-16 shrink-0 rounded object-cover sm:h-14 sm:w-20 items-center justify-center rounded-xl border border-dashed border-neutral-300 text-muted dark:border-neutral-600"

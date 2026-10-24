@@ -53,7 +53,7 @@ export const useTasksStore = defineStore("tasks", {
     },
     async loadGroupedTasks(page = GROUPED_TASKS_PAGINATION.PAGE) {
       const { getGroupedTasks } = useTasksApi();
-
+      //todo: implement AbortController
       try {
         const response = await getGroupedTasks({
           page,

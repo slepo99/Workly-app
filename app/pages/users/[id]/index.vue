@@ -1,12 +1,25 @@
 <template>
-  <div>
-    {{ userId }}
-  </div>
+  <UPage>
+    <UBreadcrumb :items="getBreadcumbs(userId)" />
+    <div class="flex flex-col gap-4 mt-4">
+      <h1 class="text-2xl font-semibold">User profile</h1>
+      <div v-if="userStore.user">
+        <UserInfo :user="userStore.user"/>
+
+      </div>
+    </div>
+  </UPage>
 </template>
 
 <script setup lang="ts">
+import { useUser } from "~/composables/pages/useUser";
+import { useUserStore } from "~/stores/user";
 const route = useRoute();
+const userStore = useUserStore();
 const userId = computed(() => route.params.id as string);
+const { onFirstLoadUser, getBreadcumbs } = useUser();
+
+await onFirstLoadUser(userId.value);
 </script>
 
 <style scoped></style>
