@@ -281,6 +281,90 @@ export const openapi = {
       },
     },
 
+    "/users/{userId}/projects": {
+      get: {
+        tags: ["Users"],
+        operationId: "getProjectsByUserId",
+        summary: "Get projects by user ID",
+        description:
+          "Returns projects belonging to the specified user, ordered by most recently updated first. If limit is provided, returns at most that many projects. Otherwise, returns all projects.",
+        security: cookieSecurity,
+        parameters: [
+          {
+            name: "userId",
+            in: "path",
+            required: true,
+            description: "User ID",
+            schema: { type: "string", format: "uuid" },
+          },
+          {
+            name: "limit",
+            in: "query",
+            required: false,
+            description:
+              "Maximum number of projects to return. Omit to return all projects.",
+            schema: {
+              type: "integer",
+              minimum: 1,
+              maximum: 100,
+              example: 4,
+            },
+          },
+        ],
+        responses: {
+          200: jsonResponse("User projects", {
+            type: "array",
+            items: ref("Project"),
+          }),
+          400: responseRef("ValidationError"),
+          401: responseRef("Unauthorized"),
+          403: responseRef("Forbidden"),
+        },
+      },
+    },
+
+    "/users/{id}/tasks": {
+      get: {
+        tags: ["Users"],
+        operationId: "getTasksByUserId",
+        summary: "Get tasks by user ID",
+        description:
+          "Returns tasks assigned to the specified user, ordered by most recently updated first. If limit is provided, returns at most that many tasks. Otherwise, returns all tasks.",
+        security: cookieSecurity,
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            description: "User ID",
+            schema: { type: "string", format: "uuid" },
+          },
+          {
+            name: "limit",
+            in: "query",
+            required: false,
+            description:
+              "Maximum number of tasks to return. Omit to return all tasks.",
+            schema: {
+              type: "integer",
+              minimum: 1,
+              maximum: 100,
+              example: 4,
+            },
+          },
+        ],
+        responses: {
+          200: jsonResponse("User tasks", {
+            type: "array",
+            items: ref("Task"),
+          }),
+          400: responseRef("ValidationError"),
+          401: responseRef("Unauthorized"),
+          403: responseRef("Forbidden"),
+        },
+      },
+    },
+
     "/users/stats": {
       get: {
         tags: ["Users"],

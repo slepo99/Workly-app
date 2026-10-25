@@ -6,13 +6,26 @@ import {
   tasks,
   taskAssignees,
 } from "~~/server/db/schema";
-import { eq, and, count, desc, ilike, inArray, isNull, asc, sql } from "drizzle-orm";
+import {
+  eq,
+  and,
+  count,
+  desc,
+  ilike,
+  inArray,
+  isNull,
+  asc,
+  sql,
+} from "drizzle-orm";
 import { ROLES, type Role } from "~~/server/constants/roles";
 import { getTaskAssignees } from "./task-assignees.service";
 import { TASK_STATUSES } from "~~/server/constants/taskStatuses";
 import { deleteImageByUrl } from "~~/server/services/uploads.service";
 import type { ProjectStatus } from "~~/server/constants/projectStatuses";
-import { getProjectAccessCondition, hasProjectAccess } from "../policies/project.policy";
+import {
+  getProjectAccessCondition,
+  hasProjectAccess,
+} from "../policies/project.policy";
 import { getTaskAccessCondition } from "../policies/task.policy";
 
 export async function createProject(
@@ -62,11 +75,7 @@ export async function getProjects(
     ? inArray(projects.status, statuses)
     : undefined;
 
-  const whereCondition = and(
-    accessCondition,
-    searchCondition,
-    statusCondition,
-  );
+  const whereCondition = and(accessCondition, searchCondition, statusCondition);
 
   const [totalResult, projectList] = await Promise.all([
     db
@@ -139,9 +148,7 @@ export async function getProjects(
     const completedCount = stats?.completedCount ?? 0;
 
     const completionPercent =
-      tasksCount === 0
-        ? 0
-        : Math.round((completedCount / tasksCount) * 100);
+      tasksCount === 0 ? 0 : Math.round((completedCount / tasksCount) * 100);
 
     return {
       ...project,
@@ -159,11 +166,7 @@ export async function getProjects(
   };
 }
 
-export async function getProjectById(
-  id: string,
-  userId: string,
-  role: Role,
-) {
+export async function getProjectById(id: string, userId: string, role: Role) {
   const accessCondition = getProjectAccessCondition(userId, role);
 
   const [project] = await db
@@ -177,12 +180,7 @@ export async function getProjectById(
       updatedAt: projects.updatedAt,
     })
     .from(projects)
-    .where(
-      and(
-        eq(projects.id, id),
-        accessCondition,
-      ),
-    );
+    .where(and(eq(projects.id, id), accessCondition));
 
   if (!project) {
     return undefined;
@@ -213,9 +211,7 @@ export async function getProjectById(
   const completedCount = completedTasksResult[0]?.count ?? 0;
 
   const completionPercent =
-    tasksCount === 0
-      ? 0
-      : Math.round((completedCount / tasksCount) * 100);
+    tasksCount === 0 ? 0 : Math.round((completedCount / tasksCount) * 100);
 
   return {
     ...project,
@@ -319,10 +315,7 @@ export async function getTasksByProjectId(
 
   const accessCondition = getTaskAccessCondition(userId, role);
 
-  const whereCondition = and(
-    eq(tasks.projectId, projectId),
-    accessCondition,
-  );
+  const whereCondition = and(eq(tasks.projectId, projectId), accessCondition);
 
   const [totalResult, tasksList] = await Promise.all([
     db
@@ -404,3 +397,30 @@ export async function getAvailableUsersByProjectId(projectId: string) {
 
   return availableUsers;
 }
+
+export async function getProjectsByUserId(
+  userId: string,
+  limit?: number,
+) {
+  const query = db
+    .select({
+      id: projects.id,
+      name: projects.name,
+      description: projects.description,
+      status: projects.status,
+      image: projects.image,
+      createdAt: projects.createdAt,
+      updatedAt: projects.updatedAt,
+    })
+    .from(projects)
+    .innerJoin(projectMembers, eq(projectMembers.projectId, projects.id))
+    .where(eq(projectMembers.userId, userId))
+    .orderBy(desc(projects.updatedAt));
+
+  if (limit) {
+    return await query.limit(limit);
+  }
+
+  return await query;
+}
+

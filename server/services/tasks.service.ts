@@ -6,7 +6,7 @@ import {
   projectMembers,
   taskAssignees,
 } from "~~/server/db/schema";
-import { eq, and, count, desc, sql  } from "drizzle-orm";
+import { eq, and, count, desc, sql } from "drizzle-orm";
 import { getTaskAssignees } from "./task-assignees.service";
 import { ROLES, type Role } from "~~/server/constants/roles";
 import type { TaskSort } from "../constants/taskSort";
@@ -163,11 +163,7 @@ export async function getTasks(
   };
 }
 
-export async function getTaskById(
-  id: string,
-  userId: string,
-  role: Role,
-) {
+export async function getTaskById(id: string, userId: string, role: Role) {
   const accessCondition = getTaskAccessCondition(userId, role);
 
   const [task] = await db
@@ -183,12 +179,7 @@ export async function getTaskById(
       updatedAt: tasks.updatedAt,
     })
     .from(tasks)
-    .where(
-      and(
-        eq(tasks.id, id),
-        accessCondition,
-      ),
-    );
+    .where(and(eq(tasks.id, id), accessCondition));
 
   if (!task) {
     return undefined;
@@ -289,4 +280,30 @@ export async function deleteTaskById(id: string) {
   const result = await db.delete(tasks).where(eq(tasks.id, id)).returning();
 
   return result[0];
+}
+
+export async function getTasksByUserId(userId: string, limit?: number) {
+   const query = db
+    .select({
+       id: tasks.id,
+        projectId: tasks.projectId,
+        title: tasks.title,
+        description: tasks.description,
+        status: tasks.status,
+        startDate: tasks.startDate,
+        endDate: tasks.endDate,
+        createdAt: tasks.createdAt,
+        updatedAt: tasks.updatedAt,
+    })
+    .from(tasks)
+    .innerJoin(taskAssignees, eq(taskAssignees.taskId, tasks.id))
+    .where(eq(taskAssignees.userId, userId))
+    .orderBy(desc(tasks.updatedAt));
+
+  if (limit) {
+    return await query.limit(limit);
+  }
+
+  return await query;
+
 }

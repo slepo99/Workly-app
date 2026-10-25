@@ -1,3 +1,4 @@
+
 <template>
   <div class="overflow-hidden rounded-lg border border-default">
     <div class="border-b border-default px-4 py-3">
@@ -52,230 +53,242 @@ const UButton = resolveComponent("UButton");
 
 const sorting = ref([]);
 
-const columns: TableColumn<TasksModel>[] = [
-  {
-    accessorKey: "id",
+const columns = computed<TableColumn<TasksModel>[]>(() => {
+  const result: TableColumn<TasksModel>[] = [
+    {
+      accessorKey: "id",
 
-    header: ({ column }) => getHeader(column, "ID"),
+      header: ({ column }) => getHeader(column, "ID"),
 
-    cell: ({ row }) =>
-      h(
-        "div",
-        {
-          class: "max-w-32 truncate text-muted",
-          title: row.original.id,
-        },
-        `#${row.original.id}`,
-      ),
-  },
-
-  {
-    accessorKey: "title",
-
-    header: ({ column }) => getHeader(column, "Task Name"),
-
-    cell: ({ row }) =>
-      h(
-        "div",
-        {
-          class: "max-w-48 truncate",
-          title: row.original.title,
-        },
-        row.original.title,
-      ),
-  },
-
-  {
-    accessorKey: "status",
-
-    header: ({ column }) => getHeader(column, "Status"),
-
-    cell: ({ row }) => {
-      const status = row.original.status;
-
-      const statusLabel =
-        getTaskStatuses.value.find((item) => item.value === status)?.label ??
-        status;
-
-      if (props.viewMode) {
-        return h(
-          "span",
+      cell: ({ row }) =>
+        h(
+          "div",
           {
-            class: [
-              "inline-flex rounded-full px-3 py-1 text-xs font-medium whitespace-nowrap",
-              getTaskStatusColors(status) ?? "",
-            ],
+            class: "max-w-32 truncate text-muted",
+            title: row.original.id,
           },
-          statusLabel,
-        );
-      }
+          `#${row.original.id}`,
+        ),
+    },
 
-      return h(USelect, {
-        modelValue: status,
-        items: getTaskStatuses.value,
-        valueKey: "value",
-        labelKey: "label",
-        size: "sm",
-        color: "neutral",
-        class: "w-36",
+    {
+      accessorKey: "title",
 
-        ui: {
-          base: `rounded-full ${
-            getTaskStatusColors(status) ?? ""
-          } outline-none ring-0`,
-        },
+      header: ({ column }) => getHeader(column, "Task Name"),
 
-        "onUpdate:modelValue": (value: string) => {
-          emit(
-            "update-status",
-            row.original.id,
-            value as TaskStatus,
+      cell: ({ row }) =>
+        h(
+          "div",
+          {
+            class: "max-w-48 truncate",
+            title: row.original.title,
+          },
+          row.original.title,
+        ),
+    },
+
+    {
+      accessorKey: "status",
+
+      header: ({ column }) => getHeader(column, "Status"),
+
+      cell: ({ row }) => {
+        const status = row.original.status;
+
+        const statusLabel =
+          getTaskStatuses.value.find((item) => item.value === status)?.label ??
+          status;
+
+        if (props.viewMode) {
+          return h(
+            "span",
+            {
+              class: [
+                "inline-flex rounded-full px-3 py-1 text-xs font-medium whitespace-nowrap",
+                getTaskStatusColors(status) ?? "",
+              ],
+            },
+            statusLabel,
           );
-        },
-      });
-    },
-  },
+        }
 
-  {
-    accessorKey: "startDate",
+        return h(USelect, {
+          modelValue: status,
+          items: getTaskStatuses.value,
+          valueKey: "value",
+          labelKey: "label",
+          size: "sm",
+          color: "neutral",
+          class: "w-36",
 
-    header: ({ column }) => getHeader(column, "Start Date"),
-
-    cell: ({ row }) => {
-      const startDate = row.original.startDate;
-
-      return startDate ? formatDate(startDate) : "—";
-    },
-  },
-
-  {
-    accessorKey: "endDate",
-
-    header: ({ column }) => getHeader(column, "End Date"),
-
-    cell: ({ row }) => {
-      const endDate = row.original.endDate;
-
-      return endDate ? formatDate(endDate) : "—";
-    },
-  },
-
-  {
-    accessorKey: "assignees",
-
-    header: "Assigned to",
-
-    cell: ({ row }) => {
-      const assignees = row.original.assignees;
-
-      if (!assignees.length) {
-        return h(
-          "span",
-          {
-            class: "text-muted",
+          ui: {
+            base: `rounded-full ${
+              getTaskStatusColors(status) ?? ""
+            } outline-none ring-0`,
           },
-          "—",
-        );
-      }
 
-      const groupKey = JSON.stringify([
-        row.original.id,
-        assignees.map((user) => [
-          user.id,
-          user.name,
-          user.avatar,
-        ]),
-      ]);
-
-      return h(
-        UAvatarGroup,
-        {
-          key: groupKey,
-          max: 3,
-        },
-        {
-          default: () =>
-            assignees.map((user) =>
-              h(UAvatar, {
-                key: user.id,
-                alt: user.name,
-                src: user.avatar ?? undefined,
-              }),
-            ),
-        },
-      );
+          "onUpdate:modelValue": (value: string) => {
+            emit(
+              "update-status",
+              row.original.id,
+              value as TaskStatus,
+            );
+          },
+        });
+      },
     },
-  },
 
-  {
-    accessorKey: "createdAt",
+    {
+      accessorKey: "startDate",
 
-    header: ({ column }) => getHeader(column, "Created At"),
+      header: ({ column }) => getHeader(column, "Start Date"),
 
-    cell: ({ row }) => formatDate(row.original.createdAt),
-  },
+      cell: ({ row }) => {
+        const startDate = row.original.startDate;
 
-  {
-    id: "actions",
-    header: "Actions",
-    enableSorting: false,
+        return startDate ? formatDate(startDate) : "—";
+      },
+    },
 
-    cell: ({ row }) => {
-      const viewButton = h(UButton, {
-        icon: "i-lucide-eye",
-        color: "neutral",
-        variant: "ghost",
-        size: "sm",
+    {
+      accessorKey: "endDate",
 
-        onClick: () => {
-          router.push(`/tasks/${row.original.id}`);
-        },
-      });
+      header: ({ column }) => getHeader(column, "End Date"),
 
-      if (props.viewMode) {
+      cell: ({ row }) => {
+        const endDate = row.original.endDate;
+
+        return endDate ? formatDate(endDate) : "—";
+      },
+    },
+  ];
+
+  const hasAssignees = props.tasks.some(
+    (task) => "assignees" in task,
+  );
+
+  if (hasAssignees) {
+    result.push({
+      accessorKey: "assignees",
+
+      header: "Assigned to",
+
+      cell: ({ row }) => {
+        const assignees = row.original.assignees;
+
+        if (!assignees || !assignees.length) {
+          return h(
+            "span",
+            {
+              class: "text-muted",
+            },
+            "—",
+          );
+        }
+
+        const groupKey = JSON.stringify([
+          row.original.id,
+          assignees.map((user) => [
+            user.id,
+            user.name,
+            user.avatar,
+          ]),
+        ]);
+
+        return h(
+          UAvatarGroup,
+          {
+            key: groupKey,
+            max: 3,
+          },
+          {
+            default: () =>
+              assignees.map((user) =>
+                h(UAvatar, {
+                  key: user.id,
+                  alt: user.name,
+                  src: user.avatar ?? undefined,
+                }),
+              ),
+          },
+        );
+      },
+    });
+  }
+
+  result.push(
+    {
+      accessorKey: "createdAt",
+
+      header: ({ column }) => getHeader(column, "Created At"),
+
+      cell: ({ row }) => formatDate(row.original.createdAt),
+    },
+
+    {
+      id: "actions",
+      header: "Actions",
+      enableSorting: false,
+
+      cell: ({ row }) => {
+        const viewButton = h(UButton, {
+          icon: "i-lucide-eye",
+          color: "neutral",
+          variant: "ghost",
+          size: "sm",
+
+          onClick: () => {
+            router.push(`/tasks/${row.original.id}`);
+          },
+        });
+
+        if (props.viewMode) {
+          return h(
+            "div",
+            {
+              class: "flex items-center gap-1",
+            },
+            [viewButton],
+          );
+        }
+
         return h(
           "div",
           {
             class: "flex items-center gap-1",
           },
-          [viewButton],
+          [
+            h(UButton, {
+              icon: "i-lucide-edit",
+              color: "neutral",
+              variant: "ghost",
+              size: "sm",
+
+              onClick: () => {
+                emit("edit-task", row.original.id);
+              },
+            }),
+
+            viewButton,
+
+            h(UButton, {
+              icon: "i-lucide-trash-2",
+              color: "error",
+              variant: "ghost",
+              size: "sm",
+
+              onClick: () => {
+                emit("delete", row.original.id);
+              },
+            }),
+          ],
         );
-      }
-
-      return h(
-        "div",
-        {
-          class: "flex items-center gap-1",
-        },
-        [
-          h(UButton, {
-            icon: "i-lucide-edit",
-            color: "neutral",
-            variant: "ghost",
-            size: "sm",
-
-            onClick: () => {
-              emit("edit-task", row.original.id);
-            },
-          }),
-
-          viewButton,
-
-          h(UButton, {
-            icon: "i-lucide-trash-2",
-            color: "error",
-            variant: "ghost",
-            size: "sm",
-
-            onClick: () => {
-              emit("delete", row.original.id);
-            },
-          }),
-        ],
-      );
+      },
     },
-  },
-];
+  );
+
+  return result;
+});
 
 function getHeader(
   column: Column<TasksModel>,

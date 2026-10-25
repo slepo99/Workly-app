@@ -1,4 +1,7 @@
 import type { UsersModelResponse, UsersStatsModel, UserModel } from "./types";
+import type { ProjectModel } from "../useProjectsApi/types";
+import type { TasksModel } from "../useTasksApi/types";
+
 import { USERS_PAGINATION } from "~/constants/api";
 export function useUsersApi() {
   const { $api } = useNuxtApp();
@@ -40,10 +43,20 @@ export function useUsersApi() {
     return $api<UserModel>(`${API.GET_USERS}/${userId}`)
   }
 
+  const getUserProjects = (userId: string) => {
+    return $api<ProjectModel[]>(`${API.GET_USERS}/${userId}/projects`)
+  }
+
+  const getUserTasks = (userId: string) => {
+    return $api<TasksModel[]>(`${API.GET_USERS}/${userId}/tasks`)
+  }
+
   return {
     getUsers,
     deleteUser,
     getUsersStats,
-    getUserById
+    getUserById,
+    getUserProjects,
+    getUserTasks
   };
 }
