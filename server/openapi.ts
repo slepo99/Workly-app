@@ -280,87 +280,57 @@ export const openapi = {
         },
       },
     },
-
-    "/users/{userId}/projects": {
+    "/users/{id}/grouped-tasks": {
       get: {
         tags: ["Users"],
-        operationId: "getProjectsByUserId",
-        summary: "Get projects by user ID",
+        summary: "Get user tasks grouped by projects",
         description:
-          "Returns projects belonging to the specified user, ordered by most recently updated first. If limit is provided, returns at most that many projects. Otherwise, returns all projects.",
-        security: cookieSecurity,
-        parameters: [
-          {
-            name: "userId",
-            in: "path",
-            required: true,
-            description: "User ID",
-            schema: { type: "string", format: "uuid" },
-          },
-          {
-            name: "limit",
-            in: "query",
-            required: false,
-            description:
-              "Maximum number of projects to return. Omit to return all projects.",
-            schema: {
-              type: "integer",
-              minimum: 1,
-              maximum: 100,
-              example: 4,
-            },
-          },
-        ],
-        responses: {
-          200: jsonResponse("User projects", {
-            type: "array",
-            items: ref("Project"),
-          }),
-          400: responseRef("ValidationError"),
-          401: responseRef("Unauthorized"),
-          403: responseRef("Forbidden"),
-        },
-      },
-    },
-
-    "/users/{id}/tasks": {
-      get: {
-        tags: ["Users"],
-        operationId: "getTasksByUserId",
-        summary: "Get tasks by user ID",
-        description:
-          "Returns tasks assigned to the specified user, ordered by most recently updated first. If limit is provided, returns at most that many tasks. Otherwise, returns all tasks.",
-        security: cookieSecurity,
+          "Returns tasks assigned to the specified user, grouped by projects. Results are filtered according to the authenticated user's access permissions and support pagination.",
         parameters: [
           {
             name: "id",
             in: "path",
             required: true,
-            description: "User ID",
-            schema: { type: "string", format: "uuid" },
+            schema: {
+              type: "string",
+              format: "uuid",
+            },
+            description: "ID of the target user",
+          },
+          {
+            name: "page",
+            in: "query",
+            required: false,
+            schema: {
+              type: "integer",
+              minimum: 1,
+              default: 1,
+            },
           },
           {
             name: "limit",
             in: "query",
             required: false,
-            description:
-              "Maximum number of tasks to return. Omit to return all tasks.",
             schema: {
               type: "integer",
               minimum: 1,
-              maximum: 100,
-              example: 4,
+              default: 10,
             },
           },
         ],
         responses: {
-          200: jsonResponse("User tasks", {
-            type: "array",
-            items: ref("Task"),
-          }),
-          400: responseRef("ValidationError"),
-          401: responseRef("Unauthorized"),
-          403: responseRef("Forbidden"),
+          200: {
+            description: "User tasks grouped by projects",
+          },
+          401: {
+            description: "Unauthorized",
+          },
+          403: {
+            description: "Forbidden",
+          },
+          404: {
+            description: "User not found",
+          },
         },
       },
     },

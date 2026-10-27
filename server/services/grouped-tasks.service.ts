@@ -6,9 +6,10 @@ import {
   inArray,
   or,
   sql,
+  eq
 } from "drizzle-orm";
 import { db } from "~~/server/db";
-import { projects, tasks } from "~~/server/db/schema";
+import { projects, tasks, taskAssignees } from "~~/server/db/schema";
 import type { Role } from "~~/server/constants/roles";
 import type { TaskStatus } from "~~/server/constants/taskStatuses";
 import type { TaskSort } from "~~/server/constants/taskSort";
@@ -156,5 +157,127 @@ export async function getGroupedTasks(
     total,
     totalPages: Math.ceil(total / limit),
     projects: projectsWithTasks,
+  };
+}
+export async function getGroupedTasksByUserId(
+  targetUserId: string,
+  viewerUserId: string,
+  viewerRole: Role,
+  page: number,
+  limit: number,
+) {
+  const offset = (page - 1) * limit;
+
+  const accessCondition = getTaskAccessCondition(
+    viewerUserId,
+    viewerRole,
+  );
+
+  const targetUserTasks = db
+    .select({
+      taskId: taskAssignees.taskId,
+    })
+    .from(taskAssignees)
+    .where(eq(taskAssignees.userId, targetUserId));
+
+  const taskWhereCondition = and(
+    accessCondition,
+    inArray(tasks.id, targetUserTasks),
+  );
+
+  const matchingProjectIds = db
+    .selectDistinct({
+      projectId: tasks.projectId,
+    })
+    .from(tasks)
+    .where(taskWhereCondition);
+
+  const [totalResult, projectList] = await Promise.all([
+    db
+      .select({
+        count: sql<number>`
+          cast(
+            count(distinct ${tasks.projectId})
+            as integer
+          )
+        `,
+      })
+      .from(tasks)
+      .where(taskWhereCondition),
+
+    db
+      .select()
+      .from(projects)
+      .where(inArray(projects.id, matchingProjectIds))
+      .orderBy(
+        desc(projects.updatedAt),
+        asc(projects.id),
+      )
+      .limit(limit)
+      .offset(offset),
+  ]);
+
+  const total = totalResult[0]?.count ?? 0;
+
+  if (!projectList.length) {
+    return {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+      projects: [],
+    };
+  }
+
+  const projectIds = projectList.map(
+    (project) => project.id,
+  );
+
+  const taskList = await db
+    .select()
+    .from(tasks)
+    .where(
+      and(
+        inArray(tasks.projectId, projectIds),
+        taskWhereCondition,
+      ),
+    )
+    .orderBy(
+      desc(tasks.updatedAt),
+      asc(tasks.id),
+    );
+
+  const taskIds = taskList.map((task) => task.id);
+
+  const assigneesByTaskId =
+    await getTaskAssigneesByTaskIds(taskIds);
+
+  const tasksWithAssignees = taskList.map((task) => ({
+    ...task,
+    assignees: assigneesByTaskId.get(task.id) ?? [],
+  }));
+
+  const tasksByProjectId = new Map<
+    string,
+    typeof tasksWithAssignees
+  >();
+
+  for (const task of tasksWithAssignees) {
+    const projectTasks =
+      tasksByProjectId.get(task.projectId) ?? [];
+
+    projectTasks.push(task);
+    tasksByProjectId.set(task.projectId, projectTasks);
+  }
+
+  return {
+    page,
+    limit,
+    total,
+    totalPages: Math.ceil(total / limit),
+    projects: projectList.map((project) => ({
+      ...project,
+      tasks: tasksByProjectId.get(project.id) ?? [],
+    })),
   };
 }

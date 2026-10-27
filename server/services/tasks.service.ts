@@ -281,29 +281,3 @@ export async function deleteTaskById(id: string) {
 
   return result[0];
 }
-
-export async function getTasksByUserId(userId: string, limit?: number) {
-   const query = db
-    .select({
-       id: tasks.id,
-        projectId: tasks.projectId,
-        title: tasks.title,
-        description: tasks.description,
-        status: tasks.status,
-        startDate: tasks.startDate,
-        endDate: tasks.endDate,
-        createdAt: tasks.createdAt,
-        updatedAt: tasks.updatedAt,
-    })
-    .from(tasks)
-    .innerJoin(taskAssignees, eq(taskAssignees.taskId, tasks.id))
-    .where(eq(taskAssignees.userId, userId))
-    .orderBy(desc(tasks.updatedAt));
-
-  if (limit) {
-    return await query.limit(limit);
-  }
-
-  return await query;
-
-}

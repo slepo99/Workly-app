@@ -82,3 +82,8 @@ export interface GetGroupedTasksParams {
   sort?: TaskSort;
   order?: TaskSortOrder;
 }
+export interface GetGroupedTasksByUserParams {
+  userId: string;
+  page?: number;
+  limit?: number;
+}

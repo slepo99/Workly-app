@@ -13,3 +13,8 @@ export const GROUPED_TASKS_PAGINATION = {
   PAGE: 1,
   LIMIT: 5,
 }
+
+export const USER_GROUPED_TASKS_PAGINATION = {
+  PAGE: 1,
+  LIMIT: 5,
+}

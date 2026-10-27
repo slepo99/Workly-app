@@ -5,9 +5,9 @@ import type {
   TaskUpdateModel,
   GroupedTasksResponseModel,
   GetGroupedTasksParams,
+  GetGroupedTasksByUserParams,
 } from "./types";
 import { GROUPED_TASKS_PAGINATION } from "~/constants/api";
-
 
 export function useTasksApi() {
   const { $api } = useNuxtApp();
@@ -68,6 +68,19 @@ export function useTasksApi() {
     });
   };
 
+  const getGroupedTasksByUserId = ({
+    userId,
+    page = GROUPED_TASKS_PAGINATION.PAGE,
+    limit = GROUPED_TASKS_PAGINATION.LIMIT,
+  }: GetGroupedTasksByUserParams) => {
+    return $api<GroupedTasksResponseModel>(`/users/${userId}/grouped-tasks`, {
+      query: {
+        page,
+        limit,
+      },
+    });
+  };
+
   return {
     getTasks,
     getProjectTasks,
@@ -75,5 +88,6 @@ export function useTasksApi() {
     postTask,
     deleteTask,
     getGroupedTasks,
+    getGroupedTasksByUserId
   };
 }

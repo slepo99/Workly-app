@@ -42,21 +42,12 @@ export function useUsersApi() {
   const getUserById = (userId: string) => {
     return $api<UserModel>(`${API.GET_USERS}/${userId}`)
   }
-
-  const getUserProjects = (userId: string) => {
-    return $api<ProjectModel[]>(`${API.GET_USERS}/${userId}/projects`)
-  }
-
-  const getUserTasks = (userId: string) => {
-    return $api<TasksModel[]>(`${API.GET_USERS}/${userId}/tasks`)
-  }
-
+  
   return {
     getUsers,
     deleteUser,
     getUsersStats,
     getUserById,
-    getUserProjects,
-    getUserTasks
+
   };
 }

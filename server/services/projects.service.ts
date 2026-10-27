@@ -398,29 +398,5 @@ export async function getAvailableUsersByProjectId(projectId: string) {
   return availableUsers;
 }
 
-export async function getProjectsByUserId(
-  userId: string,
-  limit?: number,
-) {
-  const query = db
-    .select({
-      id: projects.id,
-      name: projects.name,
-      description: projects.description,
-      status: projects.status,
-      image: projects.image,
-      createdAt: projects.createdAt,
-      updatedAt: projects.updatedAt,
-    })
-    .from(projects)
-    .innerJoin(projectMembers, eq(projectMembers.projectId, projects.id))
-    .where(eq(projectMembers.userId, userId))
-    .orderBy(desc(projects.updatedAt));
 
-  if (limit) {
-    return await query.limit(limit);
-  }
-
-  return await query;
-}
 
