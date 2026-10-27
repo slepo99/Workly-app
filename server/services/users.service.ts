@@ -1,8 +1,15 @@
 import { db } from "~~/server/db";
-import { users } from "~~/server/db/schema";
+import {
+  projectMembers,
+  projects,
+  users,
+  tasks,
+  taskAssignees,
+} from "~~/server/db/schema";
 import { eq, ilike, count, asc, or, and } from "drizzle-orm";
 import { ROLES, type Role } from "~~/server/constants/roles";
 import { deleteImageByUrl } from "~~/server/services/uploads.service";
+import { TASK_STATUSES } from "../constants/taskStatuses";
 
 const publicUserFields = {
   id: users.id,
@@ -174,6 +181,91 @@ export async function getUsersStats() {
     totalUsers: total,
     totalAdmins,
     totalManagers,
-    totalWorkers
+    totalWorkers,
   };
+}
+export async function getUserPersonalStats(userId: string) {
+  const result = await db
+  .select({
+    projectId: projectMembers.projectId,
+  })
+  .from(projectMembers)
+  .where(eq(projectMembers.userId, userId));
+
+console.log(result);
+  const [projectsCount, activeTasks, completedTasks, pendingTasks, tasksCount] =
+    await Promise.all([
+      db
+        .select({
+          count: count(),
+        })
+        .from(projects)
+        .innerJoin(projectMembers, eq(projectMembers.userId, userId))
+        .where(eq(projects.id, projectMembers.projectId)),
+
+      db
+        .select({
+          count: count(),
+        })
+        .from(tasks)
+        .innerJoin(taskAssignees, eq(taskAssignees.taskId, tasks.id))
+        .where(
+          and(
+            eq(taskAssignees.userId, userId),
+            eq(tasks.status, TASK_STATUSES.IN_PROGRESS),
+          ),
+        ),
+
+      db
+        .select({
+          count: count(),
+        })
+        .from(tasks)
+        .innerJoin(taskAssignees, eq(taskAssignees.taskId, tasks.id))
+        .where(
+          and(
+            eq(taskAssignees.userId, userId),
+            eq(tasks.status, TASK_STATUSES.COMPLETED),
+          ),
+        ),
+      db
+        .select({
+          count: count(),
+        })
+        .from(tasks)
+        .innerJoin(taskAssignees, eq(taskAssignees.taskId, tasks.id))
+        .where(
+          and(
+            eq(taskAssignees.userId, userId),
+            eq(tasks.status, TASK_STATUSES.PENDING),
+          ),
+        ),
+
+      db
+        .select({
+          count: count(),
+        })
+        .from(tasks)
+        .innerJoin(taskAssignees, eq(taskAssignees.taskId, tasks.id))
+        .where(eq(taskAssignees.userId, userId)),
+    ]);
+  const projectsCountValue = projectsCount[0]?.count ?? 0;
+  const activeTasksCount = activeTasks[0]?.count ?? 0;
+  const completedTasksCount = completedTasks[0]?.count ?? 0;
+  const pendingTasksCount = pendingTasks[0]?.count ?? 0;
+  const totalTasksCount = tasksCount[0]?.count ?? 0;
+
+  const tasksCompletitionRate =
+    totalTasksCount === 0
+      ? 0
+      : Math.round((completedTasksCount / totalTasksCount) * 100);
+
+  return {
+    proejctsCount: projectsCountValue,
+    activeTasks: activeTasksCount,
+    completedTasks: completedTasksCount,
+    pendingTasks: pendingTasksCount,
+    totalTasks: totalTasksCount,
+    tasksCompletitionRate
+  }
 }

@@ -79,9 +79,9 @@
 import { useUsers } from "~/composables/pages/useUsers";
 import { useUsersStore } from "~/stores/users";
 import { USERS_PAGINATION } from "~/constants/api";
-definePageMeta({
-  middleware: ["management"],
-});
+// definePageMeta({
+//   middleware: ["management"],
+// });
 
 const {
   onFirstLoadUsers,

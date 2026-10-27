@@ -38,15 +38,20 @@ const items = computed<NavigationMenuItem[]>(() => [
     to: "/projects",
     active: route.path.startsWith("/projects"),
   },
-  ...(isManagement.value
-    ? [
-        {
-          label: t("navigation.users"),
-          to: "/users",
-          active: route.path.startsWith("/users"),
-        },
-      ]
-    : []),
+  // ...(isManagement.value
+  //   ? [
+  //       {
+  //         label: t("navigation.users"),
+  //         to: "/users",
+  //         active: route.path.startsWith("/users"),
+  //       },
+  //     ]
+  //   : []),
+  {
+    label: t("navigation.users"),
+    to: "/users",
+    active: route.path.startsWith("/users"),
+  },
   {
     label: t("navigation.tasks"),
     to: "/tasks",

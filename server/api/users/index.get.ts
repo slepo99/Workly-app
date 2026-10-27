@@ -3,7 +3,7 @@ import { requireRole } from "~~/server/utils/requireRole";
 import { getUsers } from "~~/server/services/users.service";
 
 export default defineEventHandler(async (event) => {
-  await requireRole(event, ROLE_GROUPS.MANAGEMENT);
+  await requireRole(event, ROLE_GROUPS.ALL);
   const query = getQuery(event);
   const page = Number(query.page) || 1;
   const limit = Number(query.limit) || 12;

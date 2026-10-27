@@ -5,7 +5,7 @@ import { requireRole } from "~~/server/utils/requireRole";
 export default defineEventHandler(async (event) => {
   const currentUser = await requireRole(
     event,
-    ROLE_GROUPS.MANAGEMENT,
+    ROLE_GROUPS.ALL,
   );
 
   const targetUserId = getRouterParam(event, "id");

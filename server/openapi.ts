@@ -367,6 +367,73 @@ export const openapi = {
       },
     },
 
+    "/users/{id}/personal-stats": {
+      get: {
+        tags: ["Users"],
+        summary: "Get user personal statistics",
+        description: "Returns personal statistics for the specified user.",
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: {
+              type: "string",
+              format: "uuid",
+            },
+            description: "ID of the user",
+          },
+        ],
+        responses: {
+          200: {
+            description: "User personal statistics",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    projectsCount: {
+                      type: "integer",
+                      example: 5,
+                    },
+                    activeTasksCount: {
+                      type: "integer",
+                      example: 3,
+                    },
+                    completedTasksCount: {
+                      type: "integer",
+                      example: 12,
+                    },
+                    pendingTasksCount: {
+                      type: "integer",
+                      example: 4,
+                    },
+                    totalTasksCount: {
+                      type: "integer",
+                      example: 19,
+                    },
+                    tasksCompletitionRate: {
+                      type: "integer",
+                      example: 63,
+                    },
+                  },
+                },
+              },
+            },
+          },
+          400: {
+            description: "User ID is required",
+          },
+          401: {
+            description: "Unauthorized",
+          },
+          403: {
+            description: "Forbidden",
+          },
+        },
+      },
+    },
+
     "/projects": {
       get: {
         tags: ["Projects"],
